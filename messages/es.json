@@ -15,7 +15,8 @@
     "yes": "Sí",
     "no": "No",
     "confirm": "Confirmar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "print": "Imprimir"
   },
   "nav": {
     "dashboard": "Dashboard",

@@ -306,7 +306,9 @@ export function CustomerListSortable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => window.open(`/customers/${customer.id}`, '_blank')}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           {tCommon('view')}
                         </DropdownMenuItem>

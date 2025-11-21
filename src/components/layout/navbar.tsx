@@ -41,6 +41,12 @@ export function Navbar() {
     setCurrentLocale(cookieLocale || 'es')
   }, [])
 
+  // Hide navbar on customer view page (/customers/[id])
+  const isCustomerViewPage = pathname.startsWith('/customers/') && pathname !== '/customers'
+  if (isCustomerViewPage) {
+    return null
+  }
+
   const navigation = [
     { name: t('dashboard'), href: '/', icon: LayoutDashboard },
     { name: t('customers'), href: '/customers', icon: Users },
