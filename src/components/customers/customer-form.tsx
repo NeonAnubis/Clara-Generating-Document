@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -50,6 +51,10 @@ const getInitialFormData = (customer?: Customer | null) => ({
 })
 
 export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormProps) {
+  const t = useTranslations('customerForm')
+  const tCustomers = useTranslations('customers')
+  const tCommon = useTranslations('common')
+
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState(getInitialFormData(customer))
   const [mounted, setMounted] = useState(false)
@@ -100,7 +105,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {customer ? 'Editar Cliente' : 'Nuevo Cliente'}
+            {customer ? tCustomers('editCustomer') : tCustomers('newCustomer')}
           </DialogTitle>
         </DialogHeader>
 
@@ -108,11 +113,11 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
           {/* Personal Information */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground">
-              Información Personal
+              {t('personalInfo')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Nombre *</Label>
+                <Label htmlFor="firstName">{t('firstName')} *</Label>
                 <Input
                   id="firstName"
                   value={formData.firstName}
@@ -121,7 +126,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Apellido *</Label>
+                <Label htmlFor="lastName">{t('lastName')} *</Label>
                 <Input
                   id="lastName"
                   value={formData.lastName}
@@ -130,7 +135,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Correo Electrónico</Label>
+                <Label htmlFor="email">{t('emailAddress')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -139,7 +144,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
+                <Label htmlFor="phone">{t('phoneNumber')}</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -147,7 +152,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="mobile">Celular</Label>
+                <Label htmlFor="mobile">{t('mobile')}</Label>
                 <Input
                   id="mobile"
                   value={formData.mobile}
@@ -160,17 +165,17 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
           {/* Identification */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground">
-              Identificación
+              {t('identification')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="idType">Tipo de Identificación</Label>
+                <Label htmlFor="idType">{t('idType')}</Label>
                 <Select
                   value={formData.idType}
                   onValueChange={(value) => setFormData({ ...formData, idType: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar..." />
+                    <SelectValue placeholder={tCommon('select')} />
                   </SelectTrigger>
                   <SelectContent>
                     {ID_TYPES.map((type) => (
@@ -182,7 +187,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="idNumber">Número de Identificación</Label>
+                <Label htmlFor="idNumber">{t('idNumber')}</Label>
                 <Input
                   id="idNumber"
                   value={formData.idNumber}
@@ -195,11 +200,11 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
           {/* Address */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground">
-              Dirección
+              {t('address')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-2">
-                <Label htmlFor="address">Dirección</Label>
+                <Label htmlFor="address">{t('addressLabel')}</Label>
                 <Input
                   id="address"
                   value={formData.address}
@@ -207,7 +212,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="city">Ciudad</Label>
+                <Label htmlFor="city">{t('city')}</Label>
                 <Input
                   id="city"
                   value={formData.city}
@@ -215,7 +220,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state">Provincia</Label>
+                <Label htmlFor="state">{t('province')}</Label>
                 <Input
                   id="state"
                   value={formData.state}
@@ -223,7 +228,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="country">País</Label>
+                <Label htmlFor="country">{t('country')}</Label>
                 <Input
                   id="country"
                   value={formData.country}
@@ -231,7 +236,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="postalCode">Código Postal</Label>
+                <Label htmlFor="postalCode">{t('postalCode')}</Label>
                 <Input
                   id="postalCode"
                   value={formData.postalCode}
@@ -244,11 +249,11 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
           {/* Company Information */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground">
-              Información de Empresa
+              {t('companyInfo')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="companyName">Nombre de Empresa</Label>
+                <Label htmlFor="companyName">{t('companyName')}</Label>
                 <Input
                   id="companyName"
                   value={formData.companyName}
@@ -256,7 +261,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="companyId">Cédula Jurídica</Label>
+                <Label htmlFor="companyId">{t('companyId')}</Label>
                 <Input
                   id="companyId"
                   value={formData.companyId}
@@ -264,7 +269,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="position">Puesto</Label>
+                <Label htmlFor="position">{t('position')}</Label>
                 <Input
                   id="position"
                   value={formData.position}
@@ -277,17 +282,17 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
           {/* Additional Information */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground">
-              Información Adicional
+              {t('additionalInfo')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="category">Categoría</Label>
+                <Label htmlFor="category">{tCustomers('category')}</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => setFormData({ ...formData, category: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar..." />
+                    <SelectValue placeholder={tCommon('select')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CUSTOMER_CATEGORIES.map((cat) => (
@@ -299,7 +304,7 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Estado</Label>
+                <Label htmlFor="status">{tCustomers('status')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -308,14 +313,14 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Activo</SelectItem>
-                    <SelectItem value="inactive">Inactivo</SelectItem>
-                    <SelectItem value="pending">Pendiente</SelectItem>
+                    <SelectItem value="active">{tCustomers('statusActive')}</SelectItem>
+                    <SelectItem value="inactive">{tCustomers('statusInactive')}</SelectItem>
+                    <SelectItem value="pending">{tCustomers('statusPending')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="col-span-2 space-y-2">
-                <Label htmlFor="notes">Notas</Label>
+                <Label htmlFor="notes">{t('notes')}</Label>
                 <Textarea
                   id="notes"
                   value={formData.notes}
@@ -328,10 +333,10 @@ export function CustomerForm({ customer, open, onClose, onSave }: CustomerFormPr
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
+              {tCommon('cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar'}
+              {loading ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         </form>

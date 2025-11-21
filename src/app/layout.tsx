@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/sidebar";
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { Navbar } from "@/components/layout/navbar";
 import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
@@ -20,26 +22,31 @@ export const metadata: Metadata = {
   description: "Sistema de gestión de clientes y generación automática de documentos",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <div className="flex h-screen">
-          <Sidebar />
-          <main className="flex-1 overflow-auto bg-background">
-            <div className="container mx-auto p-6">
-              {children}
-            </div>
-          </main>
-        </div>
-        <Toaster />
+        <NextIntlClientProvider messages={messages}>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1 bg-background">
+              <div className="container mx-auto p-6">
+                {children}
+              </div>
+            </main>
+          </div>
+          <Toaster />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

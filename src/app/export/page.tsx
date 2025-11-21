@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -17,6 +18,9 @@ import { CUSTOMER_FIELDS } from '@/lib/types'
 import { FileSpreadsheet, FileText, Download } from 'lucide-react'
 
 export default function ExportPage() {
+  const t = useTranslations('export')
+  const tCommon = useTranslations('common')
+
   const [customers, setCustomers] = useState<Customer[]>([])
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [loading, setLoading] = useState(true)
@@ -132,15 +136,15 @@ export default function ExportPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Cargando...</div>
+    return <div className="text-center py-8">{tCommon('loading')}</div>
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Exportar Datos</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Genere archivos Excel o documentos Word con la información de sus clientes
+          {t('description')}
         </p>
       </div>
 
@@ -148,11 +152,11 @@ export default function ExportPage() {
         <TabsList>
           <TabsTrigger value="excel" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
-            Excel
+            {t('excel')}
           </TabsTrigger>
           <TabsTrigger value="word" className="gap-2">
             <FileText className="h-4 w-4" />
-            Word
+            {t('word')}
           </TabsTrigger>
         </TabsList>
 
@@ -160,9 +164,9 @@ export default function ExportPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Seleccionar Clientes</CardTitle>
+                <CardTitle>{t('selectCustomers')}</CardTitle>
                 <CardDescription>
-                  Elija los clientes a incluir en el archivo Excel
+                  {t('selectCustomersDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -174,7 +178,7 @@ export default function ExportPage() {
                       onCheckedChange={toggleAllCustomers}
                     />
                     <label htmlFor="all-customers" className="text-sm font-medium">
-                      Seleccionar todos ({customers.length})
+                      {tCommon('selectAll')} ({customers.length})
                     </label>
                   </div>
                   {customers.map(customer => (
@@ -200,9 +204,9 @@ export default function ExportPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Campos a Exportar</CardTitle>
+                <CardTitle>{t('fieldsToExport')}</CardTitle>
                 <CardDescription>
-                  Seleccione las columnas para el archivo Excel
+                  {t('fieldsToExportDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -231,7 +235,7 @@ export default function ExportPage() {
               size="lg"
             >
               <Download className="mr-2 h-4 w-4" />
-              {exporting ? 'Exportando...' : 'Exportar a Excel'}
+              {exporting ? t('exporting') : t('exportToExcel')}
             </Button>
           </div>
         </TabsContent>
@@ -240,9 +244,9 @@ export default function ExportPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Seleccionar Cliente</CardTitle>
+                <CardTitle>{t('selectCustomer')}</CardTitle>
                 <CardDescription>
-                  Elija el cliente para generar el documento
+                  {t('selectCustomerDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -251,7 +255,7 @@ export default function ExportPage() {
                   onValueChange={setSelectedCustomerId}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccione un cliente..." />
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map(customer => (
@@ -267,9 +271,9 @@ export default function ExportPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Seleccionar Plantilla</CardTitle>
+                <CardTitle>{t('selectTemplate')}</CardTitle>
                 <CardDescription>
-                  Elija la plantilla de documento a generar
+                  {t('selectTemplateDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -278,7 +282,7 @@ export default function ExportPage() {
                   onValueChange={setSelectedTemplateId}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccione una plantilla..." />
+                    <SelectValue placeholder={t('selectTemplatePlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {templates.map(template => (
@@ -295,7 +299,7 @@ export default function ExportPage() {
                 </Select>
                 {templates.length === 0 && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    No hay plantillas activas. Cree una en la sección de Plantillas.
+                    {t('noActiveTemplates')}
                   </p>
                 )}
               </CardContent>
@@ -309,7 +313,7 @@ export default function ExportPage() {
               size="lg"
             >
               <Download className="mr-2 h-4 w-4" />
-              {exporting ? 'Generando...' : 'Generar Documento Word'}
+              {exporting ? t('generating') : t('generateWord')}
             </Button>
           </div>
         </TabsContent>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,9 @@ interface TemplateFormProps {
 }
 
 export function TemplateForm({ template, open, onClose, onSave }: TemplateFormProps) {
+  const t = useTranslations('templates')
+  const tCommon = useTranslations('common')
+
   const [loading, setLoading] = useState(false)
   const existingMappings = template?.fieldMappings
     ? JSON.parse(template.fieldMappings)
@@ -78,47 +82,47 @@ export function TemplateForm({ template, open, onClose, onSave }: TemplateFormPr
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {template ? 'Editar Plantilla' : 'Nueva Plantilla'}
+            {template ? t('editTemplate') : t('newTemplate')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre de Plantilla *</Label>
+              <Label htmlFor="name">{t('templateName')} *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ej: Contrato de Servicios"
+                placeholder={t('templateNamePlaceholder')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Categoría</Label>
+              <Label htmlFor="category">{t('categoryLabel')}</Label>
               <Input
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="Ej: Contratos, Cartas, Facturas"
+                placeholder={t('categoryPlaceholder')}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">{t('descriptionLabel')}</Label>
             <Input
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Descripción breve de la plantilla"
+              placeholder={t('descriptionPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Campos a Utilizar</Label>
+            <Label>{t('fieldsToUse')}</Label>
             <p className="text-sm text-muted-foreground mb-2">
-              Seleccione los campos del cliente que utilizará en esta plantilla
+              {t('fieldsDescription')}
             </p>
             <div className="grid grid-cols-3 gap-2 p-4 border rounded-lg bg-muted/30">
               {CUSTOMER_FIELDS.map((field) => (
@@ -140,9 +144,9 @@ export function TemplateForm({ template, open, onClose, onSave }: TemplateFormPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Contenido de la Plantilla *</Label>
+            <Label htmlFor="content">{t('templateContent')} *</Label>
             <p className="text-sm text-muted-foreground">
-              Use {'{{campo}}'} para insertar datos del cliente. Ejemplo: {'{{firstName}}'}, {'{{lastName}}'}, {'{{companyName}}'}
+              {t('templateContentHelp')}
             </p>
             <Textarea
               id="content"
@@ -172,16 +176,16 @@ Firma: _____________________`}
               }
             />
             <label htmlFor="isActive" className="text-sm">
-              Plantilla activa
+              {t('templateActive')}
             </label>
           </div>
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
+              {tCommon('cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar'}
+              {loading ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         </form>

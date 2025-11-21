@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { DocumentTemplate } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +27,9 @@ interface TemplateListProps {
 }
 
 export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps) {
+  const t = useTranslations('templates')
+  const tCommon = useTranslations('common')
+
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
@@ -48,7 +52,7 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
   }, [])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Está seguro de eliminar esta plantilla?')) return
+    if (!confirm(t('deleteConfirm'))) return
 
     try {
       await fetch(`/api/templates/${id}`, { method: 'DELETE' })
@@ -69,7 +73,7 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
   }
 
   if (loading) {
-    return <div className="text-center py-8">Cargando plantillas...</div>
+    return <div className="text-center py-8">{t('loadingTemplates')}</div>
   }
 
   return (
@@ -77,15 +81,15 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
       <div className="flex justify-end">
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Nueva Plantilla
+          {t('newTemplate')}
         </Button>
       </div>
 
       {templates.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <FileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
-          <p>No hay plantillas creadas</p>
-          <p className="text-sm">Cree una plantilla para comenzar a generar documentos</p>
+          <p>{t('noTemplates')}</p>
+          <p className="text-sm">{t('createToStart')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -115,14 +119,14 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(template)}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          Editar
+                          {tCommon('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(template.id)}
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
+                          {tCommon('delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -135,7 +139,7 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
                     <Badge variant="secondary">{template.category}</Badge>
                   )}
                   <Badge variant={template.isActive ? 'default' : 'outline'}>
-                    {template.isActive ? 'Activa' : 'Inactiva'}
+                    {template.isActive ? t('active') : t('inactive')}
                   </Badge>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground line-clamp-2">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Customer } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -45,6 +46,9 @@ interface CustomerListProps {
 }
 
 export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }: CustomerListProps) {
+  const t = useTranslations('customers')
+  const tCommon = useTranslations('common')
+
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -108,9 +112,9 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
       pending: 'destructive',
     }
     const labels: Record<string, string> = {
-      active: 'Activo',
-      inactive: 'Inactivo',
-      pending: 'Pendiente',
+      active: t('statusActive'),
+      inactive: t('statusInactive'),
+      pending: t('statusPending'),
     }
     return (
       <Badge variant={variants[status] || 'default'}>
@@ -125,7 +129,7 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar clientes..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -133,7 +137,7 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
         </div>
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Nuevo Cliente
+          {t('newCustomer')}
         </Button>
       </div>
 
@@ -142,12 +146,12 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
           <TableHeader>
             <TableRow>
               {selectable && <TableHead className="w-12"></TableHead>}
-              <TableHead>Nombre</TableHead>
-              <TableHead>Correo</TableHead>
-              <TableHead>Teléfono</TableHead>
-              <TableHead>Empresa</TableHead>
-              <TableHead>Categoría</TableHead>
-              <TableHead>Estado</TableHead>
+              <TableHead>{t('name')}</TableHead>
+              <TableHead>{t('email')}</TableHead>
+              <TableHead>{t('phone')}</TableHead>
+              <TableHead>{t('company')}</TableHead>
+              <TableHead>{t('category')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -155,13 +159,13 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
             {loading ? (
               <TableRow>
                 <TableCell colSpan={selectable ? 8 : 7} className="text-center py-8">
-                  Cargando...
+                  {tCommon('loading')}
                 </TableCell>
               </TableRow>
             ) : customers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={selectable ? 8 : 7} className="text-center py-8 text-muted-foreground">
-                  No se encontraron clientes
+                  {t('noCustomersFound')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -200,14 +204,14 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(customer)}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          Editar
+                          {tCommon('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(customer.id)}
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
+                          {tCommon('delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -229,15 +233,15 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteCustomer')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El cliente será eliminado permanentemente del sistema.
+              {t('deleteConfirmation')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Eliminar
+              {tCommon('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
