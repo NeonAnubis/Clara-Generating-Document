@@ -8,7 +8,8 @@ export async function POST(request: NextRequest) {
     const { customerId, templateId } = data
 
     // Get customer
-    const customer = await prisma.customer.findUnique({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customer = await (prisma.customer as any).findUnique({
       where: { id: customerId },
     })
 
