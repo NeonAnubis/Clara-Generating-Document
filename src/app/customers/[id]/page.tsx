@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
-import { Printer } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 
 interface PersonInfo {
   lastName: string
@@ -52,6 +52,18 @@ interface CustomerData {
   nominalValueOfCuotas: string
   numberOfCuotasToBeIssued: string
   natureOfBusiness: string
+}
+
+const emptyPersonInfo: PersonInfo = {
+  lastName: '', givenNames: '', fullAddress: '', passportNumber: '',
+  expiryDate: '', dateOfBirth: '', placeOfBirth: '', countryOfTaxResidency: '',
+  emailAddress: '', telephoneNumber: '', profession: '', maritalStatus: '',
+  numberOfSharesHeld: '', ownershipPercentage: ''
+}
+
+const emptyCorporate: CorporateCuotaholder = {
+  companyName: '', registeredAddress: '', taxIdRegistration: '',
+  jurisdiction: '', dateOfIncorporation: '', uboSameAsNewCompany: false, numberOfSharesHeld: ''
 }
 
 // Header Component
@@ -105,7 +117,10 @@ export default function CustomerViewPage() {
   const tCommon = useTranslations('common')
 
   const [customer, setCustomer] = useState<CustomerData | null>(null)
+  const [formData, setFormData] = useState<CustomerData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
@@ -115,6 +130,7 @@ export default function CustomerViewPage() {
         if (response.ok) {
           const data = await response.json()
           setCustomer(data)
+          setFormData(data)
         }
       } catch (error) {
         console.error('Error fetching customer:', error)
@@ -125,8 +141,81 @@ export default function CustomerViewPage() {
     fetchCustomer()
   }, [id])
 
-  const handlePrint = () => {
-    window.print()
+  const handleEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setFormData(customer)
+    setIsEditing(false)
+  }
+
+  const handleSave = async () => {
+    if (!formData) return
+    setSaving(true)
+    try {
+      const response = await fetch(`/api/customers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (response.ok) {
+        // Re-fetch to get parsed JSON fields
+        const refetchResponse = await fetch(`/api/customers/${id}`)
+        if (refetchResponse.ok) {
+          const refetchedData = await refetchResponse.json()
+          setCustomer(refetchedData)
+          setFormData(refetchedData)
+        }
+        setIsEditing(false)
+      }
+    } catch (error) {
+      console.error('Error saving customer:', error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Ensure arrays have 4 items for display
+  const ensureArrayLength = <T,>(arr: T[], emptyItem: T, length: number = 4): T[] => {
+    const result = [...(arr || [])]
+    while (result.length < length) {
+      result.push({ ...emptyItem })
+    }
+    return result
+  }
+
+  const updateFormData = (field: keyof CustomerData, value: unknown) => {
+    if (!formData) return
+    setFormData({ ...formData, [field]: value })
+  }
+
+  const updateIndividualCuotaholder = (index: number, field: keyof PersonInfo, value: string) => {
+    if (!formData) return
+    const updated = ensureArrayLength(formData.individualCuotaholders || [], emptyPersonInfo)
+    updated[index] = { ...updated[index], [field]: value }
+    setFormData({ ...formData, individualCuotaholders: updated })
+  }
+
+  const updateCorporateCuotaholder = (index: number, field: keyof CorporateCuotaholder, value: string | boolean) => {
+    if (!formData) return
+    const updated = ensureArrayLength(formData.corporateCuotaholders || [], emptyCorporate)
+    updated[index] = { ...updated[index], [field]: value }
+    setFormData({ ...formData, corporateCuotaholders: updated })
+  }
+
+  const updateUbo = (index: number, field: keyof PersonInfo, value: string) => {
+    if (!formData) return
+    const updated = ensureArrayLength(formData.ubos || [], emptyPersonInfo)
+    updated[index] = { ...updated[index], [field]: value }
+    setFormData({ ...formData, ubos: updated })
+  }
+
+  const updateDirector = (index: number, field: keyof PersonInfo, value: string) => {
+    if (!formData) return
+    const updated = ensureArrayLength(formData.directors || [], emptyPersonInfo)
+    updated[index] = { ...updated[index], [field]: value }
+    setFormData({ ...formData, directors: updated })
   }
 
   if (loading) {
@@ -137,7 +226,7 @@ export default function CustomerViewPage() {
     )
   }
 
-  if (!customer) {
+  if (!formData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Customer not found</p>
@@ -145,31 +234,14 @@ export default function CustomerViewPage() {
     )
   }
 
-  // Ensure arrays have 4 items for display
-  const ensureArrayLength = <T,>(arr: T[], emptyItem: T, length: number = 4): T[] => {
-    const result = [...arr]
-    while (result.length < length) {
-      result.push(emptyItem)
-    }
-    return result
-  }
+  const individualCuotaholders = ensureArrayLength(formData.individualCuotaholders || [], emptyPersonInfo)
+  const corporateCuotaholders = ensureArrayLength(formData.corporateCuotaholders || [], emptyCorporate)
+  const ubos = ensureArrayLength(formData.ubos || [], emptyPersonInfo)
+  const directors = ensureArrayLength(formData.directors || [], emptyPersonInfo)
 
-  const emptyPersonInfo: PersonInfo = {
-    lastName: '', givenNames: '', fullAddress: '', passportNumber: '',
-    expiryDate: '', dateOfBirth: '', placeOfBirth: '', countryOfTaxResidency: '',
-    emailAddress: '', telephoneNumber: '', profession: '', maritalStatus: '',
-    numberOfSharesHeld: '', ownershipPercentage: ''
-  }
-
-  const emptyCorporate: CorporateCuotaholder = {
-    companyName: '', registeredAddress: '', taxIdRegistration: '',
-    jurisdiction: '', dateOfIncorporation: '', uboSameAsNewCompany: false, numberOfSharesHeld: ''
-  }
-
-  const individualCuotaholders = ensureArrayLength(customer.individualCuotaholders || [], emptyPersonInfo)
-  const corporateCuotaholders = ensureArrayLength(customer.corporateCuotaholders || [], emptyCorporate)
-  const ubos = ensureArrayLength(customer.ubos || [], emptyPersonInfo)
-  const directors = ensureArrayLength(customer.directors || [], emptyPersonInfo)
+  const inputClassName = isEditing ? 'h-8 text-sm border-slate-300' : 'h-8 text-sm border-slate-300 bg-slate-50'
+  const textareaClassName = isEditing ? 'text-sm h-16 resize-none' : 'text-sm h-16 resize-none bg-slate-50'
+  const largeInputClassName = isEditing ? 'max-w-xs text-2xl h-12' : 'max-w-xs text-2xl h-12 bg-slate-50'
 
   const renderPage1 = () => (
     <>
@@ -190,32 +262,57 @@ export default function CustomerViewPage() {
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 w-48 text-sm font-medium">{t('primaryContactName')}</td>
                 <td className="px-2 py-2">
-                  <Input value={customer.primaryContactName || ''} readOnly className="h-8 text-sm border-slate-300 bg-slate-50" />
+                  <Input
+                    value={formData.primaryContactName || ''}
+                    onChange={(e) => updateFormData('primaryContactName', e.target.value)}
+                    readOnly={!isEditing}
+                    className={inputClassName}
+                  />
                 </td>
               </tr>
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('primaryContactEmail')}</td>
                 <td className="px-2 py-2">
-                  <Input value={customer.primaryContactEmail || ''} readOnly className="h-8 text-sm border-slate-300 bg-slate-50" />
+                  <Input
+                    value={formData.primaryContactEmail || ''}
+                    onChange={(e) => updateFormData('primaryContactEmail', e.target.value)}
+                    readOnly={!isEditing}
+                    className={inputClassName}
+                  />
                 </td>
               </tr>
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactName')}</td>
                 <td className="px-2 py-2">
-                  <Input value={customer.secondaryContactName || ''} readOnly className="h-8 text-sm border-slate-300 bg-slate-50" />
+                  <Input
+                    value={formData.secondaryContactName || ''}
+                    onChange={(e) => updateFormData('secondaryContactName', e.target.value)}
+                    readOnly={!isEditing}
+                    className={inputClassName}
+                  />
                 </td>
               </tr>
               <tr>
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactEmail')}</td>
                 <td className="px-2 py-2">
-                  <Input value={customer.secondaryContactEmail || ''} readOnly className="h-8 text-sm border-slate-300 bg-slate-50" />
+                  <Input
+                    value={formData.secondaryContactEmail || ''}
+                    onChange={(e) => updateFormData('secondaryContactEmail', e.target.value)}
+                    readOnly={!isEditing}
+                    className={inputClassName}
+                  />
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
         <div className="flex items-center gap-2 mt-3">
-          <Checkbox id="onlyPrimarySecondary" checked={customer.onlyPrimarySecondaryNotified} disabled />
+          <Checkbox
+            id="onlyPrimarySecondary"
+            checked={formData.onlyPrimarySecondaryNotified}
+            onCheckedChange={(checked) => updateFormData('onlyPrimarySecondaryNotified', checked)}
+            disabled={!isEditing}
+          />
           <label htmlFor="onlyPrimarySecondary" className="text-sm">{t('onlyPrimarySecondaryNotified')}</label>
         </div>
       </div>
@@ -258,14 +355,16 @@ export default function CustomerViewPage() {
                       {key === 'fullAddress' ? (
                         <Textarea
                           value={individualCuotaholders[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="text-sm h-16 resize-none bg-slate-50"
+                          onChange={(e) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={textareaClassName}
                         />
                       ) : (
                         <Input
                           value={individualCuotaholders[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="h-8 text-sm border-slate-300 bg-slate-50"
+                          onChange={(e) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={inputClassName}
                         />
                       )}
                     </td>
@@ -308,19 +407,25 @@ export default function CustomerViewPage() {
                     <td key={idx} className="px-1 py-1 border-r border-slate-300 last:border-r-0">
                       {isCheckbox ? (
                         <div className="flex justify-center">
-                          <Checkbox checked={corporateCuotaholders[idx]?.uboSameAsNewCompany || false} disabled />
+                          <Checkbox
+                            checked={corporateCuotaholders[idx]?.uboSameAsNewCompany || false}
+                            onCheckedChange={(checked) => updateCorporateCuotaholder(idx, 'uboSameAsNewCompany', checked as boolean)}
+                            disabled={!isEditing}
+                          />
                         </div>
                       ) : key === 'registeredAddress' ? (
                         <Textarea
                           value={corporateCuotaholders[idx]?.[key as keyof CorporateCuotaholder] as string || ''}
-                          readOnly
-                          className="text-sm h-16 resize-none bg-slate-50"
+                          onChange={(e) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, e.target.value)}
+                          readOnly={!isEditing}
+                          className={textareaClassName}
                         />
                       ) : (
                         <Input
                           value={corporateCuotaholders[idx]?.[key as keyof CorporateCuotaholder] as string || ''}
-                          readOnly
-                          className="h-8 text-sm border-slate-300 bg-slate-50"
+                          onChange={(e) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, e.target.value)}
+                          readOnly={!isEditing}
+                          className={inputClassName}
                         />
                       )}
                     </td>
@@ -343,7 +448,11 @@ export default function CustomerViewPage() {
             {t('section')} 5 – {t('ultimateBeneficialOwners')}
           </h3>
           <span className="text-sm">{t('checkIfUboSame')}</span>
-          <Checkbox checked={customer.uboSameAsCuotaholder} disabled />
+          <Checkbox
+            checked={formData.uboSameAsCuotaholder}
+            onCheckedChange={(checked) => updateFormData('uboSameAsCuotaholder', checked)}
+            disabled={!isEditing}
+          />
         </div>
         <div className="border border-slate-300 rounded overflow-x-auto">
           <table className="w-full min-w-[800px]">
@@ -380,14 +489,16 @@ export default function CustomerViewPage() {
                       {key === 'fullAddress' ? (
                         <Textarea
                           value={ubos[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="text-sm h-16 resize-none bg-slate-50"
+                          onChange={(e) => updateUbo(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={textareaClassName}
                         />
                       ) : (
                         <Input
                           value={ubos[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="h-8 text-sm border-slate-300 bg-slate-50"
+                          onChange={(e) => updateUbo(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={inputClassName}
                         />
                       )}
                     </td>
@@ -406,7 +517,11 @@ export default function CustomerViewPage() {
             {t('section')} 6 – {t('managingDirectors')}
           </h3>
           <span className="text-sm">{t('checkIfDirectorSame')}</span>
-          <Checkbox checked={customer.directorSameAsCuotaholder} disabled />
+          <Checkbox
+            checked={formData.directorSameAsCuotaholder}
+            onCheckedChange={(checked) => updateFormData('directorSameAsCuotaholder', checked)}
+            disabled={!isEditing}
+          />
         </div>
         <div className="border border-slate-300 rounded overflow-x-auto">
           <table className="w-full min-w-[800px]">
@@ -442,14 +557,16 @@ export default function CustomerViewPage() {
                       {key === 'fullAddress' ? (
                         <Textarea
                           value={directors[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="text-sm h-16 resize-none bg-slate-50"
+                          onChange={(e) => updateDirector(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={textareaClassName}
                         />
                       ) : (
                         <Input
                           value={directors[idx]?.[key as keyof PersonInfo] || ''}
-                          readOnly
-                          className="h-8 text-sm border-slate-300 bg-slate-50"
+                          onChange={(e) => updateDirector(idx, key as keyof PersonInfo, e.target.value)}
+                          readOnly={!isEditing}
+                          className={inputClassName}
                         />
                       )}
                     </td>
@@ -472,7 +589,12 @@ export default function CustomerViewPage() {
                   <div className="text-xs text-muted-foreground">({t('defaultNominalValue')})</div>
                 </td>
                 <td className="px-4 py-3">
-                  <Input value={customer.nominalValueOfCuotas || ''} readOnly className="max-w-xs text-2xl h-12 bg-slate-50" />
+                  <Input
+                    value={formData.nominalValueOfCuotas || ''}
+                    onChange={(e) => updateFormData('nominalValueOfCuotas', e.target.value)}
+                    readOnly={!isEditing}
+                    className={largeInputClassName}
+                  />
                 </td>
               </tr>
               <tr>
@@ -481,7 +603,12 @@ export default function CustomerViewPage() {
                   <div className="text-xs text-muted-foreground">({t('defaultCuotas')})</div>
                 </td>
                 <td className="px-4 py-3">
-                  <Input value={customer.numberOfCuotasToBeIssued || ''} readOnly className="max-w-xs text-2xl h-12 bg-slate-50" />
+                  <Input
+                    value={formData.numberOfCuotasToBeIssued || ''}
+                    onChange={(e) => updateFormData('numberOfCuotasToBeIssued', e.target.value)}
+                    readOnly={!isEditing}
+                    className={largeInputClassName}
+                  />
                 </td>
               </tr>
             </tbody>
@@ -499,7 +626,12 @@ export default function CustomerViewPage() {
                   <div className="text-sm font-medium">{t('natureOfBusiness')}</div>
                 </td>
                 <td className="px-4 py-3">
-                  <Input value={customer.natureOfBusiness || ''} readOnly className="text-2xl h-12 bg-slate-50" />
+                  <Input
+                    value={formData.natureOfBusiness || ''}
+                    onChange={(e) => updateFormData('natureOfBusiness', e.target.value)}
+                    readOnly={!isEditing}
+                    className={isEditing ? 'text-2xl h-12' : 'text-2xl h-12 bg-slate-50'}
+                  />
                 </td>
               </tr>
             </tbody>
@@ -515,12 +647,23 @@ export default function CustomerViewPage() {
         {/* Form Header */}
         <FormHeader t={t} />
 
-        {/* Print Button */}
-        <div className="flex justify-end mb-4 print:hidden">
-          <Button onClick={handlePrint} variant="outline" className="gap-2">
-            <Printer className="h-4 w-4" />
-            {tCommon('print')}
-          </Button>
+        {/* Edit/Save/Cancel Buttons */}
+        <div className="flex justify-end gap-2 mb-4 print:hidden">
+          {isEditing ? (
+            <>
+              <Button onClick={handleCancel} variant="outline">
+                {tCommon('cancel')}
+              </Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? tCommon('saving') : tCommon('save')}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={handleEdit} variant="outline" className="gap-2">
+              <Pencil className="h-4 w-4" />
+              {tCommon('edit')}
+            </Button>
+          )}
         </div>
 
         {/* Page Indicator */}
