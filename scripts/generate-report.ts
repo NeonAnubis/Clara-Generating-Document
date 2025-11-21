@@ -723,7 +723,6 @@ async function generateReport() {
   const buffer = await Packer.toBuffer(doc)
   const outputPath = path.join(process.cwd(), 'Sistema_de_Papeleria_Report.docx')
   fs.writeFileSync(outputPath, buffer)
-  console.log(`Report generated: ${outputPath}`)
 }
 
 generateReport().catch(console.error)

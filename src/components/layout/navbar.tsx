@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -10,7 +11,6 @@ import {
   Download,
   LayoutDashboard,
   FileSpreadsheet,
-  Globe,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -20,9 +20,23 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 
+const LOCALES = {
+  es: { flag: '🇪🇸', name: 'Español' },
+  en: { flag: '🇺🇸', name: 'English' },
+}
+
 export function Navbar() {
   const pathname = usePathname()
   const t = useTranslations('nav')
+  const [currentLocale, setCurrentLocale] = useState<'es' | 'en'>('es')
+
+  useEffect(() => {
+    const cookieLocale = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('locale='))
+      ?.split('=')[1] as 'es' | 'en' | undefined
+    setCurrentLocale(cookieLocale || 'es')
+  }, [])
 
   const navigation = [
     { name: t('dashboard'), href: '/', icon: LayoutDashboard },
@@ -74,9 +88,8 @@ export function Navbar() {
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('language')}</span>
+              <Button variant="ghost" size="sm" className="text-xl px-2">
+                {LOCALES[currentLocale].flag}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
