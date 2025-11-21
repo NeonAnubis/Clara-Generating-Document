@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
@@ -19,10 +20,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import spainFlag from '@/assets/flags/spain.jpg'
+import usFlag from '@/assets/flags/us.jpg'
 
 const LOCALES = {
-  es: { flag: '🇪🇸', name: 'Español' },
-  en: { flag: '🇺🇸', name: 'English' },
+  es: { flag: spainFlag, name: 'Español' },
+  en: { flag: usFlag, name: 'English' },
 }
 
 export function Navbar() {
@@ -88,16 +91,24 @@ export function Navbar() {
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-xl px-2">
-                {LOCALES[currentLocale].flag}
+              <Button variant="ghost" size="sm" className="px-2">
+                <Image
+                  src={LOCALES[currentLocale].flag}
+                  alt={LOCALES[currentLocale].name}
+                  width={24}
+                  height={16}
+                  className="rounded-sm"
+                />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => switchLocale('es')}>
-                🇪🇸 Español
+              <DropdownMenuItem onClick={() => switchLocale('es')} className="flex items-center gap-2">
+                <Image src={spainFlag} alt="Español" width={20} height={14} className="rounded-sm" />
+                Español
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => switchLocale('en')}>
-                🇺🇸 English
+              <DropdownMenuItem onClick={() => switchLocale('en')} className="flex items-center gap-2">
+                <Image src={usFlag} alt="English" width={20} height={14} className="rounded-sm" />
+                English
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
