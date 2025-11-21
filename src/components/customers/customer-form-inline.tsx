@@ -94,6 +94,56 @@ const getInitialFormData = () => ({
   natureOfBusiness: '',
 })
 
+// Header Component - defined outside to prevent re-creation on state changes
+function FormHeader({ t }: { t: (key: string) => string }) {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between py-4">
+        {/* Left side - Warning text */}
+        <div className="text-[#4a4a8a] dark:text-blue-400">
+          <p className="text-lg italic font-medium">! {t('formsMustBeDigital')}</p>
+          <p className="text-lg italic font-medium">{t('handwrittenNotAccepted')}</p>
+        </div>
+
+        {/* Right side - Fast Offshore Logo */}
+        <div className="flex items-center gap-3">
+          {/* Logo Icon */}
+          <div className="w-14 h-14 bg-[#4a4a8a] rounded flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 8H24V12H12V16H20V20H12V28H8V8Z" fill="white"/>
+              <path d="M14 12L20 12" stroke="#c9a227" strokeWidth="2"/>
+              <path d="M14 20L18 20" stroke="#c9a227" strokeWidth="2"/>
+            </svg>
+          </div>
+          {/* Logo Text */}
+          <div className="text-[#4a4a8a] dark:text-slate-300">
+            <div className="flex gap-3 text-sm tracking-[0.3em] font-light">
+              <span>F</span><span>A</span><span>S</span><span>T</span>
+            </div>
+            <div className="text-sm tracking-[0.15em] font-light border-t border-[#4a4a8a] dark:border-slate-400 pt-1">
+              OFFSHORE
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Bottom border line */}
+      <div className="border-b-2 border-[#4a4a8a] dark:border-slate-500" />
+    </div>
+  )
+}
+
+// Section title component - defined outside to prevent re-creation
+function SectionTitle({ number, title, subtitle, sectionLabel }: { number: number; title: string; subtitle?: string; sectionLabel: string }) {
+  return (
+    <div className="mb-4">
+      <h3 className="text-base font-semibold text-blue-800 dark:text-blue-400">
+        {sectionLabel} {number} – {title}
+        {subtitle && <span className="font-normal text-red-600 dark:text-red-400"> ({subtitle})</span>}
+      </h3>
+    </div>
+  )
+}
+
 export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
   const t = useTranslations('companyForm')
   const tCommon = useTranslations('common')
@@ -108,7 +158,7 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/customers', {
+      const response = await fetch('/api/companies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -152,28 +202,11 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
     setFormData({ ...formData, directors: updated })
   }
 
-  const SectionTitle = ({ number, title, subtitle }: { number: number; title: string; subtitle?: string }) => (
-    <div className="mb-4">
-      <h3 className="text-base font-semibold text-blue-800 dark:text-blue-400">
-        {t('section')} {number} – {title}
-        {subtitle && <span className="font-normal text-red-600 dark:text-red-400"> ({subtitle})</span>}
-      </h3>
-    </div>
-  )
-
-  const TableInput = ({ value, onChange, className = '' }: { value: string; onChange: (v: string) => void; className?: string }) => (
-    <Input
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`h-8 text-sm border-slate-300 ${className}`}
-    />
-  )
-
   const renderPage1 = () => (
     <>
       {/* Section 1: Company Setup Information */}
       <div className="mb-8">
-        <SectionTitle number={1} title={t('companySetupInfo')} />
+        <SectionTitle number={1} title={t('companySetupInfo')} sectionLabel={t('section')} />
         <p className="text-sm text-red-600 dark:text-red-400 mb-4">
           ({t('noteNumberedCompanies')})
         </p>
@@ -181,43 +214,47 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
 
       {/* Section 2: Primary Contact(s) Information */}
       <div className="mb-8">
-        <SectionTitle number={2} title={t('primaryContactInfo')} subtitle={t('primaryContactSubtitle')} />
+        <SectionTitle number={2} title={t('primaryContactInfo')} subtitle={t('primaryContactSubtitle')} sectionLabel={t('section')} />
         <div className="border border-slate-300 rounded overflow-hidden">
           <table className="w-full">
             <tbody>
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 w-48 text-sm font-medium">{t('primaryContactName')}</td>
                 <td className="px-2 py-2">
-                  <TableInput
+                  <Input
                     value={formData.primaryContactName}
-                    onChange={(v) => setFormData({ ...formData, primaryContactName: v })}
+                    onChange={(e) => setFormData({ ...formData, primaryContactName: e.target.value })}
+                    className="h-8 text-sm border-slate-300"
                   />
                 </td>
               </tr>
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('primaryContactEmail')}</td>
                 <td className="px-2 py-2">
-                  <TableInput
+                  <Input
                     value={formData.primaryContactEmail}
-                    onChange={(v) => setFormData({ ...formData, primaryContactEmail: v })}
+                    onChange={(e) => setFormData({ ...formData, primaryContactEmail: e.target.value })}
+                    className="h-8 text-sm border-slate-300"
                   />
                 </td>
               </tr>
               <tr className="border-b border-slate-300">
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactName')}</td>
                 <td className="px-2 py-2">
-                  <TableInput
+                  <Input
                     value={formData.secondaryContactName}
-                    onChange={(v) => setFormData({ ...formData, secondaryContactName: v })}
+                    onChange={(e) => setFormData({ ...formData, secondaryContactName: e.target.value })}
+                    className="h-8 text-sm border-slate-300"
                   />
                 </td>
               </tr>
               <tr>
                 <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactEmail')}</td>
                 <td className="px-2 py-2">
-                  <TableInput
+                  <Input
                     value={formData.secondaryContactEmail}
-                    onChange={(v) => setFormData({ ...formData, secondaryContactEmail: v })}
+                    onChange={(e) => setFormData({ ...formData, secondaryContactEmail: e.target.value })}
+                    className="h-8 text-sm border-slate-300"
                   />
                 </td>
               </tr>
@@ -238,7 +275,7 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
 
       {/* Section 3: Individual Cuotaholder(s) Information */}
       <div className="mb-8">
-        <SectionTitle number={3} title={t('individualCuotaholderInfo')} subtitle={t('individualCuotaholderSubtitle')} />
+        <SectionTitle number={3} title={t('individualCuotaholderInfo')} subtitle={t('individualCuotaholderSubtitle')} sectionLabel={t('section')} />
         <div className="border border-slate-300 rounded overflow-x-auto">
           <table className="w-full min-w-[800px]">
             <thead>
@@ -278,9 +315,10 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
                           className="text-sm h-16 resize-none"
                         />
                       ) : (
-                        <TableInput
+                        <Input
                           value={formData.individualCuotaholders[idx][key as keyof PersonInfo] || ''}
-                          onChange={(v) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, v)}
+                          onChange={(e) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, e.target.value)}
+                          className="h-8 text-sm border-slate-300"
                         />
                       )}
                     </td>
@@ -294,7 +332,7 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
 
       {/* Section 4: Corporate Cuotaholder(s) Information */}
       <div className="mb-8">
-        <SectionTitle number={4} title={t('corporateCuotaholderInfo')} subtitle={t('corporateCuotaholderSubtitle')} />
+        <SectionTitle number={4} title={t('corporateCuotaholderInfo')} subtitle={t('corporateCuotaholderSubtitle')} sectionLabel={t('section')} />
         <div className="border border-slate-300 rounded overflow-x-auto">
           <table className="w-full min-w-[800px]">
             <thead>
@@ -335,9 +373,10 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
                           className="text-sm h-16 resize-none"
                         />
                       ) : (
-                        <TableInput
+                        <Input
                           value={formData.corporateCuotaholders[idx][key as keyof CorporateCuotaholder] as string || ''}
-                          onChange={(v) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, v)}
+                          onChange={(e) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, e.target.value)}
+                          className="h-8 text-sm border-slate-300"
                         />
                       )}
                     </td>
@@ -405,10 +444,11 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
                           disabled={formData.uboSameAsCuotaholder}
                         />
                       ) : (
-                        <TableInput
+                        <Input
                           value={formData.ubos[idx][key as keyof PersonInfo] || ''}
-                          onChange={(v) => updateUbo(idx, key as keyof PersonInfo, v)}
-                          className={formData.uboSameAsCuotaholder ? 'opacity-50' : ''}
+                          onChange={(e) => updateUbo(idx, key as keyof PersonInfo, e.target.value)}
+                          className={`h-8 text-sm border-slate-300 ${formData.uboSameAsCuotaholder ? 'opacity-50' : ''}`}
+                          disabled={formData.uboSameAsCuotaholder}
                         />
                       )}
                     </td>
@@ -439,7 +479,7 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
                 <th className="px-4 py-2 text-left text-sm font-medium w-48 border-b border-r border-slate-300"></th>
                 {[1, 2, 3, 4].map((num) => (
                   <th key={num} className="px-2 py-2 text-center text-sm font-medium border-b border-r border-slate-300 last:border-r-0">
-                    {t('director')}
+                    {t('director')} {num}
                   </th>
                 ))}
               </tr>
@@ -471,10 +511,11 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
                           disabled={formData.directorSameAsCuotaholder}
                         />
                       ) : (
-                        <TableInput
+                        <Input
                           value={formData.directors[idx][key as keyof PersonInfo] || ''}
-                          onChange={(v) => updateDirector(idx, key as keyof PersonInfo, v)}
-                          className={formData.directorSameAsCuotaholder ? 'opacity-50' : ''}
+                          onChange={(e) => updateDirector(idx, key as keyof PersonInfo, e.target.value)}
+                          className={`h-8 text-sm border-slate-300 ${formData.directorSameAsCuotaholder ? 'opacity-50' : ''}`}
+                          disabled={formData.directorSameAsCuotaholder}
                         />
                       )}
                     </td>
@@ -547,46 +588,10 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
     </>
   )
 
-  // Header Component matching customer_header.png design
-  const FormHeader = () => (
-    <div className="mb-8">
-      <div className="flex items-center justify-between py-4">
-        {/* Left side - Warning text */}
-        <div className="text-[#4a4a8a] dark:text-blue-400">
-          <p className="text-lg italic font-medium">! {t('formsMustBeDigital')}</p>
-          <p className="text-lg italic font-medium">{t('handwrittenNotAccepted')}</p>
-        </div>
-
-        {/* Right side - Fast Offshore Logo */}
-        <div className="flex items-center gap-3">
-          {/* Logo Icon */}
-          <div className="w-14 h-14 bg-[#4a4a8a] rounded flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 8H24V12H12V16H20V20H12V28H8V8Z" fill="white"/>
-              <path d="M14 12L20 12" stroke="#c9a227" strokeWidth="2"/>
-              <path d="M14 20L18 20" stroke="#c9a227" strokeWidth="2"/>
-            </svg>
-          </div>
-          {/* Logo Text */}
-          <div className="text-[#4a4a8a] dark:text-slate-300">
-            <div className="flex gap-3 text-sm tracking-[0.3em] font-light">
-              <span>F</span><span>A</span><span>S</span><span>T</span>
-            </div>
-            <div className="text-sm tracking-[0.15em] font-light border-t border-[#4a4a8a] dark:border-slate-400 pt-1">
-              OFFSHORE
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Bottom border line */}
-      <div className="border-b-2 border-[#4a4a8a] dark:border-slate-500" />
-    </div>
-  )
-
   return (
     <form onSubmit={handleSubmit}>
       {/* Form Header */}
-      <FormHeader />
+      <FormHeader t={t} />
 
       {showSuccess && (
         <div className="flex items-center gap-2 p-4 mb-6 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300">

@@ -115,3 +115,45 @@ model ExportHistory {
   // Timestamps
   createdAt       DateTime @default(now())
 }
+
+model Company {
+  id                          String   @id @default(cuid())
+
+  // Section 2: Primary Contact(s) Information
+  primaryContactName          String?
+  primaryContactEmail         String?
+  secondaryContactName        String?
+  secondaryContactEmail       String?
+  onlyPrimarySecondaryNotified Boolean @default(false)
+
+  // Section 3: Individual Cuotaholder(s) Information
+  // Stored as JSON array of PersonInfo objects
+  individualCuotaholders      String   @db.Text // JSON array
+
+  // Section 4: Corporate Cuotaholder(s) Information
+  // Stored as JSON array of CorporateCuotaholder objects
+  corporateCuotaholders       String   @db.Text // JSON array
+
+  // Section 5: Ultimate Beneficial Owner(s)
+  uboSameAsCuotaholder        Boolean  @default(false)
+  ubos                        String   @db.Text // JSON array of PersonInfo
+
+  // Section 6: Managing Director(s)
+  directorSameAsCuotaholder   Boolean  @default(false)
+  directors                   String   @db.Text // JSON array of PersonInfo
+
+  // Additional fields
+  nominalValueOfCuotas        String?  @default("100")
+  numberOfCuotasToBeIssued    String?  @default("1000")
+  natureOfBusiness            String?
+
+  // Status
+  status                      String   @default("active")
+
+  // Timestamps
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@index([primaryContactEmail])
+  @@index([createdAt])
+}
