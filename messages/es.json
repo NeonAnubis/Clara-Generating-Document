@@ -6,6 +6,7 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
+    "view": "Ver",
     "search": "Buscar",
     "selectAll": "Seleccionar todos",
     "noResults": "No se encontraron resultados",
@@ -69,7 +70,11 @@
     "statusPending": "Pendiente",
     "customerSaved": "Cliente guardado exitosamente",
     "sortAsc": "Ordenar ascendente",
-    "sortDesc": "Ordenar descendente"
+    "sortDesc": "Ordenar descendente",
+    "primaryContact": "Contacto Principal",
+    "cuotaholder": "Cuotahabiente",
+    "cuotaholderCount": "Cuotahabientes",
+    "businessNature": "Naturaleza del Negocio"
   },
   "customerForm": {
     "personalInfo": "Información Personal",

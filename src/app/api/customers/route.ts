@@ -5,34 +5,42 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
-    const category = searchParams.get('category') || ''
     const status = searchParams.get('status') || ''
 
     const where = {
       AND: [
         search ? {
           OR: [
-            { firstName: { contains: search, mode: 'insensitive' as const } },
-            { lastName: { contains: search, mode: 'insensitive' as const } },
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { companyName: { contains: search, mode: 'insensitive' as const } },
-            { idNumber: { contains: search, mode: 'insensitive' as const } },
+            { primaryContactName: { contains: search, mode: 'insensitive' as const } },
+            { primaryContactEmail: { contains: search, mode: 'insensitive' as const } },
+            { secondaryContactName: { contains: search, mode: 'insensitive' as const } },
+            { natureOfBusiness: { contains: search, mode: 'insensitive' as const } },
           ]
         } : {},
-        category ? { category } : {},
         status ? { status } : {},
       ]
     }
 
-    const customers = await prisma.customer.findMany({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customers = await (prisma.customer as any).findMany({
       where,
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json(customers)
+    // Parse JSON fields before returning
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parsedCustomers = customers.map((customer: any) => ({
+      ...customer,
+      individualCuotaholders: JSON.parse(customer.individualCuotaholders || '[]'),
+      corporateCuotaholders: JSON.parse(customer.corporateCuotaholders || '[]'),
+      ubos: JSON.parse(customer.ubos || '[]'),
+      directors: JSON.parse(customer.directors || '[]'),
+    }))
+
+    return NextResponse.json(parsedCustomers)
   } catch (error) {
     console.error('Error fetching customers:', error)
-    return NextResponse.json({ error: 'Error al obtener clientes' }, { status: 500 })
+    return NextResponse.json({ error: 'Error fetching customers' }, { status: 500 })
   }
 }
 
@@ -40,25 +48,23 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
 
-    const customer = await prisma.customer.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customer = await (prisma.customer as any).create({
       data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email || null,
-        phone: data.phone || null,
-        mobile: data.mobile || null,
-        idType: data.idType || null,
-        idNumber: data.idNumber || null,
-        address: data.address || null,
-        city: data.city || null,
-        state: data.state || null,
-        country: data.country || 'Costa Rica',
-        postalCode: data.postalCode || null,
-        companyName: data.companyName || null,
-        companyId: data.companyId || null,
-        position: data.position || null,
-        notes: data.notes || null,
-        category: data.category || null,
+        primaryContactName: data.primaryContactName || null,
+        primaryContactEmail: data.primaryContactEmail || null,
+        secondaryContactName: data.secondaryContactName || null,
+        secondaryContactEmail: data.secondaryContactEmail || null,
+        onlyPrimarySecondaryNotified: data.onlyPrimarySecondaryNotified || false,
+        individualCuotaholders: JSON.stringify(data.individualCuotaholders || []),
+        corporateCuotaholders: JSON.stringify(data.corporateCuotaholders || []),
+        uboSameAsCuotaholder: data.uboSameAsCuotaholder || false,
+        ubos: JSON.stringify(data.ubos || []),
+        directorSameAsCuotaholder: data.directorSameAsCuotaholder || false,
+        directors: JSON.stringify(data.directors || []),
+        nominalValueOfCuotas: data.nominalValueOfCuotas || '100',
+        numberOfCuotasToBeIssued: data.numberOfCuotasToBeIssued || '1000',
+        natureOfBusiness: data.natureOfBusiness || null,
         status: data.status || 'active',
       },
     })
@@ -66,6 +72,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(customer, { status: 201 })
   } catch (error) {
     console.error('Error creating customer:', error)
-    return NextResponse.json({ error: 'Error al crear cliente' }, { status: 500 })
+    return NextResponse.json({ error: 'Error creating customer' }, { status: 500 })
   }
 }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Customer } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -30,18 +29,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { CustomerForm } from './customer-form'
 import {
   Search,
   MoreHorizontal,
-  Pencil,
   Trash2,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Eye,
 } from 'lucide-react'
 
-type SortField = 'name' | 'email' | 'phone' | 'company' | 'category' | 'status'
+interface Customer {
+  id: string
+  primaryContactName: string | null
+  primaryContactEmail: string | null
+  secondaryContactName: string | null
+  secondaryContactEmail: string | null
+  onlyPrimarySecondaryNotified: boolean
+  individualCuotaholders: Array<{
+    lastName: string
+    givenNames: string
+    emailAddress: string
+    telephoneNumber: string
+  }>
+  corporateCuotaholders: Array<{
+    companyName: string
+  }>
+  natureOfBusiness: string | null
+  status: string
+  createdAt: string
+}
+
+type SortField = 'primaryContact' | 'email' | 'cuotaholder' | 'business' | 'status'
 type SortDirection = 'asc' | 'desc' | null
 
 interface SortState {
@@ -56,8 +75,6 @@ export function CustomerListSortable() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [customerToDelete, setCustomerToDelete] = useState<string | null>(null)
   const [sortState, setSortState] = useState<SortState>({ field: null, direction: null })
@@ -80,6 +97,28 @@ export function CustomerListSortable() {
   useEffect(() => {
     fetchCustomers()
   }, [fetchCustomers])
+
+  const getFirstCuotaholderName = (customer: Customer) => {
+    if (customer.individualCuotaholders?.length > 0) {
+      const first = customer.individualCuotaholders[0]
+      if (first.givenNames || first.lastName) {
+        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
+      }
+    }
+    if (customer.corporateCuotaholders?.length > 0) {
+      const first = customer.corporateCuotaholders[0]
+      if (first.companyName) {
+        return first.companyName
+      }
+    }
+    return ''
+  }
+
+  const getCuotaholderCount = (customer: Customer) => {
+    const individualCount = customer.individualCuotaholders?.filter(c => c.lastName || c.givenNames).length || 0
+    const corporateCount = customer.corporateCuotaholders?.filter(c => c.companyName).length || 0
+    return individualCount + corporateCount
+  }
 
   const handleSort = (field: SortField) => {
     setSortState(prev => {
@@ -106,25 +145,21 @@ export function CustomerListSortable() {
       let valueB: string
 
       switch (sortState.field) {
-        case 'name':
-          valueA = `${a.firstName} ${a.lastName}`.toLowerCase()
-          valueB = `${b.firstName} ${b.lastName}`.toLowerCase()
+        case 'primaryContact':
+          valueA = (a.primaryContactName || '').toLowerCase()
+          valueB = (b.primaryContactName || '').toLowerCase()
           break
         case 'email':
-          valueA = (a.email || '').toLowerCase()
-          valueB = (b.email || '').toLowerCase()
+          valueA = (a.primaryContactEmail || '').toLowerCase()
+          valueB = (b.primaryContactEmail || '').toLowerCase()
           break
-        case 'phone':
-          valueA = (a.phone || a.mobile || '').toLowerCase()
-          valueB = (b.phone || b.mobile || '').toLowerCase()
+        case 'cuotaholder':
+          valueA = getFirstCuotaholderName(a).toLowerCase()
+          valueB = getFirstCuotaholderName(b).toLowerCase()
           break
-        case 'company':
-          valueA = (a.companyName || '').toLowerCase()
-          valueB = (b.companyName || '').toLowerCase()
-          break
-        case 'category':
-          valueA = (a.category || '').toLowerCase()
-          valueB = (b.category || '').toLowerCase()
+        case 'business':
+          valueA = (a.natureOfBusiness || '').toLowerCase()
+          valueB = (b.natureOfBusiness || '').toLowerCase()
           break
         case 'status':
           valueA = a.status.toLowerCase()
@@ -157,16 +192,6 @@ export function CustomerListSortable() {
       setDeleteDialogOpen(false)
       setCustomerToDelete(null)
     }
-  }
-
-  const handleEdit = (customer: Customer) => {
-    setEditingCustomer(customer)
-    setFormOpen(true)
-  }
-
-  const handleFormClose = () => {
-    setFormOpen(false)
-    setEditingCustomer(null)
   }
 
   const getStatusBadge = (status: string) => {
@@ -229,19 +254,17 @@ export function CustomerListSortable() {
           <TableHeader>
             <TableRow>
               <TableHead>
-                <SortableHeader field="name">{t('name')}</SortableHeader>
+                <SortableHeader field="primaryContact">{t('primaryContact')}</SortableHeader>
               </TableHead>
               <TableHead>
                 <SortableHeader field="email">{t('email')}</SortableHeader>
               </TableHead>
               <TableHead>
-                <SortableHeader field="phone">{t('phone')}</SortableHeader>
+                <SortableHeader field="cuotaholder">{t('cuotaholder')}</SortableHeader>
               </TableHead>
+              <TableHead>{t('cuotaholderCount')}</TableHead>
               <TableHead>
-                <SortableHeader field="company">{t('company')}</SortableHeader>
-              </TableHead>
-              <TableHead>
-                <SortableHeader field="category">{t('category')}</SortableHeader>
+                <SortableHeader field="business">{t('businessNature')}</SortableHeader>
               </TableHead>
               <TableHead>
                 <SortableHeader field="status">{t('status')}</SortableHeader>
@@ -266,12 +289,14 @@ export function CustomerListSortable() {
               sortedCustomers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell className="font-medium">
-                    {customer.firstName} {customer.lastName}
+                    {customer.primaryContactName || '-'}
                   </TableCell>
-                  <TableCell>{customer.email || '-'}</TableCell>
-                  <TableCell>{customer.phone || customer.mobile || '-'}</TableCell>
-                  <TableCell>{customer.companyName || '-'}</TableCell>
-                  <TableCell>{customer.category || '-'}</TableCell>
+                  <TableCell>{customer.primaryContactEmail || '-'}</TableCell>
+                  <TableCell>{getFirstCuotaholderName(customer) || '-'}</TableCell>
+                  <TableCell>{getCuotaholderCount(customer)}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">
+                    {customer.natureOfBusiness || '-'}
+                  </TableCell>
                   <TableCell>{getStatusBadge(customer.status)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -281,9 +306,9 @@ export function CustomerListSortable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(customer)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          {tCommon('edit')}
+                        <DropdownMenuItem>
+                          <Eye className="mr-2 h-4 w-4" />
+                          {tCommon('view')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(customer.id)}
@@ -301,13 +326,6 @@ export function CustomerListSortable() {
           </TableBody>
         </Table>
       </div>
-
-      <CustomerForm
-        customer={editingCustomer}
-        open={formOpen}
-        onClose={handleFormClose}
-        onSave={fetchCustomers}
-      />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

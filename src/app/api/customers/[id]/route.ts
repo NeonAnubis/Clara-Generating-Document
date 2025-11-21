@@ -9,17 +9,27 @@ export async function GET(
     const { id } = await params
     const customer = await prisma.customer.findUnique({
       where: { id },
-      include: { documents: true },
     })
 
     if (!customer) {
-      return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
-    return NextResponse.json(customer)
+    // Parse JSON fields before returning
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customerData = customer as any
+    const parsedCustomer = {
+      ...customer,
+      individualCuotaholders: JSON.parse(customerData.individualCuotaholders || '[]'),
+      corporateCuotaholders: JSON.parse(customerData.corporateCuotaholders || '[]'),
+      ubos: JSON.parse(customerData.ubos || '[]'),
+      directors: JSON.parse(customerData.directors || '[]'),
+    }
+
+    return NextResponse.json(parsedCustomer)
   } catch (error) {
     console.error('Error fetching customer:', error)
-    return NextResponse.json({ error: 'Error al obtener cliente' }, { status: 500 })
+    return NextResponse.json({ error: 'Error fetching customer' }, { status: 500 })
   }
 }
 
@@ -31,26 +41,24 @@ export async function PUT(
     const { id } = await params
     const data = await request.json()
 
-    const customer = await prisma.customer.update({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customer = await (prisma.customer as any).update({
       where: { id },
       data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email || null,
-        phone: data.phone || null,
-        mobile: data.mobile || null,
-        idType: data.idType || null,
-        idNumber: data.idNumber || null,
-        address: data.address || null,
-        city: data.city || null,
-        state: data.state || null,
-        country: data.country || 'Costa Rica',
-        postalCode: data.postalCode || null,
-        companyName: data.companyName || null,
-        companyId: data.companyId || null,
-        position: data.position || null,
-        notes: data.notes || null,
-        category: data.category || null,
+        primaryContactName: data.primaryContactName || null,
+        primaryContactEmail: data.primaryContactEmail || null,
+        secondaryContactName: data.secondaryContactName || null,
+        secondaryContactEmail: data.secondaryContactEmail || null,
+        onlyPrimarySecondaryNotified: data.onlyPrimarySecondaryNotified || false,
+        individualCuotaholders: JSON.stringify(data.individualCuotaholders || []),
+        corporateCuotaholders: JSON.stringify(data.corporateCuotaholders || []),
+        uboSameAsCuotaholder: data.uboSameAsCuotaholder || false,
+        ubos: JSON.stringify(data.ubos || []),
+        directorSameAsCuotaholder: data.directorSameAsCuotaholder || false,
+        directors: JSON.stringify(data.directors || []),
+        nominalValueOfCuotas: data.nominalValueOfCuotas || '100',
+        numberOfCuotasToBeIssued: data.numberOfCuotasToBeIssued || '1000',
+        natureOfBusiness: data.natureOfBusiness || null,
         status: data.status || 'active',
       },
     })
@@ -58,7 +66,7 @@ export async function PUT(
     return NextResponse.json(customer)
   } catch (error) {
     console.error('Error updating customer:', error)
-    return NextResponse.json({ error: 'Error al actualizar cliente' }, { status: 500 })
+    return NextResponse.json({ error: 'Error updating customer' }, { status: 500 })
   }
 }
 
@@ -72,9 +80,9 @@ export async function DELETE(
       where: { id },
     })
 
-    return NextResponse.json({ message: 'Cliente eliminado' })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting customer:', error)
-    return NextResponse.json({ error: 'Error al eliminar cliente' }, { status: 500 })
+    return NextResponse.json({ error: 'Error deleting customer' }, { status: 500 })
   }
 }

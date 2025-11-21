@@ -6,6 +6,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "view": "View",
     "search": "Search",
     "selectAll": "Select all",
     "noResults": "No results found",
@@ -69,7 +70,11 @@
     "tabList": "Customer List",
     "customerSaved": "Customer saved successfully",
     "sortAsc": "Sort ascending",
-    "sortDesc": "Sort descending"
+    "sortDesc": "Sort descending",
+    "primaryContact": "Primary Contact",
+    "cuotaholder": "Cuotaholder",
+    "cuotaholderCount": "Cuotaholders",
+    "businessNature": "Nature of Business"
   },
   "customerForm": {
     "personalInfo": "Personal Information",

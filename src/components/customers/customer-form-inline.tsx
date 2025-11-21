@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CheckCircle, ChevronLeft, ChevronRight, Upload } from 'lucide-react'
 
 interface CustomerFormInlineProps {
   onSave?: () => void
@@ -94,6 +94,64 @@ const getInitialFormData = () => ({
   natureOfBusiness: '',
 })
 
+// Mock data for testing - fills all form fields with sample data
+const getMockFormData = () => {
+  const mockPerson = (index: number): PersonInfo => ({
+    lastName: `Smith${index + 1}`,
+    givenNames: `John${index + 1}`,
+    fullAddress: `${100 + index} Main Street, Suite ${index + 1}\nSan José, Costa Rica 10101`,
+    passportNumber: `P${String(index + 1).padStart(8, '0')}`,
+    expiryDate: '2028-12-31',
+    dateOfBirth: `198${index}-0${index + 1}-1${index}`,
+    placeOfBirth: ['New York, USA', 'London, UK', 'Madrid, Spain', 'Toronto, Canada'][index],
+    countryOfTaxResidency: ['United States', 'United Kingdom', 'Spain', 'Canada'][index],
+    emailAddress: `john.smith${index + 1}@example.com`,
+    telephoneNumber: `+1-555-000-000${index + 1}`,
+    profession: ['Software Engineer', 'Attorney', 'Accountant', 'Business Consultant'][index],
+    maritalStatus: ['Single', 'Married', 'Married', 'Single'][index],
+    numberOfSharesHeld: `${250 * (index + 1)}`,
+    ownershipPercentage: `${25}`,
+  })
+
+  const mockCorporate = (index: number): CorporateCuotaholder => ({
+    companyName: `Acme Holdings ${index + 1} LLC`,
+    registeredAddress: `${200 + index} Corporate Blvd\nDelaware, USA 19801`,
+    taxIdRegistration: `US-${String(index + 1).padStart(9, '0')}`,
+    jurisdiction: ['Delaware, USA', 'British Virgin Islands', 'Cayman Islands', 'Panama'][index],
+    dateOfIncorporation: `201${index}-0${index + 1}-01`,
+    uboSameAsNewCompany: index === 0,
+    numberOfSharesHeld: `${250 * (index + 1)}`,
+  })
+
+  return {
+    // Section 2: Primary Contact(s) Information
+    primaryContactName: 'Maria Garcia',
+    primaryContactEmail: 'maria.garcia@fastoffshore.com',
+    secondaryContactName: 'Carlos Rodriguez',
+    secondaryContactEmail: 'carlos.rodriguez@fastoffshore.com',
+    onlyPrimarySecondaryNotified: true,
+
+    // Section 3: Individual Cuotaholder(s) Information
+    individualCuotaholders: [mockPerson(0), mockPerson(1), mockPerson(2), mockPerson(3)],
+
+    // Section 4: Corporate Cuotaholder(s) Information
+    corporateCuotaholders: [mockCorporate(0), mockCorporate(1), mockCorporate(2), mockCorporate(3)],
+
+    // Section 5: Ultimate Beneficial Owner(s)
+    uboSameAsCuotaholder: false,
+    ubos: [mockPerson(0), mockPerson(1), mockPerson(2), mockPerson(3)],
+
+    // Section 6: Managing Director(s)
+    directorSameAsCuotaholder: false,
+    directors: [mockPerson(0), mockPerson(1), emptyPersonInfo(), emptyPersonInfo()],
+
+    // Additional fields
+    nominalValueOfCuotas: '100',
+    numberOfCuotasToBeIssued: '1000',
+    natureOfBusiness: 'International trading and consulting services',
+  }
+}
+
 // Header Component - defined outside to prevent re-creation on state changes
 function FormHeader({ t }: { t: (key: string) => string }) {
   return (
@@ -153,12 +211,11 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
   const [showSuccess, setShowSuccess] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSave = async () => {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/companies', {
+      const response = await fetch('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -588,10 +645,27 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
     </>
   )
 
+  const handleImportMockData = () => {
+    setFormData(getMockFormData())
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       {/* Form Header */}
       <FormHeader t={t} />
+
+      {/* Import Mock Data Button - for development testing */}
+      <div className="flex justify-end mb-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleImportMockData}
+          className="gap-2 text-orange-600 border-orange-300 hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:border-orange-700 dark:hover:bg-orange-950"
+        >
+          <Upload className="h-4 w-4" />
+          Import Mock Data
+        </Button>
+      </div>
 
       {showSuccess && (
         <div className="flex items-center gap-2 p-4 mb-6 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300">
@@ -649,12 +723,12 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button type="submit" disabled={loading} size="lg">
+            <Button type="button" onClick={handleSave} disabled={loading} size="lg">
               {loading ? tCommon('saving') : tCommon('save')}
             </Button>
           )}
         </div>
       </div>
-    </form>
+    </div>
   )
 }

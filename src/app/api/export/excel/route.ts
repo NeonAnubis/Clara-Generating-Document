@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       where: customerIds?.length > 0 ? {
         id: { in: customerIds }
       } : {},
-      orderBy: { lastName: 'asc' },
+      orderBy: { createdAt: 'desc' },
     })
 
     // Create workbook
@@ -20,28 +20,18 @@ export async function POST(request: NextRequest) {
     workbook.creator = 'Sistema de Papelería'
     workbook.created = new Date()
 
-    const worksheet = workbook.addWorksheet('Clientes')
+    const worksheet = workbook.addWorksheet('Customers')
 
-    // Define columns based on selected fields or all fields
+    // Define columns based on new Customer schema
     const allFields = [
-      { key: 'firstName', header: 'Nombre' },
-      { key: 'lastName', header: 'Apellido' },
-      { key: 'email', header: 'Correo Electrónico' },
-      { key: 'phone', header: 'Teléfono' },
-      { key: 'mobile', header: 'Celular' },
-      { key: 'idType', header: 'Tipo de ID' },
-      { key: 'idNumber', header: 'Número de ID' },
-      { key: 'address', header: 'Dirección' },
-      { key: 'city', header: 'Ciudad' },
-      { key: 'state', header: 'Provincia' },
-      { key: 'country', header: 'País' },
-      { key: 'postalCode', header: 'Código Postal' },
-      { key: 'companyName', header: 'Empresa' },
-      { key: 'companyId', header: 'Cédula Jurídica' },
-      { key: 'position', header: 'Puesto' },
-      { key: 'category', header: 'Categoría' },
-      { key: 'status', header: 'Estado' },
-      { key: 'notes', header: 'Notas' },
+      { key: 'primaryContactName', header: 'Primary Contact Name' },
+      { key: 'primaryContactEmail', header: 'Primary Contact Email' },
+      { key: 'secondaryContactName', header: 'Secondary Contact Name' },
+      { key: 'secondaryContactEmail', header: 'Secondary Contact Email' },
+      { key: 'natureOfBusiness', header: 'Nature of Business' },
+      { key: 'nominalValueOfCuotas', header: 'Nominal Value of Cuotas' },
+      { key: 'numberOfCuotasToBeIssued', header: 'Number of Cuotas' },
+      { key: 'status', header: 'Status' },
     ]
 
     const selectedFields = fields?.length > 0
@@ -51,7 +41,7 @@ export async function POST(request: NextRequest) {
     worksheet.columns = selectedFields.map(field => ({
       header: field.header,
       key: field.key,
-      width: 20,
+      width: 25,
     }))
 
     // Style header row
@@ -86,7 +76,7 @@ export async function POST(request: NextRequest) {
     await prisma.exportHistory.create({
       data: {
         exportType: 'excel',
-        fileName: `clientes_${new Date().toISOString().split('T')[0]}.xlsx`,
+        fileName: `customers_${new Date().toISOString().split('T')[0]}.xlsx`,
         recordCount: customers.length,
         filterCriteria: JSON.stringify({ customerIds, fields }),
       },
@@ -95,11 +85,11 @@ export async function POST(request: NextRequest) {
     return new NextResponse(buffer as ArrayBuffer, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="clientes_${new Date().toISOString().split('T')[0]}.xlsx"`,
+        'Content-Disposition': `attachment; filename="customers_${new Date().toISOString().split('T')[0]}.xlsx"`,
       },
     })
   } catch (error) {
     console.error('Error exporting to Excel:', error)
-    return NextResponse.json({ error: 'Error al exportar a Excel' }, { status: 500 })
+    return NextResponse.json({ error: 'Error exporting to Excel' }, { status: 500 })
   }
 }

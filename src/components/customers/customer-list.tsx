@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Customer } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -30,79 +29,87 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { CustomerForm } from './customer-form'
 import {
-  Plus,
   Search,
   MoreHorizontal,
   Pencil,
-  Trash2
+  Trash2,
+  Eye
 } from 'lucide-react'
 
+interface Company {
+  id: string
+  primaryContactName: string | null
+  primaryContactEmail: string | null
+  secondaryContactName: string | null
+  secondaryContactEmail: string | null
+  onlyPrimarySecondaryNotified: boolean
+  individualCuotaholders: Array<{
+    lastName: string
+    givenNames: string
+    emailAddress: string
+    telephoneNumber: string
+  }>
+  corporateCuotaholders: Array<{
+    companyName: string
+  }>
+  natureOfBusiness: string | null
+  status: string
+  createdAt: string
+}
+
 interface CustomerListProps {
-  onSelectCustomer?: (customer: Customer) => void
+  onSelectCompany?: (company: Company) => void
   selectable?: boolean
   selectedIds?: string[]
 }
 
-export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }: CustomerListProps) {
+export function CustomerList({ onSelectCompany, selectable, selectedIds = [] }: CustomerListProps) {
   const t = useTranslations('customers')
   const tCommon = useTranslations('common')
 
-  const [customers, setCustomers] = useState<Customer[]>([])
+  const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [customerToDelete, setCustomerToDelete] = useState<string | null>(null)
+  const [companyToDelete, setCompanyToDelete] = useState<string | null>(null)
 
-  const fetchCustomers = useCallback(async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
 
       const response = await fetch(`/api/customers?${params}`)
       const data = await response.json()
-      setCustomers(data)
+      setCompanies(data)
     } catch (error) {
-      console.error('Error fetching customers:', error)
+      console.error('Error fetching companies:', error)
     } finally {
       setLoading(false)
     }
   }, [search])
 
   useEffect(() => {
-    fetchCustomers()
-  }, [fetchCustomers])
+    fetchCompanies()
+  }, [fetchCompanies])
 
   const handleDeleteClick = (id: string) => {
-    setCustomerToDelete(id)
+    setCompanyToDelete(id)
     setDeleteDialogOpen(true)
   }
 
   const handleDeleteConfirm = async () => {
-    if (!customerToDelete) return
+    if (!companyToDelete) return
 
     try {
-      await fetch(`/api/customers/${customerToDelete}`, { method: 'DELETE' })
-      fetchCustomers()
+      await fetch(`/api/customers/${companyToDelete}`, { method: 'DELETE' })
+      fetchCompanies()
     } catch (error) {
-      console.error('Error deleting customer:', error)
+      console.error('Error deleting company:', error)
     } finally {
       setDeleteDialogOpen(false)
-      setCustomerToDelete(null)
+      setCompanyToDelete(null)
     }
-  }
-
-  const handleEdit = (customer: Customer) => {
-    setEditingCustomer(customer)
-    setFormOpen(true)
-  }
-
-  const handleFormClose = () => {
-    setFormOpen(false)
-    setEditingCustomer(null)
   }
 
   const getStatusBadge = (status: string) => {
@@ -123,6 +130,28 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
     )
   }
 
+  const getFirstCuotaholderName = (company: Company) => {
+    if (company.individualCuotaholders?.length > 0) {
+      const first = company.individualCuotaholders[0]
+      if (first.givenNames || first.lastName) {
+        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
+      }
+    }
+    if (company.corporateCuotaholders?.length > 0) {
+      const first = company.corporateCuotaholders[0]
+      if (first.companyName) {
+        return first.companyName
+      }
+    }
+    return '-'
+  }
+
+  const getCuotaholderCount = (company: Company) => {
+    const individualCount = company.individualCuotaholders?.filter(c => c.lastName || c.givenNames).length || 0
+    const corporateCount = company.corporateCuotaholders?.filter(c => c.companyName).length || 0
+    return individualCount + corporateCount
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -135,10 +164,6 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
             className="pl-9"
           />
         </div>
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('newCustomer')}
-        </Button>
       </div>
 
       <div className="rounded-lg border">
@@ -146,11 +171,11 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
           <TableHeader>
             <TableRow>
               {selectable && <TableHead className="w-12"></TableHead>}
-              <TableHead>{t('name')}</TableHead>
+              <TableHead>{t('primaryContact')}</TableHead>
               <TableHead>{t('email')}</TableHead>
-              <TableHead>{t('phone')}</TableHead>
-              <TableHead>{t('company')}</TableHead>
-              <TableHead>{t('category')}</TableHead>
+              <TableHead>{t('cuotaholder')}</TableHead>
+              <TableHead>{t('cuotaholderCount')}</TableHead>
+              <TableHead>{t('businessNature')}</TableHead>
               <TableHead>{t('status')}</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
@@ -162,38 +187,40 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
-            ) : customers.length === 0 ? (
+            ) : companies.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={selectable ? 8 : 7} className="text-center py-8 text-muted-foreground">
                   {t('noCustomersFound')}
                 </TableCell>
               </TableRow>
             ) : (
-              customers.map((customer) => (
+              companies.map((company) => (
                 <TableRow
-                  key={customer.id}
+                  key={company.id}
                   className={selectable ? 'cursor-pointer hover:bg-muted/50' : ''}
-                  onClick={() => selectable && onSelectCustomer?.(customer)}
+                  onClick={() => selectable && onSelectCompany?.(company)}
                 >
                   {selectable && (
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(customer.id)}
-                        onChange={() => onSelectCustomer?.(customer)}
+                        checked={selectedIds.includes(company.id)}
+                        onChange={() => onSelectCompany?.(company)}
                         onClick={(e) => e.stopPropagation()}
                         className="h-4 w-4"
                       />
                     </TableCell>
                   )}
                   <TableCell className="font-medium">
-                    {customer.firstName} {customer.lastName}
+                    {company.primaryContactName || '-'}
                   </TableCell>
-                  <TableCell>{customer.email || '-'}</TableCell>
-                  <TableCell>{customer.phone || customer.mobile || '-'}</TableCell>
-                  <TableCell>{customer.companyName || '-'}</TableCell>
-                  <TableCell>{customer.category || '-'}</TableCell>
-                  <TableCell>{getStatusBadge(customer.status)}</TableCell>
+                  <TableCell>{company.primaryContactEmail || '-'}</TableCell>
+                  <TableCell>{getFirstCuotaholderName(company)}</TableCell>
+                  <TableCell>{getCuotaholderCount(company)}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">
+                    {company.natureOfBusiness || '-'}
+                  </TableCell>
+                  <TableCell>{getStatusBadge(company.status)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -202,12 +229,16 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(customer)}>
+                        <DropdownMenuItem>
+                          <Eye className="mr-2 h-4 w-4" />
+                          {tCommon('view')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
                           <Pencil className="mr-2 h-4 w-4" />
                           {tCommon('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDeleteClick(customer.id)}
+                          onClick={() => handleDeleteClick(company.id)}
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -222,13 +253,6 @@ export function CustomerList({ onSelectCustomer, selectable, selectedIds = [] }:
           </TableBody>
         </Table>
       </div>
-
-      <CustomerForm
-        customer={editingCustomer}
-        open={formOpen}
-        onClose={handleFormClose}
-        onSave={fetchCustomers}
-      />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

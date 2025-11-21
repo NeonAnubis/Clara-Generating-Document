@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!customer) {
-      return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
     // Get template
@@ -22,30 +22,29 @@ export async function POST(request: NextRequest) {
     })
 
     if (!template) {
-      return NextResponse.json({ error: 'Plantilla no encontrada' }, { status: 404 })
+      return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
+
+    // Parse JSON fields
+    const individualCuotaholders = JSON.parse(customer.individualCuotaholders)
+    const corporateCuotaholders = JSON.parse(customer.corporateCuotaholders)
+
+    // Get first cuotaholder name for file naming
+    const firstCuotaholder = individualCuotaholders[0] || {}
+    const cuotaholderName = firstCuotaholder.lastName
+      ? `${firstCuotaholder.givenNames || ''}_${firstCuotaholder.lastName}`.trim()
+      : corporateCuotaholders[0]?.companyName || 'customer'
 
     // Replace placeholders in template content
     let content = template.content
     const placeholders: Record<string, string | null> = {
-      '{{firstName}}': customer.firstName,
-      '{{lastName}}': customer.lastName,
-      '{{fullName}}': `${customer.firstName} ${customer.lastName}`,
-      '{{email}}': customer.email,
-      '{{phone}}': customer.phone,
-      '{{mobile}}': customer.mobile,
-      '{{idType}}': customer.idType,
-      '{{idNumber}}': customer.idNumber,
-      '{{address}}': customer.address,
-      '{{city}}': customer.city,
-      '{{state}}': customer.state,
-      '{{country}}': customer.country,
-      '{{postalCode}}': customer.postalCode,
-      '{{companyName}}': customer.companyName,
-      '{{companyId}}': customer.companyId,
-      '{{position}}': customer.position,
-      '{{notes}}': customer.notes,
-      '{{category}}': customer.category,
+      '{{primaryContactName}}': customer.primaryContactName,
+      '{{primaryContactEmail}}': customer.primaryContactEmail,
+      '{{secondaryContactName}}': customer.secondaryContactName,
+      '{{secondaryContactEmail}}': customer.secondaryContactEmail,
+      '{{natureOfBusiness}}': customer.natureOfBusiness,
+      '{{nominalValueOfCuotas}}': customer.nominalValueOfCuotas,
+      '{{numberOfCuotasToBeIssued}}': customer.numberOfCuotasToBeIssued,
       '{{date}}': new Date().toLocaleDateString('es-CR'),
     }
 
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
           new Paragraph({
             children: [
               new TextRun({
-                text: `Generado el: ${new Date().toLocaleDateString('es-CR')}`,
+                text: `Generated on: ${new Date().toLocaleDateString('es-CR')}`,
                 size: 20,
                 italics: true,
               }),
@@ -111,14 +110,23 @@ export async function POST(request: NextRequest) {
     // Generate buffer
     const buffer = await Packer.toBuffer(doc)
 
+    const fileName = `${template.name}_${cuotaholderName}.docx`.replace(/\s+/g, '_')
+
     // Log generated document
     await prisma.generatedDocument.create({
       data: {
         customerId: customer.id,
         templateId: template.id,
-        fileName: `${template.name}_${customer.lastName}_${customer.firstName}.docx`,
+        fileName,
         fileType: 'docx',
-        generatedData: JSON.stringify({ customer, template: { id: template.id, name: template.name } }),
+        generatedData: JSON.stringify({
+          customer: {
+            id: customer.id,
+            primaryContactName: customer.primaryContactName,
+            natureOfBusiness: customer.natureOfBusiness,
+          },
+          template: { id: template.id, name: template.name }
+        }),
       },
     })
 
@@ -126,7 +134,7 @@ export async function POST(request: NextRequest) {
     await prisma.exportHistory.create({
       data: {
         exportType: 'word',
-        fileName: `${template.name}_${customer.lastName}_${customer.firstName}.docx`,
+        fileName,
         recordCount: 1,
         filterCriteria: JSON.stringify({ customerId, templateId }),
       },
@@ -135,11 +143,11 @@ export async function POST(request: NextRequest) {
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="${template.name}_${customer.lastName}_${customer.firstName}.docx"`,
+        'Content-Disposition': `attachment; filename="${fileName}"`,
       },
     })
   } catch (error) {
     console.error('Error generating Word document:', error)
-    return NextResponse.json({ error: 'Error al generar documento Word' }, { status: 500 })
+    return NextResponse.json({ error: 'Error generating Word document' }, { status: 500 })
   }
 }

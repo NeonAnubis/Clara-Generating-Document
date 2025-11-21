@@ -13,9 +13,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Customer, DocumentTemplate } from '@/lib/types'
-import { CUSTOMER_FIELDS } from '@/lib/types'
+import { DocumentTemplate } from '@/lib/types'
 import { FileSpreadsheet, FileText, Download } from 'lucide-react'
+
+interface Customer {
+  id: string
+  primaryContactName: string | null
+  primaryContactEmail: string | null
+  natureOfBusiness: string | null
+  individualCuotaholders: Array<{ lastName: string; givenNames: string }>
+  corporateCuotaholders: Array<{ companyName: string }>
+}
+
+const EXPORT_FIELDS = [
+  { key: 'primaryContactName', label: 'Primary Contact Name' },
+  { key: 'primaryContactEmail', label: 'Primary Contact Email' },
+  { key: 'secondaryContactName', label: 'Secondary Contact Name' },
+  { key: 'secondaryContactEmail', label: 'Secondary Contact Email' },
+  { key: 'natureOfBusiness', label: 'Nature of Business' },
+  { key: 'nominalValueOfCuotas', label: 'Nominal Value of Cuotas' },
+  { key: 'numberOfCuotasToBeIssued', label: 'Number of Cuotas' },
+  { key: 'status', label: 'Status' },
+]
 
 export default function ExportPage() {
   const t = useTranslations('export')
@@ -29,7 +48,7 @@ export default function ExportPage() {
   // Excel export state
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([])
   const [selectedFields, setSelectedFields] = useState<string[]>(
-    CUSTOMER_FIELDS.map(f => f.key)
+    EXPORT_FIELDS.map(f => f.key)
   )
 
   // Word export state
@@ -46,6 +65,25 @@ export default function ExportPage() {
       setLoading(false)
     })
   }, [])
+
+  const getCustomerDisplayName = (customer: Customer) => {
+    if (customer.primaryContactName) {
+      return customer.primaryContactName
+    }
+    if (customer.individualCuotaholders?.length > 0) {
+      const first = customer.individualCuotaholders[0]
+      if (first.givenNames || first.lastName) {
+        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
+      }
+    }
+    if (customer.corporateCuotaholders?.length > 0) {
+      const first = customer.corporateCuotaholders[0]
+      if (first.companyName) {
+        return first.companyName
+      }
+    }
+    return 'Customer'
+  }
 
   const handleExcelExport = async () => {
     setExporting(true)
@@ -64,7 +102,7 @@ export default function ExportPage() {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `clientes_${new Date().toISOString().split('T')[0]}.xlsx`
+        a.download = `customers_${new Date().toISOString().split('T')[0]}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()
@@ -98,7 +136,8 @@ export default function ExportPage() {
         a.href = url
         const template = templates.find(t => t.id === selectedTemplateId)
         const customer = customers.find(c => c.id === selectedCustomerId)
-        a.download = `${template?.name}_${customer?.lastName}_${customer?.firstName}.docx`
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `${template?.name}_${customerName}.docx`
         document.body.appendChild(a)
         a.click()
         a.remove()
@@ -189,10 +228,10 @@ export default function ExportPage() {
                         onCheckedChange={() => toggleCustomer(customer.id)}
                       />
                       <label htmlFor={customer.id} className="text-sm">
-                        {customer.firstName} {customer.lastName}
-                        {customer.companyName && (
+                        {getCustomerDisplayName(customer)}
+                        {customer.natureOfBusiness && (
                           <span className="text-muted-foreground ml-1">
-                            ({customer.companyName})
+                            ({customer.natureOfBusiness})
                           </span>
                         )}
                       </label>
@@ -211,7 +250,7 @@ export default function ExportPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {CUSTOMER_FIELDS.map(field => (
+                  {EXPORT_FIELDS.map(field => (
                     <div key={field.key} className="flex items-center space-x-2">
                       <Checkbox
                         id={`field-${field.key}`}
@@ -260,8 +299,8 @@ export default function ExportPage() {
                   <SelectContent>
                     {customers.map(customer => (
                       <SelectItem key={customer.id} value={customer.id}>
-                        {customer.firstName} {customer.lastName}
-                        {customer.companyName && ` (${customer.companyName})`}
+                        {getCustomerDisplayName(customer)}
+                        {customer.natureOfBusiness && ` (${customer.natureOfBusiness})`}
                       </SelectItem>
                     ))}
                   </SelectContent>
