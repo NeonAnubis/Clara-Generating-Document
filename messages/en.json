@@ -148,6 +148,8 @@
     "noExports": "No exports recorded"
   },
   "companyForm": {
+    "formsMustBeDigital": "Forms must be completed digitally!",
+    "handwrittenNotAccepted": "Handwritten forms cannot be accepted",
     "section": "SECTION",
     "companySetupInfo": "COMPANY SETUP INFORMATION",
     "noteNumberedCompanies": "NOTE all companies in Costa Rica are Numbered companies",

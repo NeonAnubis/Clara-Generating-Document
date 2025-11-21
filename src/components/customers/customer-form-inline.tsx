@@ -547,8 +547,47 @@ export function CustomerFormInline({ onSave }: CustomerFormInlineProps) {
     </>
   )
 
+  // Header Component matching customer_header.png design
+  const FormHeader = () => (
+    <div className="mb-8">
+      <div className="flex items-center justify-between py-4">
+        {/* Left side - Warning text */}
+        <div className="text-[#4a4a8a] dark:text-blue-400">
+          <p className="text-lg italic font-medium">! {t('formsMustBeDigital')}</p>
+          <p className="text-lg italic font-medium">{t('handwrittenNotAccepted')}</p>
+        </div>
+
+        {/* Right side - Fast Offshore Logo */}
+        <div className="flex items-center gap-3">
+          {/* Logo Icon */}
+          <div className="w-14 h-14 bg-[#4a4a8a] rounded flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 8H24V12H12V16H20V20H12V28H8V8Z" fill="white"/>
+              <path d="M14 12L20 12" stroke="#c9a227" strokeWidth="2"/>
+              <path d="M14 20L18 20" stroke="#c9a227" strokeWidth="2"/>
+            </svg>
+          </div>
+          {/* Logo Text */}
+          <div className="text-[#4a4a8a] dark:text-slate-300">
+            <div className="flex gap-3 text-sm tracking-[0.3em] font-light">
+              <span>F</span><span>A</span><span>S</span><span>T</span>
+            </div>
+            <div className="text-sm tracking-[0.15em] font-light border-t border-[#4a4a8a] dark:border-slate-400 pt-1">
+              OFFSHORE
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Bottom border line */}
+      <div className="border-b-2 border-[#4a4a8a] dark:border-slate-500" />
+    </div>
+  )
+
   return (
     <form onSubmit={handleSubmit}>
+      {/* Form Header */}
+      <FormHeader />
+
       {showSuccess && (
         <div className="flex items-center gap-2 p-4 mb-6 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300">
           <CheckCircle className="h-5 w-5" />
