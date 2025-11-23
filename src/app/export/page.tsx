@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
-import { FileSpreadsheet, FileText, Download, Award } from 'lucide-react'
+import { Download, Award } from 'lucide-react'
 
 interface Customer {
   id: string
