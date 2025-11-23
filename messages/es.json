@@ -142,7 +142,15 @@
     "selectTemplatePlaceholder": "Seleccione una plantilla...",
     "noActiveTemplates": "No hay plantillas activas. Cree una en la sección de Plantillas.",
     "generateWord": "Generar Documento Word",
-    "generating": "Generando..."
+    "generating": "Generando...",
+    "quotaCertificate": "Certificado de Cuotas",
+    "selectCustomerForCertificate": "Elija el cliente para generar el certificado de cuotas",
+    "selectCuotaholder": "Seleccionar Cuotahabiente",
+    "certificateDetails": "Detalles del Certificado",
+    "certificateDetailsDescription": "Configure el número de certificado y serie",
+    "certificateNumber": "Número de Certificado",
+    "certificateSeries": "Serie",
+    "generateCertificate": "Generar Certificado"
   },
   "history": {
     "title": "Historial de Exportaciones",

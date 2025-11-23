@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
-import { FileSpreadsheet, FileText, Download } from 'lucide-react'
+import { FileSpreadsheet, FileText, Download, Award } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -54,6 +54,12 @@ export default function ExportPage() {
   // Word export state
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+
+  // Quota certificate state
+  const [certCustomerId, setCertCustomerId] = useState<string>('')
+  const [certCuotaholderIndex, setCertCuotaholderIndex] = useState<number>(0)
+  const [certNumber, setCertNumber] = useState<string>('001')
+  const [certSeries, setCertSeries] = useState<string>('AB')
 
   useEffect(() => {
     Promise.all([
@@ -174,6 +180,46 @@ export default function ExportPage() {
     )
   }
 
+  const handleCertificateExport = async () => {
+    if (!certCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/quota-certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: certCustomerId,
+          cuotaholderIndex: certCuotaholderIndex,
+          certificateNumber: certNumber,
+          series: certSeries,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `Certificado_Cuotas_${certNumber}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating certificate:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const getSelectedCustomerCuotaholders = () => {
+    const customer = customers.find(c => c.id === certCustomerId)
+    if (!customer) return []
+    return customer.individualCuotaholders || []
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -196,6 +242,10 @@ export default function ExportPage() {
           <TabsTrigger value="word" className="gap-2">
             <FileText className="h-4 w-4" />
             {t('word')}
+          </TabsTrigger>
+          <TabsTrigger value="certificate" className="gap-2">
+            <Award className="h-4 w-4" />
+            {t('quotaCertificate')}
           </TabsTrigger>
         </TabsList>
 
@@ -353,6 +403,105 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateWord')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="certificate" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('selectCustomer')}</CardTitle>
+                <CardDescription>
+                  {t('selectCustomerForCertificate')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Select
+                  value={certCustomerId}
+                  onValueChange={(value) => {
+                    setCertCustomerId(value)
+                    setCertCuotaholderIndex(0)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {getCustomerDisplayName(customer)}
+                        {customer.natureOfBusiness && ` (${customer.natureOfBusiness})`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {certCustomerId && getSelectedCustomerCuotaholders().length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('selectCuotaholder')}</label>
+                    <Select
+                      value={certCuotaholderIndex.toString()}
+                      onValueChange={(value) => setCertCuotaholderIndex(parseInt(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getSelectedCustomerCuotaholders().map((holder: { givenNames?: string; lastName?: string }, index: number) => (
+                          <SelectItem key={index} value={index.toString()}>
+                            {`${holder.givenNames || ''} ${holder.lastName || ''}`.trim() || `Cuotaholder ${index + 1}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('certificateDetails')}</CardTitle>
+                <CardDescription>
+                  {t('certificateDetailsDescription')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('certificateNumber')}</label>
+                    <input
+                      type="text"
+                      value={certNumber}
+                      onChange={(e) => setCertNumber(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="001"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('certificateSeries')}</label>
+                    <input
+                      type="text"
+                      value={certSeries}
+                      onChange={(e) => setCertSeries(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="AB"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleCertificateExport}
+              disabled={exporting || !certCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateCertificate')}
             </Button>
           </div>
         </TabsContent>

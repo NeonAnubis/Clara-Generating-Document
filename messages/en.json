@@ -142,7 +142,15 @@
     "selectTemplatePlaceholder": "Select a template...",
     "noActiveTemplates": "No active templates. Create one in the Templates section.",
     "generateWord": "Generate Word Document",
-    "generating": "Generating..."
+    "generating": "Generating...",
+    "quotaCertificate": "Quota Certificate",
+    "selectCustomerForCertificate": "Choose the customer to generate the quota certificate",
+    "selectCuotaholder": "Select Cuotaholder",
+    "certificateDetails": "Certificate Details",
+    "certificateDetailsDescription": "Configure the certificate number and series",
+    "certificateNumber": "Certificate Number",
+    "certificateSeries": "Series",
+    "generateCertificate": "Generate Certificate"
   },
   "history": {
     "title": "Export History",

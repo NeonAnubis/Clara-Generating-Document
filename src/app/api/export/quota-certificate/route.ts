@@ -1,0 +1,351 @@
+import { NextRequest, NextResponse } from 'next/server'
+import prisma from '@/lib/prisma'
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  AlignmentType,
+  BorderStyle,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+  VerticalAlign,
+  PageOrientation,
+} from 'docx'
+
+export async function POST(request: NextRequest) {
+  try {
+    const data = await request.json()
+    const { customerId, cuotaholderIndex = 0, certificateNumber = '001', series = 'AB' } = data
+
+    // Get customer
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customer = await (prisma.customer as any).findUnique({
+      where: { id: customerId },
+    })
+
+    if (!customer) {
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
+    }
+
+    // Parse JSON fields
+    const individualCuotaholders = JSON.parse(customer.individualCuotaholders || '[]')
+    const cuotaholder = individualCuotaholders[cuotaholderIndex] || {}
+
+    const nominalValue = customer.nominalValueOfCuotas || '100'
+    const numberOfCuotas = customer.numberOfCuotasToBeIssued || '1000'
+    const totalCapital = parseInt(nominalValue) * parseInt(numberOfCuotas)
+
+    // Generate current date in Spanish format
+    const currentDate = new Date()
+    const dateOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+    const formattedDate = currentDate.toLocaleDateString('es-CR', dateOptions)
+
+    // Create company ID (this should come from somewhere - using placeholder)
+    const companyId = '3-102-XXXXXX' // This should be stored in the customer/company record
+
+    const cuotaholderName = `${cuotaholder.givenNames || ''} ${cuotaholder.lastName || ''}`.trim().toUpperCase() || 'NOMBRE DEL CUOTAHABIENTE'
+    const passportCountry = cuotaholder.placeOfBirth || 'estonio'
+    const passportNumber = cuotaholder.passportNumber || 'XXXXXXXXX'
+
+    // Create the certificate document with borders
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            size: {
+              orientation: PageOrientation.LANDSCAPE,
+              width: 15840, // 11 inches in twips
+              height: 12240, // 8.5 inches in twips
+            },
+            margin: {
+              top: 720, // 0.5 inch
+              right: 720,
+              bottom: 720,
+              left: 720,
+            },
+          },
+        },
+        children: [
+          // Outer table for borders
+          new Table({
+            width: {
+              size: 100,
+              type: WidthType.PERCENTAGE,
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    borders: {
+                      top: { style: BorderStyle.DOUBLE, size: 12, color: 'B8860B' }, // Gold
+                      bottom: { style: BorderStyle.DOUBLE, size: 12, color: 'B8860B' },
+                      left: { style: BorderStyle.DOUBLE, size: 12, color: 'B8860B' },
+                      right: { style: BorderStyle.DOUBLE, size: 12, color: 'B8860B' },
+                    },
+                    children: [
+                      new Table({
+                        width: {
+                          size: 100,
+                          type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                          new TableRow({
+                            children: [
+                              new TableCell({
+                                borders: {
+                                  top: { style: BorderStyle.SINGLE, size: 6, color: '1E3A5F' }, // Navy blue
+                                  bottom: { style: BorderStyle.SINGLE, size: 6, color: '1E3A5F' },
+                                  left: { style: BorderStyle.SINGLE, size: 6, color: '1E3A5F' },
+                                  right: { style: BorderStyle.SINGLE, size: 6, color: '1E3A5F' },
+                                },
+                                margins: {
+                                  top: 400,
+                                  bottom: 400,
+                                  left: 400,
+                                  right: 400,
+                                },
+                                children: [
+                                  // Header row with certificate info
+                                  new Table({
+                                    width: { size: 100, type: WidthType.PERCENTAGE },
+                                    rows: [
+                                      new TableRow({
+                                        children: [
+                                          new TableCell({
+                                            width: { size: 50, type: WidthType.PERCENTAGE },
+                                            borders: {
+                                              top: { style: BorderStyle.NONE },
+                                              bottom: { style: BorderStyle.NONE },
+                                              left: { style: BorderStyle.NONE },
+                                              right: { style: BorderStyle.NONE },
+                                            },
+                                            children: [
+                                              new Paragraph({
+                                                children: [
+                                                  new TextRun({ text: `CERTIFICADO DE CUOTAS ${certificateNumber}`, color: '1E3A5F', size: 20 }),
+                                                ],
+                                              }),
+                                              new Paragraph({
+                                                children: [
+                                                  new TextRun({ text: `SERIE ${series}`, color: '1E3A5F', size: 20, italics: true }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          new TableCell({
+                                            width: { size: 50, type: WidthType.PERCENTAGE },
+                                            borders: {
+                                              top: { style: BorderStyle.NONE },
+                                              bottom: { style: BorderStyle.NONE },
+                                              left: { style: BorderStyle.NONE },
+                                              right: { style: BorderStyle.NONE },
+                                            },
+                                            children: [
+                                              new Paragraph({
+                                                alignment: AlignmentType.RIGHT,
+                                                children: [
+                                                  new TextRun({ text: `VALE POR ${numberOfCuotas} CUOTAS`, color: '1E3A5F', size: 28, bold: true }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+
+                                  // Company name
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 400, after: 200 },
+                                    children: [
+                                      new TextRun({ text: `${companyId} SOCIEDAD DE RESPONSABILIDAD LIMITADA`, bold: true, size: 36, color: '1E3A5F' }),
+                                    ],
+                                  }),
+
+                                  // CR number
+                                  new Paragraph({
+                                    alignment: AlignmentType.RIGHT,
+                                    children: [
+                                      new TextRun({ text: 'CR00043', color: '1E3A5F', size: 18 }),
+                                    ],
+                                  }),
+
+                                  // Domiciled info
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 200 },
+                                    children: [
+                                      new TextRun({ text: 'DOMICILIADA EN SAN JOSE', color: '1E3A5F', size: 22 }),
+                                    ],
+                                  }),
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    children: [
+                                      new TextRun({ text: `CEDULA JURIDICA ${companyId}`, color: '1E3A5F', size: 22 }),
+                                    ],
+                                  }),
+
+                                  // Capital social box
+                                  new Table({
+                                    width: { size: 80, type: WidthType.PERCENTAGE },
+                                    alignment: AlignmentType.CENTER,
+                                    rows: [
+                                      new TableRow({
+                                        children: [
+                                          new TableCell({
+                                            borders: {
+                                              top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+                                              bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+                                              left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+                                              right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+                                            },
+                                            margins: { top: 200, bottom: 200, left: 200, right: 200 },
+                                            shading: { fill: 'F5F5F5' },
+                                            children: [
+                                              new Paragraph({
+                                                alignment: AlignmentType.CENTER,
+                                                children: [
+                                                  new TextRun({ text: `CAPITAL SOCIAL ${totalCapital.toLocaleString('es-CR')} COLONES REPRESENTANDO POR`, size: 20 }),
+                                                ],
+                                              }),
+                                              new Paragraph({
+                                                alignment: AlignmentType.CENTER,
+                                                children: [
+                                                  new TextRun({ text: `${numberOfCuotas} CUOTAS COMUNES Y NOMINATIVAS`, size: 20 }),
+                                                ],
+                                              }),
+                                              new Paragraph({
+                                                alignment: AlignmentType.CENTER,
+                                                children: [
+                                                  new TextRun({ text: `DE ${nominalValue} COLONES CADA UNA`, size: 20 }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+
+                                  // Constitution info
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 300 },
+                                    children: [
+                                      new TextRun({ text: 'Constituida por escritura otorgada en San José, ante la notaria Clara Alvarado Jiménez e inscrita ante el Registro', size: 18 }),
+                                    ],
+                                  }),
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    children: [
+                                      new TextRun({ text: 'Público, Sección Mercantil.', size: 18 }),
+                                    ],
+                                  }),
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    children: [
+                                      new TextRun({ text: `Plazo Social 120 años a partir de la fecha de constitución el ${formattedDate}.`, size: 18 }),
+                                    ],
+                                  }),
+
+                                  // Certification text
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 400 },
+                                    children: [
+                                      new TextRun({ text: 'Certificamos que ', size: 22 }),
+                                      new TextRun({ text: cuotaholderName + ',', bold: true, size: 22 }),
+                                      new TextRun({ text: ` con pasaporte ${passportCountry} número ${passportNumber}`, size: 22 }),
+                                    ],
+                                  }),
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 200 },
+                                    children: [
+                                      new TextRun({ text: 'es propietaria de ', size: 22 }),
+                                      new TextRun({ text: `${numberOfCuotas} CUOTAS`, bold: true, size: 22 }),
+                                      new TextRun({ text: ' comunes y nominativas.', size: 22 }),
+                                    ],
+                                  }),
+
+                                  // Validation text
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 200 },
+                                    children: [
+                                      new TextRun({ text: 'Para su validez, este título debe ser certificado por el GERENTE.', size: 20 }),
+                                    ],
+                                  }),
+
+                                  // Date
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 200 },
+                                    children: [
+                                      new TextRun({ text: `San José, ${formattedDate}.`, bold: true, size: 20 }),
+                                    ],
+                                  }),
+
+                                  // Signature line
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 400 },
+                                    children: [
+                                      new TextRun({ text: '________________________________________', size: 20 }),
+                                    ],
+                                  }),
+                                  new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    spacing: { before: 100, after: 200 },
+                                    children: [
+                                      new TextRun({ text: 'GERENTE', bold: true, size: 20 }),
+                                    ],
+                                  }),
+                                ],
+                                verticalAlign: VerticalAlign.CENTER,
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                    verticalAlign: VerticalAlign.CENTER,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }],
+    })
+
+    // Generate buffer
+    const buffer = await Packer.toBuffer(doc)
+
+    const fileName = `Certificado_Cuotas_${cuotaholderName.replace(/\s+/g, '_')}.docx`
+
+    // Log export history
+    await prisma.exportHistory.create({
+      data: {
+        exportType: 'word',
+        fileName,
+        recordCount: 1,
+        filterCriteria: JSON.stringify({ customerId, type: 'quota-certificate' }),
+      },
+    })
+
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      },
+    })
+  } catch (error) {
+    console.error('Error generating quota certificate:', error)
+    return NextResponse.json({ error: 'Error generating quota certificate' }, { status: 500 })
+  }
+}
