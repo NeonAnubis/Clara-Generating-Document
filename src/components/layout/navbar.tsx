@@ -50,7 +50,7 @@ export function Navbar() {
   const navigation = [
     { name: t('dashboard'), href: '/', icon: LayoutDashboard },
     { name: t('customers'), href: '/customers', icon: Users },
-    { name: t('templates'), href: '/templates', icon: FileText },
+    // { name: t('templates'), href: '/templates', icon: FileText },
     { name: t('export'), href: '/export', icon: Download },
     { name: t('history'), href: '/history', icon: FileSpreadsheet },
   ]

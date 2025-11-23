@@ -235,14 +235,14 @@ export default function ExportPage() {
 
       <Tabs defaultValue="excel" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="excel" className="gap-2">
+          {/* <TabsTrigger value="excel" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
             {t('excel')}
           </TabsTrigger>
           <TabsTrigger value="word" className="gap-2">
             <FileText className="h-4 w-4" />
             {t('word')}
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="certificate" className="gap-2">
             <Award className="h-4 w-4" />
             {t('quotaCertificate')}

@@ -12,7 +12,6 @@ import {
   TableCell,
   WidthType,
   VerticalAlign,
-  PageOrientation,
 } from 'docx'
 
 export async function POST(request: NextRequest) {
@@ -56,15 +55,14 @@ export async function POST(request: NextRequest) {
         properties: {
           page: {
             size: {
-              orientation: PageOrientation.LANDSCAPE,
-              width: 15840, // 11 inches in twips
-              height: 12240, // 8.5 inches in twips
+              width: 15840, // 11 inches in twips (1440 * 11)
+              height: 12240, // 8.5 inches in twips (1440 * 8.5)
             },
             margin: {
-              top: 720, // 0.5 inch
-              right: 720,
-              bottom: 720,
-              left: 720,
+              top: 1699, // 1.18 inch in twips (1440 * 1.18)
+              bottom: 1699, // 1.18 inch in twips
+              left: 1411, // 0.98 inch in twips (1440 * 0.98)
+              right: 1411, // 0.98 inch in twips
             },
           },
         },
