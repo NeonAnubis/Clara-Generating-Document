@@ -60,7 +60,7 @@ export default function ExportPage() {
   const [certCuotaholderIndex, setCertCuotaholderIndex] = useState<number>(0)
   const [certNumber, setCertNumber] = useState<string>('001')
   const [certSeries, setCertSeries] = useState<string>('AB')
-
+  // Fetch customers and templates on mount
   useEffect(() => {
     Promise.all([
       fetch('/api/customers').then(r => r.json()),
