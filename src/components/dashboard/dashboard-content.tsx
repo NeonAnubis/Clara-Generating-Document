@@ -16,7 +16,7 @@ interface DashboardStats {
     createdAt: Date
   }>
 }
-// DashboardContent component to display stats and quick actions
+//  Dashboard content component displaying stats and quick actions
 export function DashboardContent({ stats }: { stats: DashboardStats }) {
   const t = useTranslations('dashboard')
 
