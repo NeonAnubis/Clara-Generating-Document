@@ -25,7 +25,8 @@
     "export": "Export",
     "history": "History",
     "brand": "Papelería",
-    "language": "Language"
+    "language": "Language",
+    "signOut": "Sign Out"
   },
   "dashboard": {
     "title": "Dashboard",

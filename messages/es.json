@@ -25,7 +25,8 @@
     "export": "Exportar",
     "history": "Historial",
     "brand": "Papelería",
-    "language": "Idioma"
+    "language": "Idioma",
+    "signOut": "Cerrar Sesión"
   },
   "dashboard": {
     "title": "Dashboard",
