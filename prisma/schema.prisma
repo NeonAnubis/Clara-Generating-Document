@@ -122,7 +122,7 @@ model User {
   id              String   @id @default(cuid())
   email           String   @unique
   password        String   // hashed password
-  name            String?
+  whatsappNumber  String   // required WhatsApp number
 
   // Status
   isActive        Boolean  @default(true)

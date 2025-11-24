@@ -43,6 +43,14 @@ export async function setAuthCookie(token: string) {
 
 export async function removeAuthCookie() {
   const cookieStore = await cookies()
+  // Delete the cookie and also set it to expire immediately
+  cookieStore.set(TOKEN_NAME, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/',
+  })
   cookieStore.delete(TOKEN_NAME)
 }
 
