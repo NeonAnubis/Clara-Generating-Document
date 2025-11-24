@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import spainFlag from '@/assets/flags/spain.jpg'
 import usFlag from '@/assets/flags/us.jpg'
+import logo from '@/assets/logo.png'
 
 const LOCALES = {
   es: { flag: spainFlag, name: 'Español' },
@@ -93,9 +94,14 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <span className="text-xl">📋</span>
-            <span>{t('brand')}</span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src={logo}
+              alt="Logo"
+              width={120}
+              height={40}
+              className="object-contain"
+            />
           </Link>
 
           {/* Navigation Links */}
