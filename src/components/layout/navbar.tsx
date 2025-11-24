@@ -94,13 +94,14 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           {/* Brand */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center h-full py-2">
             <Image
               src={logo}
               alt="Logo"
               width={120}
               height={40}
-              className="object-contain"
+              className="h-full w-auto object-contain"
+              priority
             />
           </Link>
 
