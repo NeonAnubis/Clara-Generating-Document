@@ -117,3 +117,19 @@ model ExportHistory {
   // Timestamps
   createdAt       DateTime @default(now())
 }
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  password        String   // hashed password
+  name            String?
+
+  // Status
+  isActive        Boolean  @default(true)
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([email])
+}

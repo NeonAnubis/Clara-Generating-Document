@@ -11,13 +11,17 @@ import {
   Download,
   LayoutDashboard,
   FileSpreadsheet,
+  LogOut,
+  User,
 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import spainFlag from '@/assets/flags/spain.jpg'
 import usFlag from '@/assets/flags/us.jpg'
@@ -27,10 +31,18 @@ const LOCALES = {
   en: { flag: usFlag, name: 'English' },
 }
 
+interface UserInfo {
+  id: string
+  email: string
+  name: string | null
+}
+
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const t = useTranslations('nav')
   const [currentLocale, setCurrentLocale] = useState<'es' | 'en'>('es')
+  const [user, setUser] = useState<UserInfo | null>(null)
 
   useEffect(() => {
     const cookieLocale = document.cookie
@@ -38,11 +50,23 @@ export function Navbar() {
       .find(row => row.startsWith('locale='))
       ?.split('=')[1] as 'es' | 'en' | undefined
     setCurrentLocale(cookieLocale || 'es')
+
+    // Fetch current user
+    fetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(() => {})
   }, [])
 
-  // Hide navbar on customer view page (/customers/[id])
+  // Hide navbar on certain pages
   const isCustomerViewPage = pathname.startsWith('/customers/') && pathname !== '/customers'
-  if (isCustomerViewPage) {
+  const isAuthPage = pathname === '/signin' || pathname === '/signup'
+
+  if (isCustomerViewPage || isAuthPage) {
     return null
   }
 
@@ -57,6 +81,12 @@ export function Navbar() {
   const switchLocale = async (locale: string) => {
     document.cookie = `locale=${locale};path=/;max-age=31536000`
     window.location.reload()
+  }
+
+  const handleSignOut = async () => {
+    await fetch('/api/auth/signout', { method: 'POST' })
+    router.push('/signin')
+    router.refresh()
   }
 
   return (
@@ -93,30 +123,57 @@ export function Navbar() {
             })}
           </div>
 
-          {/* Language Switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="px-2">
-                <Image
-                  src={LOCALES[currentLocale].flag}
-                  alt={LOCALES[currentLocale].name}
-                  width={24}
-                  height={16}
-                  className="rounded-sm"
-                />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => switchLocale('es')} className="flex items-center gap-2">
-                <Image src={spainFlag} alt="Español" width={20} height={14} className="rounded-sm" />
-                Español
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => switchLocale('en')} className="flex items-center gap-2">
-                <Image src={usFlag} alt="English" width={20} height={14} className="rounded-sm" />
-                English
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Right side: Language Switcher + User Menu */}
+          <div className="flex items-center gap-2">
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="px-2">
+                  <Image
+                    src={LOCALES[currentLocale].flag}
+                    alt={LOCALES[currentLocale].name}
+                    width={24}
+                    height={16}
+                    className="rounded-sm"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => switchLocale('es')} className="flex items-center gap-2">
+                  <Image src={spainFlag} alt="Español" width={20} height={14} className="rounded-sm" />
+                  Español
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => switchLocale('en')} className="flex items-center gap-2">
+                  <Image src={usFlag} alt="English" width={20} height={14} className="rounded-sm" />
+                  English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* User Menu */}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline max-w-[100px] truncate">
+                      {user.name || user.email}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                    {user.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t('signOut')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </div>
     </nav>
