@@ -19,7 +19,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -154,18 +153,11 @@ export function Navbar() {
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline max-w-[120px] truncate">
-                      {user.whatsappNumber}
-                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                    {user.email}
-                  </div>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     {t('signOut')}
