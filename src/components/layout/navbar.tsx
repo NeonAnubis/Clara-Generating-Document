@@ -34,7 +34,7 @@ const LOCALES = {
 interface UserInfo {
   id: string
   email: string
-  name: string | null
+  whatsappNumber: string
 }
 
 export function Navbar() {
@@ -156,8 +156,8 @@ export function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline max-w-[100px] truncate">
-                      {user.name || user.email}
+                    <span className="hidden sm:inline max-w-[120px] truncate">
+                      {user.whatsappNumber}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>

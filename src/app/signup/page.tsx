@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react'
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [name, setName] = useState('')
+  const [whatsappNumber, setWhatsappNumber] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -32,13 +32,18 @@ export default function SignUpPage() {
       return
     }
 
+    if (!whatsappNumber.trim()) {
+      setError('WhatsApp number is required')
+      return
+    }
+
     setLoading(true)
 
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, whatsappNumber }),
       })
 
       const data = await response.json()
@@ -76,19 +81,20 @@ export default function SignUpPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
               <Input
-                id="name"
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                id="whatsappNumber"
+                type="tel"
+                placeholder="+1234567890"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                required
                 disabled={loading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
                 type="email"

@@ -4,11 +4,18 @@ import { hashPassword, generateToken, setAuthCookie } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json()
+    const { email, password, whatsappNumber } = await request.json()
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
+        { status: 400 }
+      )
+    }
+
+    if (!whatsappNumber || !whatsappNumber.trim()) {
+      return NextResponse.json(
+        { error: 'WhatsApp number is required' },
         { status: 400 }
       )
     }
@@ -34,7 +41,7 @@ export async function POST(request: NextRequest) {
       data: {
         email,
         password: hashedPassword,
-        name: name || null,
+        whatsappNumber: whatsappNumber.trim(),
       },
     })
 
@@ -46,7 +53,7 @@ export async function POST(request: NextRequest) {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        whatsappNumber: user.whatsappNumber,
       },
     })
   } catch (error) {

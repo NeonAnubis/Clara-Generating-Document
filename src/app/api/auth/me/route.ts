@@ -21,7 +21,7 @@ export async function GET() {
       select: {
         id: true,
         email: true,
-        name: true,
+        whatsappNumber: true,
         isActive: true,
       },
     })
