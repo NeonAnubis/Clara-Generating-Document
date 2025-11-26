@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -41,26 +40,16 @@ import {
 
 interface Customer {
   id: string
-  primaryContactName: string | null
-  primaryContactEmail: string | null
-  secondaryContactName: string | null
-  secondaryContactEmail: string | null
-  onlyPrimarySecondaryNotified: boolean
-  individualCuotaholders: Array<{
-    lastName: string
-    givenNames: string
-    emailAddress: string
-    telephoneNumber: string
-  }>
-  corporateCuotaholders: Array<{
-    companyName: string
-  }>
-  natureOfBusiness: string | null
-  status: string
+  companyName: string | null
+  companyType: string | null
+  legalId: string | null
+  shareholderOne: string | null
+  shareholderTwo: string | null
+  email: string | null
   createdAt: string
 }
 
-type SortField = 'primaryContact' | 'email' | 'cuotaholder' | 'business' | 'status'
+type SortField = 'companyName' | 'legalId' | 'email' | 'shareholder'
 type SortDirection = 'asc' | 'desc' | null
 
 interface SortState {
@@ -98,26 +87,18 @@ export function CustomerListSortable() {
     fetchCustomers()
   }, [fetchCustomers])
 
-  const getFirstCuotaholderName = (customer: Customer) => {
-    if (customer.individualCuotaholders?.length > 0) {
-      const first = customer.individualCuotaholders[0]
-      if (first.givenNames || first.lastName) {
-        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
-      }
+  const getShareholderDisplay = (customer: Customer) => {
+    if (customer.shareholderOne) {
+      return customer.shareholderOne
     }
-    if (customer.corporateCuotaholders?.length > 0) {
-      const first = customer.corporateCuotaholders[0]
-      if (first.companyName) {
-        return first.companyName
-      }
-    }
-    return ''
+    return '-'
   }
 
-  const getCuotaholderCount = (customer: Customer) => {
-    const individualCount = customer.individualCuotaholders?.filter(c => c.lastName || c.givenNames).length || 0
-    const corporateCount = customer.corporateCuotaholders?.filter(c => c.companyName).length || 0
-    return individualCount + corporateCount
+  const getShareholderCount = (customer: Customer) => {
+    let count = 0
+    if (customer.shareholderOne) count++
+    if (customer.shareholderTwo) count++
+    return count
   }
 
   const handleSort = (field: SortField) => {
@@ -145,25 +126,21 @@ export function CustomerListSortable() {
       let valueB: string
 
       switch (sortState.field) {
-        case 'primaryContact':
-          valueA = (a.primaryContactName || '').toLowerCase()
-          valueB = (b.primaryContactName || '').toLowerCase()
+        case 'companyName':
+          valueA = (a.companyName || '').toLowerCase()
+          valueB = (b.companyName || '').toLowerCase()
+          break
+        case 'legalId':
+          valueA = (a.legalId || '').toLowerCase()
+          valueB = (b.legalId || '').toLowerCase()
           break
         case 'email':
-          valueA = (a.primaryContactEmail || '').toLowerCase()
-          valueB = (b.primaryContactEmail || '').toLowerCase()
+          valueA = (a.email || '').toLowerCase()
+          valueB = (b.email || '').toLowerCase()
           break
-        case 'cuotaholder':
-          valueA = getFirstCuotaholderName(a).toLowerCase()
-          valueB = getFirstCuotaholderName(b).toLowerCase()
-          break
-        case 'business':
-          valueA = (a.natureOfBusiness || '').toLowerCase()
-          valueB = (b.natureOfBusiness || '').toLowerCase()
-          break
-        case 'status':
-          valueA = a.status.toLowerCase()
-          valueB = b.status.toLowerCase()
+        case 'shareholder':
+          valueA = (a.shareholderOne || '').toLowerCase()
+          valueB = (b.shareholderOne || '').toLowerCase()
           break
         default:
           return 0
@@ -194,23 +171,6 @@ export function CustomerListSortable() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-      active: 'default',
-      inactive: 'secondary',
-      pending: 'destructive',
-    }
-    const labels: Record<string, string> = {
-      active: t('statusActive'),
-      inactive: t('statusInactive'),
-      pending: t('statusPending'),
-    }
-    return (
-      <Badge variant={variants[status] || 'default'}>
-        {labels[status] || status}
-      </Badge>
-    )
-  }
 
   const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => {
     const isActive = sortState.field === field
@@ -254,34 +214,31 @@ export function CustomerListSortable() {
           <TableHeader>
             <TableRow>
               <TableHead>
-                <SortableHeader field="primaryContact">{t('primaryContact')}</SortableHeader>
+                <SortableHeader field="companyName">{t('company')}</SortableHeader>
+              </TableHead>
+              <TableHead>
+                <SortableHeader field="legalId">Legal ID</SortableHeader>
               </TableHead>
               <TableHead>
                 <SortableHeader field="email">{t('email')}</SortableHeader>
               </TableHead>
               <TableHead>
-                <SortableHeader field="cuotaholder">{t('cuotaholder')}</SortableHeader>
+                <SortableHeader field="shareholder">Shareholder</SortableHeader>
               </TableHead>
-              <TableHead>{t('cuotaholderCount')}</TableHead>
-              <TableHead>
-                <SortableHeader field="business">{t('businessNature')}</SortableHeader>
-              </TableHead>
-              <TableHead>
-                <SortableHeader field="status">{t('status')}</SortableHeader>
-              </TableHead>
+              <TableHead>Shareholders</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
             ) : sortedCustomers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {t('noCustomersFound')}
                 </TableCell>
               </TableRow>
@@ -289,15 +246,12 @@ export function CustomerListSortable() {
               sortedCustomers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell className="font-medium">
-                    {customer.primaryContactName || '-'}
+                    {customer.companyName || '-'}
                   </TableCell>
-                  <TableCell>{customer.primaryContactEmail || '-'}</TableCell>
-                  <TableCell>{getFirstCuotaholderName(customer) || '-'}</TableCell>
-                  <TableCell>{getCuotaholderCount(customer)}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    {customer.natureOfBusiness || '-'}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(customer.status)}</TableCell>
+                  <TableCell>{customer.legalId || '-'}</TableCell>
+                  <TableCell>{customer.email || '-'}</TableCell>
+                  <TableCell>{getShareholderDisplay(customer)}</TableCell>
+                  <TableCell>{getShareholderCount(customer)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

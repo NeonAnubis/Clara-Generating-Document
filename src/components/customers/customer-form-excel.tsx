@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Upload } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface CustomerFormExcelProps {
   onSave?: () => void
@@ -13,79 +14,155 @@ interface CustomerFormExcelProps {
 
 export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   const { toast } = useToast()
+  const t = useTranslations('customerForm')
   const [loading, setLoading] = useState(false)
 
   // Company Information
-  const [nombreDeLaSociedad, setNombreDeLaSociedad] = useState('')
-  const [tipoDeSociedad, setTipoDeSociedad] = useState('')
-  const [abreviatura, setAbreviatura] = useState('')
-  const [cedulaJuridica, setCedulaJuridica] = useState('')
-  const [capitalSocial, setCapitalSocial] = useState('')
-  const [cantidadCuotas, setCantidadCuotas] = useState('')
-  const [valorDeCuotas, setValorDeCuotas] = useState('')
-  const [serie, setSerie] = useState('')
-  const [domicilio, setDomicilio] = useState('')
-  const [plazoSocial, setPlazoSocial] = useState('')
-  const [fechaDeConstitucion, setFechaDeConstitucion] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [companyType, setCompanyType] = useState('')
+  const [abbreviation, setAbbreviation] = useState('')
+  const [legalId, setLegalId] = useState('')
+  const [shareCapital, setShareCapital] = useState('')
+  const [numberOfShares, setNumberOfShares] = useState('')
+  const [shareValue, setShareValue] = useState('')
+  const [series, setSeries] = useState('')
+  const [registeredAddress, setRegisteredAddress] = useState('')
+  const [companyTerm, setCompanyTerm] = useState('')
+  const [incorporationDate, setIncorporationDate] = useState('')
 
-  // Cuotista 1
-  const [cuotistaUno, setCuotistaUno] = useState('')
-  const [numeroDeCertificado, setNumeroDeCertificado] = useState('')
-  const [identificacion, setIdentificacion] = useState('')
-  const [propiedad, setPropiedad] = useState('')
-  const [numeroDeCuotas, setNumeroDeCuotas] = useState('')
-  const [fecha, setFecha] = useState('')
-  const [mes, setMes] = useState('')
-  const [ano, setAno] = useState('')
-  const [imprimir, setImprimir] = useState('')
-  const [capitalNumero, setCapitalNumero] = useState('')
-  const [estadoCivil, setEstadoCivil] = useState('')
-  const [profesion, setProfesion] = useState('')
-  const [domicilioCuotista1, setDomicilioCuotista1] = useState('')
-  const [referencia, setReferencia] = useState('')
-  const [enLetrasCuotas1, setEnLetrasCuotas1] = useState('')
-  const [porcentaje1, setPorcentaje1] = useState('')
+  // Shareholder 1
+  const [shareholderOne, setShareholderOne] = useState('')
+  const [certificateNumber, setCertificateNumber] = useState('')
+  const [identification, setIdentification] = useState('')
+  const [ownership, setOwnership] = useState('')
+  const [numberOfSharesHeld, setNumberOfSharesHeld] = useState('')
+  const [date, setDate] = useState('')
+  const [month, setMonth] = useState('')
+  const [year, setYear] = useState('')
+  const [print, setPrint] = useState('')
+  const [excelId, setExcelId] = useState('')
+  const [capitalNumber, setCapitalNumber] = useState('')
+  const [maritalStatus, setMaritalStatus] = useState('')
+  const [profession, setProfession] = useState('')
+  const [shareholder1Address, setShareholder1Address] = useState('')
+  const [reference, setReference] = useState('')
+  const [sharesInWords1, setSharesInWords1] = useState('')
+  const [percentage1, setPercentage1] = useState('')
 
-  // Cuotista 2
-  const [numeroDeCertificado2, setNumeroDeCertificado2] = useState('')
-  const [referencia2, setReferencia2] = useState('')
-  const [domicilioCuotista2, setDomicilioCuotista2] = useState('')
-  const [profesion2, setProfesion2] = useState('')
-  const [estadoCivil2, setEstadoCivil2] = useState('')
-  const [cuotista2, setCuotista2] = useState('')
-  const [identificacion2, setIdentificacion2] = useState('')
-  const [propiedad2, setPropiedad2] = useState('')
-  const [porcentaje2, setPorcentaje2] = useState('')
-  const [enNumerosCuotas2, setEnNumerosCuotas2] = useState('')
-  const [numeroDeCuotas2, setNumeroDeCuotas2] = useState('')
+  // Shareholder 2
+  const [certificateNumber2, setCertificateNumber2] = useState('')
+  const [reference2, setReference2] = useState('')
+  const [shareholder2Address, setShareholder2Address] = useState('')
+  const [profession2, setProfession2] = useState('')
+  const [maritalStatus2, setMaritalStatus2] = useState('')
+  const [shareholderTwo, setShareholderTwo] = useState('')
+  const [identification2, setIdentification2] = useState('')
+  const [ownership2, setOwnership2] = useState('')
+  const [percentage2, setPercentage2] = useState('')
+  const [sharesInNumbers2, setSharesInNumbers2] = useState('')
+  const [numberOfSharesHeld2, setNumberOfSharesHeld2] = useState('')
 
   // Additional Fields
-  const [campo1, setCampo1] = useState('')
-  const [cedulaLetras, setCedulaLetras] = useState('')
-  const [fechaInicioRenovacion, setFechaInicioRenovacion] = useState('')
-  const [activa, setActiva] = useState('')
-  const [archivado, setArchivado] = useState('')
-  const [cooperador, setCooperador] = useState('')
-  const [representanteLegal, setRepresentanteLegal] = useState('')
-  const [identificacionRepresentante, setIdentificacionRepresentante] = useState('')
-  const [tributacionActiva, setTributacionActiva] = useState('')
+  const [field1, setField1] = useState('')
+  const [legalIdInWords, setLegalIdInWords] = useState('')
+  const [renewalStartDate, setRenewalStartDate] = useState('')
+  const [active, setActive] = useState('')
+  const [archived, setArchived] = useState('')
+  const [cooperator, setCooperator] = useState('')
+  const [legalRepresentative, setLegalRepresentative] = useState('')
+  const [representativeId, setRepresentativeId] = useState('')
+  const [activeTaxation, setActiveTaxation] = useState('')
 
-  // Gerente (Manager)
-  const [nombreGerente, setNombreGerente] = useState('')
-  const [idGerente, setIdGerente] = useState('')
-  const [domicilioGerente, setDomicilioGerente] = useState('')
-  const [ocupacionGerente, setOcupacionGerente] = useState('')
-  const [estadoCivilGerente, setEstadoCivilGerente] = useState('')
-  const [nacionalidadGerente, setNacionalidadGerente] = useState('')
-  const [apellidoGerente, setApellidoGerente] = useState('')
+  // Manager
+  const [managerFirstName, setManagerFirstName] = useState('')
+  const [managerId, setManagerId] = useState('')
+  const [managerAddress, setManagerAddress] = useState('')
+  const [managerOccupation, setManagerOccupation] = useState('')
+  const [managerMaritalStatus, setManagerMaritalStatus] = useState('')
+  const [managerNationality, setManagerNationality] = useState('')
+  const [managerLastName, setManagerLastName] = useState('')
 
   // Other
-  const [denominacion, setDenominacion] = useState('')
-  const [idEnNumeros, setIdEnNumeros] = useState('')
-  const [disueltaRegistro, setDisueltaRegistro] = useState('')
-  const [legalizacionLibros, setLegalizacionLibros] = useState('')
-  const [correoElectronico, setCorreoElectronico] = useState('')
-  const [nombreComercial, setNombreComercial] = useState('')
+  const [denomination, setDenomination] = useState('')
+  const [idInNumbers, setIdInNumbers] = useState('')
+  const [dissolvedRecord, setDissolvedRecord] = useState('')
+  const [bookLegalization, setBookLegalization] = useState('')
+  const [email, setEmail] = useState('')
+  const [tradeName, setTradeName] = useState('')
+
+  const handleImportMockData = () => {
+    // Populate with mock data for testing
+    setCompanyName('VISIONGLASS')
+    setCompanyType('SOCIEDAD DE RESPONSABILIDAD LIMITADA')
+    setAbbreviation('S.R.L')
+    setLegalId('3-102-694610')
+    setShareCapital('CIEN MIL')
+    setNumberOfShares('MIL')
+    setShareValue('CIEN')
+    setSeries('AB')
+    setRegisteredAddress('SAN JOSÉ')
+    setCompanyTerm('450')
+    setIncorporationDate('31 de marzo del 2015')
+    setShareholderOne('CHRISTIAN FERNANDO BAEZA HASBÚN')
+    setCertificateNumber('1')
+    setIdentification('pasaporte venezolano número 042269762')
+    setOwnership('propietario')
+    setNumberOfSharesHeld('500')
+    setDate('1')
+    setMonth('abril')
+    setYear('2015')
+    setPrint('*')
+    setExcelId('22')
+    setCapitalNumber('100 000')
+    setMaritalStatus('casado')
+    setProfession('ingeniero civil')
+    setShareholder1Address('Venezuela, Anzoátegui, Lechería, av. Camejo Octavio, Urb. Las Villas')
+    setReference('EL COMPRADOR')
+    setSharesInWords1('QUINIENTAS')
+    setPercentage1('50')
+    setCertificateNumber2('2')
+    setReference2('LA COMPRADORA')
+    setShareholder2Address('Venezuela, Anzoátegui, Lechería, av. Camejo Octavio, Urb. Las Villas')
+    setProfession2('licenciada en Contaduría')
+    setMaritalStatus2('casada')
+    setShareholderTwo('YENNY MAR CRUZ DE PAZ')
+    setIdentification2('pasaporte venezolano número 108254545')
+    setOwnership2('propietaria')
+    setPercentage2('50')
+    setSharesInNumbers2('QUINIENTAS')
+    setNumberOfSharesHeld2('500')
+    setField1('22')
+    setLegalIdInWords('tres-uno cero dos-seis nueve cuatro seis uno cero')
+    setRenewalStartDate('04/30/15 00:00:00')
+    setActive('1')
+    setArchived('0')
+    setCooperator('STERLING LEGAL SERVICES LTD')
+    setLegalRepresentative('Juan Pérez')
+    setRepresentativeId('1-0234-0567')
+    setActiveTaxation('0')
+
+    // Manager data
+    setManagerFirstName('Carlos')
+    setManagerLastName('Rodríguez')
+    setManagerId('1-0987-0654')
+    setManagerMaritalStatus('casado')
+    setManagerOccupation('administrador')
+    setManagerNationality('costarricense')
+    setManagerAddress('San José, Escazú, Calle Principal')
+
+    // Other fields
+    setDenomination('VISIONGLASS SOCIEDAD DE RESPONSABILIDAD LIMITADA')
+    setIdInNumbers('3102694610')
+    setDissolvedRecord('0')
+    setBookLegalization('Libro 1, Folio 234')
+    setEmail('info@visionglass.com')
+    setTradeName('VisionGlass CR')
+
+    toast({
+      title: 'Success',
+      description: 'Mock data imported successfully',
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -96,66 +173,67 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nombreDeLaSociedad,
-          tipoDeSociedad,
-          abreviatura,
-          cedulaJuridica,
-          capitalSocial,
-          cantidadCuotas,
-          valorDeCuotas,
-          serie,
-          domicilio,
-          plazoSocial: plazoSocial ? parseInt(plazoSocial) : null,
-          fechaDeConstitucion,
-          cuotistaUno,
-          numeroDeCertificado: numeroDeCertificado ? parseInt(numeroDeCertificado) : null,
-          identificacion,
-          propiedad,
-          numeroDeCuotas: numeroDeCuotas ? parseInt(numeroDeCuotas) : null,
-          fecha: fecha ? parseInt(fecha) : null,
-          mes,
-          ano: ano ? parseInt(ano) : null,
-          imprimir,
-          capitalNumero,
-          estadoCivil,
-          profesion,
-          domicilioCuotista1,
-          referencia,
-          enLetrasCuotas1,
-          porcentaje1,
-          numeroDeCertificado2: numeroDeCertificado2 ? parseInt(numeroDeCertificado2) : null,
-          referencia2,
-          domicilioCuotista2,
-          profesion2,
-          estadoCivil2,
-          cuotista2,
-          identificacion2,
-          propiedad2,
-          porcentaje2,
-          enNumerosCuotas2,
-          numeroDeCuotas2: numeroDeCuotas2 ? parseInt(numeroDeCuotas2) : null,
-          campo1: campo1 ? parseInt(campo1) : null,
-          cedulaLetras,
-          fechaInicioRenovacion,
-          activa: activa ? parseInt(activa) : null,
-          archivado: archivado ? parseInt(archivado) : null,
-          cooperador,
-          representanteLegal,
-          identificacionRepresentante,
-          tributacionActiva: tributacionActiva ? parseInt(tributacionActiva) : null,
-          nombreGerente,
-          idGerente,
-          domicilioGerente,
-          ocupacionGerente,
-          estadoCivilGerente,
-          nacionalidadGerente,
-          apellidoGerente,
-          denominacion,
-          idEnNumeros,
-          disueltaRegistro: disueltaRegistro ? parseInt(disueltaRegistro) : null,
-          legalizacionLibros,
-          correoElectronico,
-          nombreComercial,
+          companyName,
+          companyType,
+          abbreviation,
+          legalId,
+          shareCapital,
+          numberOfShares,
+          shareValue,
+          series,
+          registeredAddress,
+          companyTerm: companyTerm ? parseInt(companyTerm) : null,
+          incorporationDate,
+          shareholderOne,
+          certificateNumber: certificateNumber ? parseInt(certificateNumber) : null,
+          identification,
+          ownership,
+          numberOfSharesHeld: numberOfSharesHeld ? parseInt(numberOfSharesHeld) : null,
+          date: date ? parseInt(date) : null,
+          month,
+          year: year ? parseInt(year) : null,
+          print,
+          excelId: excelId ? parseInt(excelId) : null,
+          capitalNumber,
+          maritalStatus,
+          profession,
+          shareholder1Address,
+          reference,
+          sharesInWords1,
+          percentage1,
+          certificateNumber2: certificateNumber2 ? parseInt(certificateNumber2) : null,
+          reference2,
+          shareholder2Address,
+          profession2,
+          maritalStatus2,
+          shareholderTwo,
+          identification2,
+          ownership2,
+          percentage2,
+          sharesInNumbers2,
+          numberOfSharesHeld2: numberOfSharesHeld2 ? parseInt(numberOfSharesHeld2) : null,
+          field1: field1 ? parseInt(field1) : null,
+          legalIdInWords,
+          renewalStartDate,
+          active: active ? parseInt(active) : null,
+          archived: archived ? parseInt(archived) : null,
+          cooperator,
+          legalRepresentative,
+          representativeId,
+          activeTaxation: activeTaxation ? parseInt(activeTaxation) : null,
+          managerFirstName,
+          managerId,
+          managerAddress,
+          managerOccupation,
+          managerMaritalStatus,
+          managerNationality,
+          managerLastName,
+          denomination,
+          idInNumbers,
+          dissolvedRecord: dissolvedRecord ? parseInt(dissolvedRecord) : null,
+          bookLegalization,
+          email,
+          tradeName,
         }),
       })
 
@@ -183,355 +261,414 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Import Data Button */}
+      <div className="flex justify-end">
+        <Button type="button" variant="outline" onClick={handleImportMockData}>
+          <Upload className="mr-2 h-4 w-4" />
+          {t('importData')}
+        </Button>
+      </div>
+
       {/* Company Information Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Company Information</h3>
+        <h3 className="text-lg font-semibold">{t('companyInfo')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="nombreDeLaSociedad">NOMBRE DE LA SOCIEDAD *</Label>
+            <Label htmlFor="companyName">{t('companyName')} *</Label>
             <Input
-              id="nombreDeLaSociedad"
-              value={nombreDeLaSociedad}
-              onChange={(e) => setNombreDeLaSociedad(e.target.value)}
+              id="companyName"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tipoDeSociedad">TIPO DE SOCIEDAD</Label>
+            <Label htmlFor="companyType">{t('companyType')}</Label>
             <Input
-              id="tipoDeSociedad"
-              value={tipoDeSociedad}
-              onChange={(e) => setTipoDeSociedad(e.target.value)}
+              id="companyType"
+              value={companyType}
+              onChange={(e) => setCompanyType(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="abreviatura">ABREVIATURA</Label>
+            <Label htmlFor="abbreviation">{t('abbreviation')}</Label>
             <Input
-              id="abreviatura"
-              value={abreviatura}
-              onChange={(e) => setAbreviatura(e.target.value)}
+              id="abbreviation"
+              value={abbreviation}
+              onChange={(e) => setAbbreviation(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cedulaJuridica">CÉDULA JURÍDICA</Label>
+            <Label htmlFor="legalId">{t('legalId')}</Label>
             <Input
-              id="cedulaJuridica"
-              value={cedulaJuridica}
-              onChange={(e) => setCedulaJuridica(e.target.value)}
+              id="legalId"
+              value={legalId}
+              onChange={(e) => setLegalId(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="capitalSocial">CAPITAL SOCIAL</Label>
+            <Label htmlFor="shareCapital">{t('shareCapital')}</Label>
             <Input
-              id="capitalSocial"
-              value={capitalSocial}
-              onChange={(e) => setCapitalSocial(e.target.value)}
+              id="shareCapital"
+              value={shareCapital}
+              onChange={(e) => setShareCapital(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cantidadCuotas">CANTIDAD CUOTAS</Label>
+            <Label htmlFor="numberOfShares">{t('numberOfShares')}</Label>
             <Input
-              id="cantidadCuotas"
-              value={cantidadCuotas}
-              onChange={(e) => setCantidadCuotas(e.target.value)}
+              id="numberOfShares"
+              value={numberOfShares}
+              onChange={(e) => setNumberOfShares(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="valorDeCuotas">VALOR DE CUOTAS</Label>
+            <Label htmlFor="shareValue">{t('shareValue')}</Label>
             <Input
-              id="valorDeCuotas"
-              value={valorDeCuotas}
-              onChange={(e) => setValorDeCuotas(e.target.value)}
+              id="shareValue"
+              value={shareValue}
+              onChange={(e) => setShareValue(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="serie">SERIE</Label>
+            <Label htmlFor="series">{t('series')}</Label>
             <Input
-              id="serie"
-              value={serie}
-              onChange={(e) => setSerie(e.target.value)}
+              id="series"
+              value={series}
+              onChange={(e) => setSeries(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="domicilio">DOMICILIO</Label>
+            <Label htmlFor="registeredAddress">{t('registeredAddress')}</Label>
             <Input
-              id="domicilio"
-              value={domicilio}
-              onChange={(e) => setDomicilio(e.target.value)}
+              id="registeredAddress"
+              value={registeredAddress}
+              onChange={(e) => setRegisteredAddress(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="plazoSocial">PLAZO SOCIAL</Label>
+            <Label htmlFor="companyTerm">{t('companyTerm')}</Label>
             <Input
-              id="plazoSocial"
+              id="companyTerm"
               type="number"
-              value={plazoSocial}
-              onChange={(e) => setPlazoSocial(e.target.value)}
+              value={companyTerm}
+              onChange={(e) => setCompanyTerm(e.target.value)}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="fechaDeConstitucion">FECHA DE CONSTITUCIÓN</Label>
+            <Label htmlFor="incorporationDate">{t('incorporationDate')}</Label>
             <Input
-              id="fechaDeConstitucion"
-              value={fechaDeConstitucion}
-              onChange={(e) => setFechaDeConstitucion(e.target.value)}
+              id="incorporationDate"
+              value={incorporationDate}
+              onChange={(e) => setIncorporationDate(e.target.value)}
             />
           </div>
         </div>
       </div>
 
-      {/* Cuotista 1 Section */}
+      {/* Shareholder 1 Section */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="text-lg font-semibold">Cuotista 1</h3>
+        <h3 className="text-lg font-semibold">{t('shareholder1')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="cuotistaUno">CUOTISTA UNO</Label>
+            <Label htmlFor="shareholderOne">{t('shareholderOne')}</Label>
             <Input
-              id="cuotistaUno"
-              value={cuotistaUno}
-              onChange={(e) => setCuotistaUno(e.target.value)}
+              id="shareholderOne"
+              value={shareholderOne}
+              onChange={(e) => setShareholderOne(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="identificacion">IDENTIFICACIÓN</Label>
+            <Label htmlFor="identification">{t('identification')}</Label>
             <Input
-              id="identificacion"
-              value={identificacion}
-              onChange={(e) => setIdentificacion(e.target.value)}
+              id="identification"
+              value={identification}
+              onChange={(e) => setIdentification(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="numeroDeCertificado">NUMERO DE CERTIFICADO</Label>
+            <Label htmlFor="certificateNumber">{t('certificateNumber')}</Label>
             <Input
-              id="numeroDeCertificado"
+              id="certificateNumber"
               type="number"
-              value={numeroDeCertificado}
-              onChange={(e) => setNumeroDeCertificado(e.target.value)}
+              value={certificateNumber}
+              onChange={(e) => setCertificateNumber(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="propiedad">PROPIEDAD</Label>
+            <Label htmlFor="ownership">{t('ownership')}</Label>
             <Input
-              id="propiedad"
-              value={propiedad}
-              onChange={(e) => setPropiedad(e.target.value)}
+              id="ownership"
+              value={ownership}
+              onChange={(e) => setOwnership(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="numeroDeCuotas">NUMERO DE CUOTAS</Label>
+            <Label htmlFor="numberOfSharesHeld">{t('numberOfSharesHeld')}</Label>
             <Input
-              id="numeroDeCuotas"
+              id="numberOfSharesHeld"
               type="number"
-              value={numeroDeCuotas}
-              onChange={(e) => setNumeroDeCuotas(e.target.value)}
+              value={numberOfSharesHeld}
+              onChange={(e) => setNumberOfSharesHeld(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="porcentaje1">PORCENTAJE</Label>
+            <Label htmlFor="percentage1">{t('percentage1')}</Label>
             <Input
-              id="porcentaje1"
-              value={porcentaje1}
-              onChange={(e) => setPorcentaje1(e.target.value)}
+              id="percentage1"
+              value={percentage1}
+              onChange={(e) => setPercentage1(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="estadoCivil">ESTADO CIVIL</Label>
+            <Label htmlFor="maritalStatus">{t('maritalStatus')}</Label>
             <Input
-              id="estadoCivil"
-              value={estadoCivil}
-              onChange={(e) => setEstadoCivil(e.target.value)}
+              id="maritalStatus"
+              value={maritalStatus}
+              onChange={(e) => setMaritalStatus(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profesion">PROFESION</Label>
+            <Label htmlFor="profession">{t('profession')}</Label>
             <Input
-              id="profesion"
-              value={profesion}
-              onChange={(e) => setProfesion(e.target.value)}
+              id="profession"
+              value={profession}
+              onChange={(e) => setProfession(e.target.value)}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="domicilioCuotista1">DOMICILIO CUOTISTA1</Label>
+            <Label htmlFor="shareholder1Address">{t('shareholder1Address')}</Label>
             <Input
-              id="domicilioCuotista1"
-              value={domicilioCuotista1}
-              onChange={(e) => setDomicilioCuotista1(e.target.value)}
+              id="shareholder1Address"
+              value={shareholder1Address}
+              onChange={(e) => setShareholder1Address(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="referencia">REFERENCIA</Label>
+            <Label htmlFor="reference">{t('reference')}</Label>
             <Input
-              id="referencia"
-              value={referencia}
-              onChange={(e) => setReferencia(e.target.value)}
+              id="reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="enLetrasCuotas1">EN LETRAS CUOTAS1</Label>
+            <Label htmlFor="sharesInWords1">{t('sharesInWords1')}</Label>
             <Input
-              id="enLetrasCuotas1"
-              value={enLetrasCuotas1}
-              onChange={(e) => setEnLetrasCuotas1(e.target.value)}
+              id="sharesInWords1"
+              value={sharesInWords1}
+              onChange={(e) => setSharesInWords1(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date">{t('date')}</Label>
+            <Input
+              id="date"
+              type="number"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="month">{t('month')}</Label>
+            <Input
+              id="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="year">{t('year')}</Label>
+            <Input
+              id="year"
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="print">{t('print')}</Label>
+            <Input
+              id="print"
+              value={print}
+              onChange={(e) => setPrint(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="excelId">{t('excelId')}</Label>
+            <Input
+              id="excelId"
+              type="number"
+              value={excelId}
+              onChange={(e) => setExcelId(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="capitalNumber">{t('capitalNumber')}</Label>
+            <Input
+              id="capitalNumber"
+              value={capitalNumber}
+              onChange={(e) => setCapitalNumber(e.target.value)}
             />
           </div>
         </div>
       </div>
 
-      {/* Cuotista 2 Section */}
+      {/* Shareholder 2 Section */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="text-lg font-semibold">Cuotista 2</h3>
+        <h3 className="text-lg font-semibold">{t('shareholder2')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="cuotista2">CUOTISTA 2</Label>
+            <Label htmlFor="shareholderTwo">{t('shareholderTwo')}</Label>
             <Input
-              id="cuotista2"
-              value={cuotista2}
-              onChange={(e) => setCuotista2(e.target.value)}
+              id="shareholderTwo"
+              value={shareholderTwo}
+              onChange={(e) => setShareholderTwo(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="identificacion2">IDENTIFICACION2</Label>
+            <Label htmlFor="identification2">{t('identification2')}</Label>
             <Input
-              id="identificacion2"
-              value={identificacion2}
-              onChange={(e) => setIdentificacion2(e.target.value)}
+              id="identification2"
+              value={identification2}
+              onChange={(e) => setIdentification2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="numeroDeCertificado2">NUMERO DE CERTIFICADO2</Label>
+            <Label htmlFor="certificateNumber2">{t('certificateNumber2')}</Label>
             <Input
-              id="numeroDeCertificado2"
+              id="certificateNumber2"
               type="number"
-              value={numeroDeCertificado2}
-              onChange={(e) => setNumeroDeCertificado2(e.target.value)}
+              value={certificateNumber2}
+              onChange={(e) => setCertificateNumber2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="propiedad2">PROPIEDAD2</Label>
+            <Label htmlFor="ownership2">{t('ownership2')}</Label>
             <Input
-              id="propiedad2"
-              value={propiedad2}
-              onChange={(e) => setPropiedad2(e.target.value)}
+              id="ownership2"
+              value={ownership2}
+              onChange={(e) => setOwnership2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="numeroDeCuotas2">NUMERO DE CUOTAS2</Label>
+            <Label htmlFor="numberOfSharesHeld2">{t('numberOfSharesHeld2')}</Label>
             <Input
-              id="numeroDeCuotas2"
+              id="numberOfSharesHeld2"
               type="number"
-              value={numeroDeCuotas2}
-              onChange={(e) => setNumeroDeCuotas2(e.target.value)}
+              value={numberOfSharesHeld2}
+              onChange={(e) => setNumberOfSharesHeld2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="porcentaje2">PORCENTAJE2</Label>
+            <Label htmlFor="percentage2">{t('percentage2')}</Label>
             <Input
-              id="porcentaje2"
-              value={porcentaje2}
-              onChange={(e) => setPorcentaje2(e.target.value)}
+              id="percentage2"
+              value={percentage2}
+              onChange={(e) => setPercentage2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="estadoCivil2">ESTADO CIVIL2</Label>
+            <Label htmlFor="maritalStatus2">{t('maritalStatus2')}</Label>
             <Input
-              id="estadoCivil2"
-              value={estadoCivil2}
-              onChange={(e) => setEstadoCivil2(e.target.value)}
+              id="maritalStatus2"
+              value={maritalStatus2}
+              onChange={(e) => setMaritalStatus2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profesion2">PROFESION2</Label>
+            <Label htmlFor="profession2">{t('profession2')}</Label>
             <Input
-              id="profesion2"
-              value={profesion2}
-              onChange={(e) => setProfesion2(e.target.value)}
+              id="profession2"
+              value={profession2}
+              onChange={(e) => setProfession2(e.target.value)}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="domicilioCuotista2">DOMICILIO CUOTISTA2</Label>
+            <Label htmlFor="shareholder2Address">{t('shareholder2Address')}</Label>
             <Input
-              id="domicilioCuotista2"
-              value={domicilioCuotista2}
-              onChange={(e) => setDomicilioCuotista2(e.target.value)}
+              id="shareholder2Address"
+              value={shareholder2Address}
+              onChange={(e) => setShareholder2Address(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="referencia2">REFERENCIA2</Label>
+            <Label htmlFor="reference2">{t('reference2')}</Label>
             <Input
-              id="referencia2"
-              value={referencia2}
-              onChange={(e) => setReferencia2(e.target.value)}
+              id="reference2"
+              value={reference2}
+              onChange={(e) => setReference2(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="enNumerosCuotas2">EN NUMEROS CUOTAS2</Label>
+            <Label htmlFor="sharesInNumbers2">{t('sharesInNumbers2')}</Label>
             <Input
-              id="enNumerosCuotas2"
-              value={enNumerosCuotas2}
-              onChange={(e) => setEnNumerosCuotas2(e.target.value)}
+              id="sharesInNumbers2"
+              value={sharesInNumbers2}
+              onChange={(e) => setSharesInNumbers2(e.target.value)}
             />
           </div>
         </div>
       </div>
 
-      {/* Gerente Section */}
+      {/* Manager Section */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="text-lg font-semibold">Gerente (Manager)</h3>
+        <h3 className="text-lg font-semibold">{t('managerFirstName')} / {t('managerLastName')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="nombreGerente">Nombre Gerente</Label>
+            <Label htmlFor="managerFirstName">{t('managerFirstName')}</Label>
             <Input
-              id="nombreGerente"
-              value={nombreGerente}
-              onChange={(e) => setNombreGerente(e.target.value)}
+              id="managerFirstName"
+              value={managerFirstName}
+              onChange={(e) => setManagerFirstName(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="apellidoGerente">Apellido Gerente</Label>
+            <Label htmlFor="managerLastName">{t('managerLastName')}</Label>
             <Input
-              id="apellidoGerente"
-              value={apellidoGerente}
-              onChange={(e) => setApellidoGerente(e.target.value)}
+              id="managerLastName"
+              value={managerLastName}
+              onChange={(e) => setManagerLastName(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="idGerente">ID Gerente</Label>
+            <Label htmlFor="managerId">{t('managerId')}</Label>
             <Input
-              id="idGerente"
-              value={idGerente}
-              onChange={(e) => setIdGerente(e.target.value)}
+              id="managerId"
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="estadoCivilGerente">Estado Civil Gerente</Label>
+            <Label htmlFor="managerMaritalStatus">{t('managerMaritalStatus')}</Label>
             <Input
-              id="estadoCivilGerente"
-              value={estadoCivilGerente}
-              onChange={(e) => setEstadoCivilGerente(e.target.value)}
+              id="managerMaritalStatus"
+              value={managerMaritalStatus}
+              onChange={(e) => setManagerMaritalStatus(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ocupacionGerente">Ocupación Gerente</Label>
+            <Label htmlFor="managerOccupation">{t('managerOccupation')}</Label>
             <Input
-              id="ocupacionGerente"
-              value={ocupacionGerente}
-              onChange={(e) => setOcupacionGerente(e.target.value)}
+              id="managerOccupation"
+              value={managerOccupation}
+              onChange={(e) => setManagerOccupation(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="nacionalidadGerente">Nacionalidad Gerente</Label>
+            <Label htmlFor="managerNationality">{t('managerNationality')}</Label>
             <Input
-              id="nacionalidadGerente"
-              value={nacionalidadGerente}
-              onChange={(e) => setNacionalidadGerente(e.target.value)}
+              id="managerNationality"
+              value={managerNationality}
+              onChange={(e) => setManagerNationality(e.target.value)}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="domicilioGerente">Domicilio Gerente</Label>
+            <Label htmlFor="managerAddress">{t('managerAddress')}</Label>
             <Input
-              id="domicilioGerente"
-              value={domicilioGerente}
-              onChange={(e) => setDomicilioGerente(e.target.value)}
+              id="managerAddress"
+              value={managerAddress}
+              onChange={(e) => setManagerAddress(e.target.value)}
             />
           </div>
         </div>
@@ -539,132 +676,132 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
 
       {/* Additional Information Section */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="text-lg font-semibold">Additional Information</h3>
+        <h3 className="text-lg font-semibold">{t('additionalInfo')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="campo1">Campo1</Label>
+            <Label htmlFor="field1">{t('field1')}</Label>
             <Input
-              id="campo1"
+              id="field1"
               type="number"
-              value={campo1}
-              onChange={(e) => setCampo1(e.target.value)}
+              value={field1}
+              onChange={(e) => setField1(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cedulaLetras">CÉDULA LETRAS</Label>
+            <Label htmlFor="legalIdInWords">{t('legalIdInWords')}</Label>
             <Input
-              id="cedulaLetras"
-              value={cedulaLetras}
-              onChange={(e) => setCedulaLetras(e.target.value)}
+              id="legalIdInWords"
+              value={legalIdInWords}
+              onChange={(e) => setLegalIdInWords(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fechaInicioRenovacion">Fecha Inicio Renovación</Label>
+            <Label htmlFor="renewalStartDate">{t('renewalStartDate')}</Label>
             <Input
-              id="fechaInicioRenovacion"
-              value={fechaInicioRenovacion}
-              onChange={(e) => setFechaInicioRenovacion(e.target.value)}
+              id="renewalStartDate"
+              value={renewalStartDate}
+              onChange={(e) => setRenewalStartDate(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="activa">Activa</Label>
+            <Label htmlFor="active">{t('active')}</Label>
             <Input
-              id="activa"
+              id="active"
               type="number"
-              value={activa}
-              onChange={(e) => setActiva(e.target.value)}
+              value={active}
+              onChange={(e) => setActive(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="archivado">Archivado</Label>
+            <Label htmlFor="archived">{t('archived')}</Label>
             <Input
-              id="archivado"
+              id="archived"
               type="number"
-              value={archivado}
-              onChange={(e) => setArchivado(e.target.value)}
+              value={archived}
+              onChange={(e) => setArchived(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cooperador">COOPERADOR</Label>
+            <Label htmlFor="cooperator">{t('cooperator')}</Label>
             <Input
-              id="cooperador"
-              value={cooperador}
-              onChange={(e) => setCooperador(e.target.value)}
+              id="cooperator"
+              value={cooperator}
+              onChange={(e) => setCooperator(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="representanteLegal">Representante Legal</Label>
+            <Label htmlFor="legalRepresentative">{t('legalRepresentative')}</Label>
             <Input
-              id="representanteLegal"
-              value={representanteLegal}
-              onChange={(e) => setRepresentanteLegal(e.target.value)}
+              id="legalRepresentative"
+              value={legalRepresentative}
+              onChange={(e) => setLegalRepresentative(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="identificacionRepresentante">Identificación Representante</Label>
+            <Label htmlFor="representativeId">{t('representativeId')}</Label>
             <Input
-              id="identificacionRepresentante"
-              value={identificacionRepresentante}
-              onChange={(e) => setIdentificacionRepresentante(e.target.value)}
+              id="representativeId"
+              value={representativeId}
+              onChange={(e) => setRepresentativeId(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tributacionActiva">Tributación Activa</Label>
+            <Label htmlFor="activeTaxation">{t('activeTaxation')}</Label>
             <Input
-              id="tributacionActiva"
+              id="activeTaxation"
               type="number"
-              value={tributacionActiva}
-              onChange={(e) => setTributacionActiva(e.target.value)}
+              value={activeTaxation}
+              onChange={(e) => setActiveTaxation(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="disueltaRegistro">Disuelta Registro</Label>
+            <Label htmlFor="dissolvedRecord">{t('dissolvedRecord')}</Label>
             <Input
-              id="disueltaRegistro"
+              id="dissolvedRecord"
               type="number"
-              value={disueltaRegistro}
-              onChange={(e) => setDisueltaRegistro(e.target.value)}
+              value={dissolvedRecord}
+              onChange={(e) => setDissolvedRecord(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="legalizacionLibros">Legalización Libros</Label>
+            <Label htmlFor="bookLegalization">{t('bookLegalization')}</Label>
             <Input
-              id="legalizacionLibros"
-              value={legalizacionLibros}
-              onChange={(e) => setLegalizacionLibros(e.target.value)}
+              id="bookLegalization"
+              value={bookLegalization}
+              onChange={(e) => setBookLegalization(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="idEnNumeros">ID en numeros</Label>
+            <Label htmlFor="idInNumbers">{t('idInNumbers')}</Label>
             <Input
-              id="idEnNumeros"
-              value={idEnNumeros}
-              onChange={(e) => setIdEnNumeros(e.target.value)}
+              id="idInNumbers"
+              value={idInNumbers}
+              onChange={(e) => setIdInNumbers(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="correoElectronico">Correo Electrónico</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
-              id="correoElectronico"
+              id="email"
               type="email"
-              value={correoElectronico}
-              onChange={(e) => setCorreoElectronico(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="nombreComercial">Nombre Comercial</Label>
+            <Label htmlFor="tradeName">{t('tradeName')}</Label>
             <Input
-              id="nombreComercial"
-              value={nombreComercial}
-              onChange={(e) => setNombreComercial(e.target.value)}
+              id="tradeName"
+              value={tradeName}
+              onChange={(e) => setTradeName(e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="denominacion">Denominación</Label>
+            <Label htmlFor="denomination">{t('denomination')}</Label>
             <Input
-              id="denominacion"
-              value={denominacion}
-              onChange={(e) => setDenominacion(e.target.value)}
+              id="denomination"
+              value={denomination}
+              onChange={(e) => setDenomination(e.target.value)}
             />
           </div>
         </div>
@@ -676,10 +813,10 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              {t('notes')}...
             </>
           ) : (
-            'Register Customer'
+            t('registerCustomer')
           )}
         </Button>
       </div>

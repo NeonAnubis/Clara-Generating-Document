@@ -5,21 +5,16 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
-    const status = searchParams.get('status') || ''
 
-    const where = {
-      AND: [
-        search ? {
-          OR: [
-            { primaryContactName: { contains: search, mode: 'insensitive' as const } },
-            { primaryContactEmail: { contains: search, mode: 'insensitive' as const } },
-            { secondaryContactName: { contains: search, mode: 'insensitive' as const } },
-            { natureOfBusiness: { contains: search, mode: 'insensitive' as const } },
-          ]
-        } : {},
-        status ? { status } : {},
+    const where = search ? {
+      OR: [
+        { companyName: { contains: search, mode: 'insensitive' as const } },
+        { legalId: { contains: search, mode: 'insensitive' as const } },
+        { shareholderOne: { contains: search, mode: 'insensitive' as const } },
+        { shareholderTwo: { contains: search, mode: 'insensitive' as const } },
+        { email: { contains: search, mode: 'insensitive' as const } },
       ]
-    }
+    } : {}
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const customers = await (prisma.customer as any).findMany({
@@ -27,17 +22,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    // Parse JSON fields before returning
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const parsedCustomers = customers.map((customer: any) => ({
-      ...customer,
-      individualCuotaholders: JSON.parse(customer.individualCuotaholders || '[]'),
-      corporateCuotaholders: JSON.parse(customer.corporateCuotaholders || '[]'),
-      ubos: JSON.parse(customer.ubos || '[]'),
-      directors: JSON.parse(customer.directors || '[]'),
-    }))
-
-    return NextResponse.json(parsedCustomers)
+    return NextResponse.json(customers)
   } catch (error) {
     console.error('Error fetching customers:', error)
     return NextResponse.json({ error: 'Error fetching customers' }, { status: 500 })
@@ -51,21 +36,78 @@ export async function POST(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const customer = await (prisma.customer as any).create({
       data: {
-        primaryContactName: data.primaryContactName || null,
-        primaryContactEmail: data.primaryContactEmail || null,
-        secondaryContactName: data.secondaryContactName || null,
-        secondaryContactEmail: data.secondaryContactEmail || null,
-        onlyPrimarySecondaryNotified: data.onlyPrimarySecondaryNotified || false,
-        individualCuotaholders: JSON.stringify(data.individualCuotaholders || []),
-        corporateCuotaholders: JSON.stringify(data.corporateCuotaholders || []),
-        uboSameAsCuotaholder: data.uboSameAsCuotaholder || false,
-        ubos: JSON.stringify(data.ubos || []),
-        directorSameAsCuotaholder: data.directorSameAsCuotaholder || false,
-        directors: JSON.stringify(data.directors || []),
-        nominalValueOfCuotas: data.nominalValueOfCuotas || '100',
-        numberOfCuotasToBeIssued: data.numberOfCuotasToBeIssued || '1000',
-        natureOfBusiness: data.natureOfBusiness || null,
-        status: data.status || 'active',
+        // Company Information
+        companyName: data.companyName || null,
+        companyType: data.companyType || null,
+        abbreviation: data.abbreviation || null,
+        legalId: data.legalId || null,
+        shareCapital: data.shareCapital || null,
+        numberOfShares: data.numberOfShares || null,
+        shareValue: data.shareValue || null,
+        series: data.series || null,
+        registeredAddress: data.registeredAddress || null,
+        companyTerm: data.companyTerm || null,
+        incorporationDate: data.incorporationDate || null,
+
+        // Shareholder 1
+        shareholderOne: data.shareholderOne || null,
+        certificateNumber: data.certificateNumber || null,
+        identification: data.identification || null,
+        ownership: data.ownership || null,
+        numberOfSharesHeld: data.numberOfSharesHeld || null,
+        date: data.date || null,
+        month: data.month || null,
+        year: data.year || null,
+        print: data.print || null,
+        excelId: data.excelId || null,
+        capitalNumber: data.capitalNumber || null,
+        maritalStatus: data.maritalStatus || null,
+        profession: data.profession || null,
+        shareholder1Address: data.shareholder1Address || null,
+        reference: data.reference || null,
+        sharesInWords1: data.sharesInWords1 || null,
+        percentage1: data.percentage1 || null,
+
+        // Shareholder 2
+        certificateNumber2: data.certificateNumber2 || null,
+        reference2: data.reference2 || null,
+        shareholder2Address: data.shareholder2Address || null,
+        profession2: data.profession2 || null,
+        maritalStatus2: data.maritalStatus2 || null,
+        shareholderTwo: data.shareholderTwo || null,
+        identification2: data.identification2 || null,
+        ownership2: data.ownership2 || null,
+        percentage2: data.percentage2 || null,
+        sharesInNumbers2: data.sharesInNumbers2 || null,
+        numberOfSharesHeld2: data.numberOfSharesHeld2 || null,
+
+        // Additional Fields
+        field1: data.field1 || null,
+        legalIdInWords: data.legalIdInWords || null,
+        renewalStartDate: data.renewalStartDate || null,
+        active: data.active || null,
+        archived: data.archived || null,
+        cooperator: data.cooperator || null,
+        legalRepresentative: data.legalRepresentative || null,
+        representativeId: data.representativeId || null,
+        activeTaxation: data.activeTaxation || null,
+
+        // Manager
+        managerFirstName: data.managerFirstName || null,
+        managerId: data.managerId || null,
+        managerAddress: data.managerAddress || null,
+        managerOccupation: data.managerOccupation || null,
+        managerMaritalStatus: data.managerMaritalStatus || null,
+        managerNationality: data.managerNationality || null,
+        managerLastName: data.managerLastName || null,
+
+        // Other
+        denomination: data.denomination || null,
+        idInNumbers: data.idInNumbers || null,
+        dissolvedRecord: data.dissolvedRecord || null,
+        bookLegalization: data.bookLegalization || null,
+        email: data.email || null,
+        tradeName: data.tradeName || null,
       },
     })
 

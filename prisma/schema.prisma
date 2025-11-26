@@ -11,77 +11,77 @@ model Customer {
   id                          String   @id @default(cuid())
 
   // Company Information
-  nombreDeLaSociedad          String?  // NOMBRE DE LA SOCIEDAD
-  tipoDeSociedad              String?  // TIPO DE SOCIEDAD
-  abreviatura                 String?  // ABREVIATURA
-  cedulaJuridica              String?  // CÉDULA JURÍDICA
-  capitalSocial               String?  // CAPITAL SOCIAL
-  cantidadCuotas              String?  // CANTIDAD CUOTAS
-  valorDeCuotas               String?  // VALOR DE CUOTAS
-  serie                       String?  // SERIE
-  domicilio                   String?  // DOMICILIO
-  plazoSocial                 Int?     // PLAZO SOCIAL
-  fechaDeConstitucion         String?  // FECHA DE CONSTITUCIÓN
+  companyName                 String?  // Company name
+  companyType                 String?  // Type of company
+  abbreviation                String?  // Abbreviation
+  legalId                     String?  // Legal ID (Cédula Jurídica)
+  shareCapital                String?  // Share capital
+  numberOfShares              String?  // Number of shares
+  shareValue                  String?  // Share value
+  series                      String?  // Series
+  registeredAddress           String?  // Registered address
+  companyTerm                 Int?     // Company term (years)
+  incorporationDate           String?  // Incorporation date
 
-  // Cuotista 1
-  cuotistaUno                 String?  // CUOTISTA UNO
-  numeroDeCertificado         Int?     // NUMERO DE CERTIFICADO
-  identificacion              String?  // IDENTIFICACIÓN
-  propiedad                   String?  // PROPIEDAD
-  numeroDeCuotas              Int?     // NUMERO DE CUOTAS
-  fecha                       Int?     // FECHA
-  mes                         String?  // MES
-  ano                         Int?     // AÑO
-  imprimir                    String?  // IMPRIMIR
+  // Shareholder 1
+  shareholderOne              String?  // Shareholder one
+  certificateNumber           Int?     // Certificate number
+  identification              String?  // Identification
+  ownership                   String?  // Ownership
+  numberOfSharesHeld          Int?     // Number of shares
+  date                        Int?     // Date
+  month                       String?  // Month
+  year                        Int?     // Year
+  print                       String?  // Print
   excelId                     Int?     // Id (from Excel)
-  capitalNumero               String?  // CAPITAL NÚMERO
-  estadoCivil                 String?  // ESTADO CIVIL
-  profesion                   String?  // PROFESION
-  domicilioCuotista1          String?  // DOMICILIO CUOTISTA1
-  referencia                  String?  // REFERENCIA
-  enLetrasCuotas1             String?  // EN LETRAS CUOTAS1
-  porcentaje1                 String?  // PORCENTAJE1
+  capitalNumber               String?  // Capital number
+  maritalStatus               String?  // Marital status
+  profession                  String?  // Profession
+  shareholder1Address         String?  // Shareholder 1 address
+  reference                   String?  // Reference
+  sharesInWords1              String?  // Shares in words
+  percentage1                 String?  // Percentage
 
-  // Cuotista 2
-  numeroDeCertificado2        Int?     // NUMERO DE CERTIFICADO2
-  referencia2                 String?  // REFERENCIA2
-  domicilioCuotista2          String?  // DOMICILIO CUOTISTA2
-  profesion2                  String?  // PROFESION2
-  estadoCivil2                String?  // ESTADO CIVIL2
-  cuotista2                   String?  // CUOTISTA 2
-  identificacion2             String?  // IDENTIFICACION2
-  propiedad2                  String?  // PROPIEDAD2
-  porcentaje2                 String?  // PORCENTAJE2
-  enNumerosCuotas2            String?  // EN NUMEROS CUOTAS2
-  numeroDeCuotas2             Int?     // NUMERO DE CUOTAS2
+  // Shareholder 2
+  certificateNumber2          Int?     // Certificate number 2
+  reference2                  String?  // Reference 2
+  shareholder2Address         String?  // Shareholder 2 address
+  profession2                 String?  // Profession 2
+  maritalStatus2              String?  // Marital status 2
+  shareholderTwo              String?  // Shareholder 2
+  identification2             String?  // Identification 2
+  ownership2                  String?  // Ownership 2
+  percentage2                 String?  // Percentage 2
+  sharesInNumbers2            String?  // Shares in numbers 2
+  numberOfSharesHeld2         Int?     // Number of shares 2
 
   // Additional Fields
-  campo1                      Int?     // Campo1
-  cedulaLetras                String?  // CÉDULA LETRAS
-  fechaInicioRenovacion       String?  // Fecha Inicio Renovación
-  activa                      Int?     // Activa
-  archivado                   Int?     // Archivado
-  cooperador                  String?  // COOPERADOR
-  representanteLegal          String?  // Represntante Legal
-  identificacionRepresentante String?  // Identificación Representante
-  tributacionActiva           Int?     // Tributación Activa
+  field1                      Int?     // Field 1
+  legalIdInWords              String?  // Legal ID in words
+  renewalStartDate            String?  // Renewal start date
+  active                      Int?     // Active
+  archived                    Int?     // Archived
+  cooperator                  String?  // Cooperator
+  legalRepresentative         String?  // Legal representative
+  representativeId            String?  // Representative ID
+  activeTaxation              Int?     // Active taxation
 
-  // Gerente (Manager)
-  nombreGerente               String?  // Nombre Gerente
-  idGerente                   String?  // ID Gerente
-  domicilioGerente            String?  // Domicilio Gerente
-  ocupacionGerente            String?  // Ocupación Gerente
-  estadoCivilGerente          String?  // Estado Civil Gerente
-  nacionalidadGerente         String?  // Nacionalidad Gerente
-  apellidoGerente             String?  // Apellido Gerente
+  // Manager
+  managerFirstName            String?  // Manager first name
+  managerId                   String?  // Manager ID
+  managerAddress              String?  // Manager address
+  managerOccupation           String?  // Manager occupation
+  managerMaritalStatus        String?  // Manager marital status
+  managerNationality          String?  // Manager nationality
+  managerLastName             String?  // Manager last name
 
   // Other
-  denominacion                String?  // Denominación
-  idEnNumeros                 String?  // ID en numeros
-  disueltaRegistro            Int?     // Disuelta Registro
-  legalizacionLibros          String?  // Legalizacion libros
-  correoElectronico           String?  // Correo Electrónico
-  nombreComercial             String?  // Nombre Comercial
+  denomination                String?  // Denomination
+  idInNumbers                 String?  // ID in numbers
+  dissolvedRecord             Int?     // Dissolved record
+  bookLegalization            String?  // Book legalization
+  email                       String?  // Email
+  tradeName                   String?  // Trade name
 
   // Timestamps
   createdAt                   DateTime @default(now())
@@ -90,8 +90,8 @@ model Customer {
   // Relations
   documents                   GeneratedDocument[]
 
-  @@index([cedulaJuridica])
-  @@index([nombreDeLaSociedad])
+  @@index([legalId])
+  @@index([companyName])
   @@index([createdAt])
 }
 

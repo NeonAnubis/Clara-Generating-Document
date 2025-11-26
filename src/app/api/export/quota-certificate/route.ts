@@ -29,25 +29,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
-    // Parse JSON fields
-    const individualCuotaholders = JSON.parse(customer.individualCuotaholders || '[]')
-    const cuotaholder = individualCuotaholders[cuotaholderIndex] || {}
-
-    const nominalValue = customer.nominalValueOfCuotas || '100'
-    const numberOfCuotas = customer.numberOfCuotasToBeIssued || '1000'
-    const totalCapital = parseInt(nominalValue) * parseInt(numberOfCuotas)
+    const shareValue = customer.shareValue || '100'
+    const numberOfShares = customer.numberOfShares || '1000'
+    const totalCapital = parseInt(shareValue) * parseInt(numberOfShares)
 
     // Generate current date in Spanish format
     const currentDate = new Date()
     const dateOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
     const formattedDate = currentDate.toLocaleDateString('es-CR', dateOptions)
 
-    // Create company ID (this should come from somewhere - using placeholder)
-    const companyId = '3-102-XXXXXX' // This should be stored in the customer/company record
+    // Create company ID from legalId
+    const companyId = customer.legalId || '3-102-XXXXXX'
 
-    const cuotaholderName = `${cuotaholder.givenNames || ''} ${cuotaholder.lastName || ''}`.trim().toUpperCase() || 'NOMBRE DEL CUOTAHABIENTE'
-    const passportCountry = cuotaholder.placeOfBirth || 'estonio'
-    const passportNumber = cuotaholder.passportNumber || 'XXXXXXXXX'
+    const shareholderIndex = cuotaholderIndex === 0 ? 'One' : 'Two'
+    const shareholderField = `shareholder${shareholderIndex}` as const
+    const shareholderName = customer[shareholderField] || 'NOMBRE DEL CUOTAHABIENTE'
+    const cuotaholderName = shareholderName.toUpperCase()
+    const identificationField = `identification${cuotaholderIndex === 0 ? '' : '2'}` as const
+    const identification = customer[identificationField] || 'XXXXXXXXX'
 
     // Create the certificate document with borders
     const doc = new Document({
@@ -145,7 +144,7 @@ export async function POST(request: NextRequest) {
                                               new Paragraph({
                                                 alignment: AlignmentType.RIGHT,
                                                 children: [
-                                                  new TextRun({ text: `VALE POR ${numberOfCuotas} CUOTAS`, color: '1E3A5F', size: 28, bold: true }),
+                                                  new TextRun({ text: `VALE POR ${numberOfShares} CUOTAS`, color: '1E3A5F', size: 28, bold: true }),
                                                 ],
                                               }),
                                             ],
@@ -213,13 +212,13 @@ export async function POST(request: NextRequest) {
                                               new Paragraph({
                                                 alignment: AlignmentType.CENTER,
                                                 children: [
-                                                  new TextRun({ text: `${numberOfCuotas} CUOTAS COMUNES Y NOMINATIVAS`, size: 20 }),
+                                                  new TextRun({ text: `${numberOfShares} CUOTAS COMUNES Y NOMINATIVAS`, size: 20 }),
                                                 ],
                                               }),
                                               new Paragraph({
                                                 alignment: AlignmentType.CENTER,
                                                 children: [
-                                                  new TextRun({ text: `DE ${nominalValue} COLONES CADA UNA`, size: 20 }),
+                                                  new TextRun({ text: `DE ${shareValue} COLONES CADA UNA`, size: 20 }),
                                                 ],
                                               }),
                                             ],
@@ -257,7 +256,7 @@ export async function POST(request: NextRequest) {
                                     children: [
                                       new TextRun({ text: 'Certificamos que ', size: 22 }),
                                       new TextRun({ text: cuotaholderName + ',', bold: true, size: 22 }),
-                                      new TextRun({ text: ` con pasaporte ${passportCountry} número ${passportNumber}`, size: 22 }),
+                                      new TextRun({ text: ` con identificación número ${identification}`, size: 22 }),
                                     ],
                                   }),
                                   new Paragraph({
@@ -265,7 +264,7 @@ export async function POST(request: NextRequest) {
                                     spacing: { before: 200 },
                                     children: [
                                       new TextRun({ text: 'es propietaria de ', size: 22 }),
-                                      new TextRun({ text: `${numberOfCuotas} CUOTAS`, bold: true, size: 22 }),
+                                      new TextRun({ text: `${numberOfShares} CUOTAS`, bold: true, size: 22 }),
                                       new TextRun({ text: ' comunes y nominativas.', size: 22 }),
                                     ],
                                   }),
