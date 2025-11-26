@@ -110,6 +110,9 @@
     "registeredAddress": "Registered Address",
     "companyTerm": "Company Term",
     "incorporationDate": "Incorporation Date",
+    "shareholder1": "Shareholder 1",
+    "shareholder2": "Shareholder 2",
+    "manager": "Manager",
     "shareholderOne": "Shareholder One",
     "shareholderTwo": "Shareholder Two",
     "certificateNumber": "Certificate Number",
@@ -273,7 +276,10 @@
     "certificateDetailsDescription": "Configure the certificate number and series",
     "certificateNumber": "Certificate Number",
     "certificateSeries": "Series",
-    "generateCertificate": "Generate Certificate"
+    "generateCertificate": "Generate Certificate",
+    "actaConstitutiva": "Acta Constitutiva",
+    "selectCustomerForActa": "Choose the customer to generate the Acta Constitutiva document",
+    "generateActa": "Generate Acta Constitutiva"
   },
   "history": {
     "title": "Export History",

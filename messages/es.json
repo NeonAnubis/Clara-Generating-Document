@@ -110,6 +110,9 @@
     "registeredAddress": "Domicilio",
     "companyTerm": "Plazo Social",
     "incorporationDate": "Fecha de Constitución",
+    "shareholder1": "Cuotista 1",
+    "shareholder2": "Cuotista 2",
+    "manager": "Gerente",
     "shareholderOne": "Cuotista Uno",
     "shareholderTwo": "Cuotista Dos",
     "certificateNumber": "Número de Certificado",
@@ -273,7 +276,10 @@
     "certificateDetailsDescription": "Configure el número de certificado y serie",
     "certificateNumber": "Número de Certificado",
     "certificateSeries": "Serie",
-    "generateCertificate": "Generar Certificado"
+    "generateCertificate": "Generar Certificado",
+    "actaConstitutiva": "Acta Constitutiva",
+    "selectCustomerForActa": "Elija el cliente para generar el documento de Acta Constitutiva",
+    "generateActa": "Generar Acta Constitutiva"
   },
   "history": {
     "title": "Historial de Exportaciones",

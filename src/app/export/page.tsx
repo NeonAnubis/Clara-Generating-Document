@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
-import { Download, Award } from 'lucide-react'
+import { Download, Award, FileText } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -42,6 +42,10 @@ export default function ExportPage() {
   const [certCuotaholderIndex, setCertCuotaholderIndex] = useState<number>(0)
   const [certNumber, setCertNumber] = useState<string>('001')
   const [certSeries, setCertSeries] = useState<string>('AB')
+
+  // Acta constitutiva state
+  const [actaCustomerId, setActaCustomerId] = useState<string>('')
+
   // Fetch customers and templates on mount
   useEffect(() => {
     Promise.all([
@@ -146,6 +150,39 @@ export default function ExportPage() {
     return holders
   }
 
+  const handleActaConstitutivaExport = async () => {
+    if (!actaCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/acta-constitutiva', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: actaCustomerId,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === actaCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Acta_Constitutiva_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating acta constitutiva:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -172,6 +209,10 @@ export default function ExportPage() {
           <TabsTrigger value="certificate" className="gap-2">
             <Award className="h-4 w-4" />
             {t('quotaCertificate')}
+          </TabsTrigger>
+          <TabsTrigger value="acta-constitutiva" className="gap-2">
+            <FileText className="h-4 w-4" />
+            {t('actaConstitutiva')}
           </TabsTrigger>
         </TabsList>
 
@@ -346,6 +387,45 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateCertificate')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="acta-constitutiva" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('selectCustomer')}</CardTitle>
+              <CardDescription>
+                {t('selectCustomerForActa')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={actaCustomerId}
+                onValueChange={setActaCustomerId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {getCustomerDisplayName(customer)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleActaConstitutivaExport}
+              disabled={exporting || !actaCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateActa')}
             </Button>
           </div>
         </TabsContent>
