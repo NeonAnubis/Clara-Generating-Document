@@ -66,14 +66,32 @@ model Customer {
   representativeId            String?  // Representative ID
   activeTaxation              Int?     // Active taxation
 
-  // Manager
-  managerFirstName            String?  // Manager first name
-  managerId                   String?  // Manager ID
-  managerAddress              String?  // Manager address
-  managerOccupation           String?  // Manager occupation
-  managerMaritalStatus        String?  // Manager marital status
-  managerNationality          String?  // Manager nationality
-  managerLastName             String?  // Manager last name
+  // Manager 1
+  managerFirstName            String?  // Manager 1 first name
+  managerId                   String?  // Manager 1 ID
+  managerAddress              String?  // Manager 1 address
+  managerOccupation           String?  // Manager 1 occupation
+  managerMaritalStatus        String?  // Manager 1 marital status
+  managerNationality          String?  // Manager 1 nationality
+  managerLastName             String?  // Manager 1 last name
+
+  // Manager 2
+  manager2FirstName           String?  // Manager 2 first name
+  manager2LastName            String?  // Manager 2 last name
+  manager2Id                  String?  // Manager 2 ID
+  manager2Address             String?  // Manager 2 address
+  manager2Occupation          String?  // Manager 2 occupation
+  manager2MaritalStatus       String?  // Manager 2 marital status
+  manager2Nationality         String?  // Manager 2 nationality
+
+  // Sub-manager
+  subManagerFirstName         String?  // Sub-manager first name
+  subManagerLastName          String?  // Sub-manager last name
+  subManagerId                String?  // Sub-manager ID
+  subManagerAddress           String?  // Sub-manager address
+  subManagerOccupation        String?  // Sub-manager occupation
+  subManagerMaritalStatus     String?  // Sub-manager marital status
+  subManagerNationality       String?  // Sub-manager nationality
 
   // Other
   denomination                String?  // Denomination
