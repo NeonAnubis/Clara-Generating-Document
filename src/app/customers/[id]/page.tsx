@@ -381,7 +381,7 @@ export default function CustomerDetailPage() {
 
         {/* Shareholder 1 */}
         <div className="bg-card rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-4">Shareholder 1</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('shareholder1')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('shareholderOne')}</Label>
@@ -516,12 +516,87 @@ export default function CustomerDetailPage() {
                 <p className="text-sm py-2">{displayCustomer?.sharesInWords1 || '-'}</p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label>{t('date')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.date || ''}
+                  onChange={(e) => updateField('date', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.date || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('month')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.month || ''}
+                  onChange={(e) => updateField('month', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.month || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('year')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.year || ''}
+                  onChange={(e) => updateField('year', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.year || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('print')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.print || ''}
+                  onChange={(e) => updateField('print', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.print || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('excelId')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.excelId || ''}
+                  onChange={(e) => updateField('excelId', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.excelId || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('capitalNumber')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.capitalNumber || ''}
+                  onChange={(e) => updateField('capitalNumber', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.capitalNumber || '-'}</p>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Shareholder 2 */}
         <div className="bg-card rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-4">Shareholder 2</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('shareholder2')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('shareholderTwo')}</Label>
@@ -661,7 +736,7 @@ export default function CustomerDetailPage() {
 
         {/* Manager */}
         <div className="bg-card rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-4">Manager</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('manager')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('managerFirstName')}</Label>
@@ -859,6 +934,71 @@ export default function CustomerDetailPage() {
                 />
               ) : (
                 <p className="text-sm py-2">{displayCustomer?.renewalStartDate || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('field1')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.field1 || ''}
+                  onChange={(e) => updateField('field1', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.field1 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('active')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.active || ''}
+                  onChange={(e) => updateField('active', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.active || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('archived')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.archived || ''}
+                  onChange={(e) => updateField('archived', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.archived || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('activeTaxation')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.activeTaxation || ''}
+                  onChange={(e) => updateField('activeTaxation', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.activeTaxation || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('dissolvedRecord')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.dissolvedRecord || ''}
+                  onChange={(e) => updateField('dissolvedRecord', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.dissolvedRecord || '-'}</p>
               )}
             </div>
 
