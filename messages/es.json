@@ -279,7 +279,10 @@
     "generateCertificate": "Generar Certificado",
     "actaConstitutiva": "Acta Constitutiva",
     "selectCustomerForActa": "Elija el cliente para generar el documento de Acta Constitutiva",
-    "generateActa": "Generar Acta Constitutiva"
+    "generateActa": "Generar Acta Constitutiva",
+    "portada": "Portada",
+    "selectCustomerForPortada": "Elija el cliente para generar el documento de portadas de libros",
+    "generatePortada": "Generar Portada"
   },
   "history": {
     "title": "Historial de Exportaciones",

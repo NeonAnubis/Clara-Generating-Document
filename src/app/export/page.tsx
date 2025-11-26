@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
-import { Download, Award, FileText } from 'lucide-react'
+import { Download, Award, FileText, BookOpen } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -32,6 +32,7 @@ export default function ExportPage() {
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Word export state
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
@@ -46,17 +47,41 @@ export default function ExportPage() {
   // Acta constitutiva state
   const [actaCustomerId, setActaCustomerId] = useState<string>('')
 
-  // Fetch customers and templates on mount
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/customers').then(r => r.json()),
-      fetch('/api/templates').then(r => r.json()),
-    ]).then(([customersData, templatesData]) => {
-      setCustomers(customersData)
-      setTemplates(templatesData.filter((t: DocumentTemplate) => t.isActive))
+  // Portada state
+  const [portadaCustomerId, setPortadaCustomerId] = useState<string>('')
+
+  // Fetch data with proper error handling
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Fetch customers first (required for all tabs)
+      const customersResponse = await fetch('/api/customers?fields=id,companyName,legalId,shareholderOne,shareholderTwo,email')
+      if (!customersResponse.ok) {
+        throw new Error('Failed to fetch customers')
+      }
+      const customersData = await customersResponse.json()
+      setCustomers(Array.isArray(customersData) ? customersData : [])
+
+      // Fetch templates (only active ones, minimal fields for dropdown)
+      const templatesResponse = await fetch('/api/templates?active=true&minimal=true')
+      if (templatesResponse.ok) {
+        const templatesData = await templatesResponse.json()
+        setTemplates(Array.isArray(templatesData) ? templatesData : [])
+      }
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError(err instanceof Error ? err.message : 'Error loading data')
+    } finally {
       setLoading(false)
-    })
+    }
   }, [])
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const getCustomerDisplayName = (customer: Customer) => {
     if (customer.companyName) {
@@ -183,8 +208,52 @@ export default function ExportPage() {
     }
   }
 
+  const handlePortadaExport = async () => {
+    if (!portadaCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/portada', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: portadaCustomerId,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === portadaCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Portada_Libros_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating portada:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500 mb-4">{error}</p>
+        <Button onClick={fetchData} variant="outline">
+          Retry
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -213,6 +282,10 @@ export default function ExportPage() {
           <TabsTrigger value="acta-constitutiva" className="gap-2">
             <FileText className="h-4 w-4" />
             {t('actaConstitutiva')}
+          </TabsTrigger>
+          <TabsTrigger value="portada" className="gap-2">
+            <BookOpen className="h-4 w-4" />
+            {t('portada')}
           </TabsTrigger>
         </TabsList>
 
@@ -426,6 +499,45 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateActa')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="portada" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('selectCustomer')}</CardTitle>
+              <CardDescription>
+                {t('selectCustomerForPortada')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={portadaCustomerId}
+                onValueChange={setPortadaCustomerId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {getCustomerDisplayName(customer)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handlePortadaExport}
+              disabled={exporting || !portadaCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generatePortada')}
             </Button>
           </div>
         </TabsContent>
