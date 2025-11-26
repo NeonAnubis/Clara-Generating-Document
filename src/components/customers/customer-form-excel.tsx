@@ -60,11 +60,15 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   const [numeroDeCuotas2, setNumeroDeCuotas2] = useState('')
 
   // Additional Fields
+  const [campo1, setCampo1] = useState('')
   const [cedulaLetras, setCedulaLetras] = useState('')
   const [fechaInicioRenovacion, setFechaInicioRenovacion] = useState('')
+  const [activa, setActiva] = useState('')
+  const [archivado, setArchivado] = useState('')
   const [cooperador, setCooperador] = useState('')
   const [representanteLegal, setRepresentanteLegal] = useState('')
   const [identificacionRepresentante, setIdentificacionRepresentante] = useState('')
+  const [tributacionActiva, setTributacionActiva] = useState('')
 
   // Gerente (Manager)
   const [nombreGerente, setNombreGerente] = useState('')
@@ -78,6 +82,7 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   // Other
   const [denominacion, setDenominacion] = useState('')
   const [idEnNumeros, setIdEnNumeros] = useState('')
+  const [disueltaRegistro, setDisueltaRegistro] = useState('')
   const [legalizacionLibros, setLegalizacionLibros] = useState('')
   const [correoElectronico, setCorreoElectronico] = useState('')
   const [nombreComercial, setNombreComercial] = useState('')
@@ -129,11 +134,15 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
           porcentaje2,
           enNumerosCuotas2,
           numeroDeCuotas2: numeroDeCuotas2 ? parseInt(numeroDeCuotas2) : null,
+          campo1: campo1 ? parseInt(campo1) : null,
           cedulaLetras,
           fechaInicioRenovacion,
+          activa: activa ? parseInt(activa) : null,
+          archivado: archivado ? parseInt(archivado) : null,
           cooperador,
           representanteLegal,
           identificacionRepresentante,
+          tributacionActiva: tributacionActiva ? parseInt(tributacionActiva) : null,
           nombreGerente,
           idGerente,
           domicilioGerente,
@@ -143,6 +152,7 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
           apellidoGerente,
           denominacion,
           idEnNumeros,
+          disueltaRegistro: disueltaRegistro ? parseInt(disueltaRegistro) : null,
           legalizacionLibros,
           correoElectronico,
           nombreComercial,
@@ -532,6 +542,49 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
         <h3 className="text-lg font-semibold">Additional Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
+            <Label htmlFor="campo1">Campo1</Label>
+            <Input
+              id="campo1"
+              type="number"
+              value={campo1}
+              onChange={(e) => setCampo1(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cedulaLetras">CÉDULA LETRAS</Label>
+            <Input
+              id="cedulaLetras"
+              value={cedulaLetras}
+              onChange={(e) => setCedulaLetras(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fechaInicioRenovacion">Fecha Inicio Renovación</Label>
+            <Input
+              id="fechaInicioRenovacion"
+              value={fechaInicioRenovacion}
+              onChange={(e) => setFechaInicioRenovacion(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="activa">Activa</Label>
+            <Input
+              id="activa"
+              type="number"
+              value={activa}
+              onChange={(e) => setActiva(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="archivado">Archivado</Label>
+            <Input
+              id="archivado"
+              type="number"
+              value={archivado}
+              onChange={(e) => setArchivado(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="cooperador">COOPERADOR</Label>
             <Input
               id="cooperador"
@@ -553,6 +606,40 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
               id="identificacionRepresentante"
               value={identificacionRepresentante}
               onChange={(e) => setIdentificacionRepresentante(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tributacionActiva">Tributación Activa</Label>
+            <Input
+              id="tributacionActiva"
+              type="number"
+              value={tributacionActiva}
+              onChange={(e) => setTributacionActiva(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="disueltaRegistro">Disuelta Registro</Label>
+            <Input
+              id="disueltaRegistro"
+              type="number"
+              value={disueltaRegistro}
+              onChange={(e) => setDisueltaRegistro(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="legalizacionLibros">Legalización Libros</Label>
+            <Input
+              id="legalizacionLibros"
+              value={legalizacionLibros}
+              onChange={(e) => setLegalizacionLibros(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="idEnNumeros">ID en numeros</Label>
+            <Input
+              id="idEnNumeros"
+              value={idEnNumeros}
+              onChange={(e) => setIdEnNumeros(e.target.value)}
             />
           </div>
           <div className="space-y-2">
