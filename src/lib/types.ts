@@ -30,21 +30,17 @@ export interface CorporateCuotaholder {
 }
 
 export interface CustomerFormData {
-  primaryContactName: string
-  primaryContactEmail: string
-  secondaryContactName: string
-  secondaryContactEmail: string
-  onlyPrimarySecondaryNotified: boolean
-  individualCuotaholders: PersonInfo[]
-  corporateCuotaholders: CorporateCuotaholder[]
-  uboSameAsCuotaholder: boolean
-  ubos: PersonInfo[]
-  directorSameAsCuotaholder: boolean
-  directors: PersonInfo[]
-  nominalValueOfCuotas: string
-  numberOfCuotasToBeIssued: string
-  natureOfBusiness: string
-  status: string
+  companyName: string
+  companyType: string
+  abbreviation: string
+  legalId: string
+  shareCapital: string
+  numberOfShares: string
+  shareValue: string
+  series: string
+  registeredAddress: string
+  companyTerm: number
+  incorporationDate: string
 }
 
 export interface TemplateFormData {
@@ -57,13 +53,14 @@ export interface TemplateFormData {
 }
 
 export const CUSTOMER_FIELDS = [
-  { key: 'primaryContactName', label: 'Primary Contact Name', required: false },
-  { key: 'primaryContactEmail', label: 'Primary Contact Email', required: false },
-  { key: 'secondaryContactName', label: 'Secondary Contact Name', required: false },
-  { key: 'secondaryContactEmail', label: 'Secondary Contact Email', required: false },
-  { key: 'natureOfBusiness', label: 'Nature of Business', required: false },
-  { key: 'nominalValueOfCuotas', label: 'Nominal Value of Cuotas', required: false },
-  { key: 'numberOfCuotasToBeIssued', label: 'Number of Cuotas', required: false },
+  { key: 'companyName', label: 'Company Name', required: false },
+  { key: 'companyType', label: 'Company Type', required: false },
+  { key: 'legalId', label: 'Legal ID', required: false },
+  { key: 'shareholderOne', label: 'Shareholder One', required: false },
+  { key: 'shareholderTwo', label: 'Shareholder Two', required: false },
+  { key: 'email', label: 'Email', required: false },
+  { key: 'shareValue', label: 'Share Value', required: false },
+  { key: 'numberOfShares', label: 'Number of Shares', required: false },
 ] as const
 
 export const CUSTOMER_STATUS = [

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -39,22 +38,11 @@ import {
 
 interface Company {
   id: string
-  primaryContactName: string | null
-  primaryContactEmail: string | null
-  secondaryContactName: string | null
-  secondaryContactEmail: string | null
-  onlyPrimarySecondaryNotified: boolean
-  individualCuotaholders: Array<{
-    lastName: string
-    givenNames: string
-    emailAddress: string
-    telephoneNumber: string
-  }>
-  corporateCuotaholders: Array<{
-    companyName: string
-  }>
-  natureOfBusiness: string | null
-  status: string
+  companyName: string | null
+  legalId: string | null
+  shareholderOne: string | null
+  shareholderTwo: string | null
+  email: string | null
   createdAt: string
 }
 
@@ -112,44 +100,18 @@ export function CustomerList({ onSelectCompany, selectable, selectedIds = [] }: 
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-      active: 'default',
-      inactive: 'secondary',
-      pending: 'destructive',
-    }
-    const labels: Record<string, string> = {
-      active: t('statusActive'),
-      inactive: t('statusInactive'),
-      pending: t('statusPending'),
-    }
-    return (
-      <Badge variant={variants[status] || 'default'}>
-        {labels[status] || status}
-      </Badge>
-    )
-  }
-
-  const getFirstCuotaholderName = (company: Company) => {
-    if (company.individualCuotaholders?.length > 0) {
-      const first = company.individualCuotaholders[0]
-      if (first.givenNames || first.lastName) {
-        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
-      }
-    }
-    if (company.corporateCuotaholders?.length > 0) {
-      const first = company.corporateCuotaholders[0]
-      if (first.companyName) {
-        return first.companyName
-      }
+  const getShareholderDisplay = (company: Company) => {
+    if (company.shareholderOne) {
+      return company.shareholderOne
     }
     return '-'
   }
 
-  const getCuotaholderCount = (company: Company) => {
-    const individualCount = company.individualCuotaholders?.filter(c => c.lastName || c.givenNames).length || 0
-    const corporateCount = company.corporateCuotaholders?.filter(c => c.companyName).length || 0
-    return individualCount + corporateCount
+  const getShareholderCount = (company: Company) => {
+    let count = 0
+    if (company.shareholderOne) count++
+    if (company.shareholderTwo) count++
+    return count
   }
 
   return (
@@ -171,25 +133,24 @@ export function CustomerList({ onSelectCompany, selectable, selectedIds = [] }: 
           <TableHeader>
             <TableRow>
               {selectable && <TableHead className="w-12"></TableHead>}
-              <TableHead>{t('primaryContact')}</TableHead>
+              <TableHead>{t('company')}</TableHead>
+              <TableHead>Legal ID</TableHead>
               <TableHead>{t('email')}</TableHead>
-              <TableHead>{t('cuotaholder')}</TableHead>
-              <TableHead>{t('cuotaholderCount')}</TableHead>
-              <TableHead>{t('businessNature')}</TableHead>
-              <TableHead>{t('status')}</TableHead>
+              <TableHead>Shareholder</TableHead>
+              <TableHead>Shareholders</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={selectable ? 8 : 7} className="text-center py-8">
+                <TableCell colSpan={selectable ? 7 : 6} className="text-center py-8">
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
             ) : companies.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={selectable ? 8 : 7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={selectable ? 7 : 6} className="text-center py-8 text-muted-foreground">
                   {t('noCustomersFound')}
                 </TableCell>
               </TableRow>
@@ -212,15 +173,12 @@ export function CustomerList({ onSelectCompany, selectable, selectedIds = [] }: 
                     </TableCell>
                   )}
                   <TableCell className="font-medium">
-                    {company.primaryContactName || '-'}
+                    {company.companyName || '-'}
                   </TableCell>
-                  <TableCell>{company.primaryContactEmail || '-'}</TableCell>
-                  <TableCell>{getFirstCuotaholderName(company)}</TableCell>
-                  <TableCell>{getCuotaholderCount(company)}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    {company.natureOfBusiness || '-'}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(company.status)}</TableCell>
+                  <TableCell>{company.legalId || '-'}</TableCell>
+                  <TableCell>{company.email || '-'}</TableCell>
+                  <TableCell>{getShareholderDisplay(company)}</TableCell>
+                  <TableCell>{getShareholderCount(company)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

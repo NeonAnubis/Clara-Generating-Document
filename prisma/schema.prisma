@@ -10,36 +10,78 @@ datasource db {
 model Customer {
   id                          String   @id @default(cuid())
 
-  // Section 2: Primary Contact(s) Information
-  primaryContactName          String?
-  primaryContactEmail         String?
-  secondaryContactName        String?
-  secondaryContactEmail       String?
-  onlyPrimarySecondaryNotified Boolean @default(false)
+  // Company Information
+  companyName                 String?  // Company name
+  companyType                 String?  // Type of company
+  abbreviation                String?  // Abbreviation
+  legalId                     String?  // Legal ID (Cédula Jurídica)
+  shareCapital                String?  // Share capital
+  numberOfShares              String?  // Number of shares
+  shareValue                  String?  // Share value
+  series                      String?  // Series
+  registeredAddress           String?  // Registered address
+  companyTerm                 Int?     // Company term (years)
+  incorporationDate           String?  // Incorporation date
 
-  // Section 3: Individual Cuotaholder(s) Information
-  // Stored as JSON array of PersonInfo objects
-  individualCuotaholders      String   @db.Text // JSON array
+  // Shareholder 1
+  shareholderOne              String?  // Shareholder one
+  certificateNumber           Int?     // Certificate number
+  identification              String?  // Identification
+  ownership                   String?  // Ownership
+  numberOfSharesHeld          Int?     // Number of shares
+  date                        Int?     // Date
+  month                       String?  // Month
+  year                        Int?     // Year
+  print                       String?  // Print
+  excelId                     Int?     // Id (from Excel)
+  capitalNumber               String?  // Capital number
+  maritalStatus               String?  // Marital status
+  profession                  String?  // Profession
+  shareholder1Address         String?  // Shareholder 1 address
+  reference                   String?  // Reference
+  sharesInWords1              String?  // Shares in words
+  percentage1                 String?  // Percentage
 
-  // Section 4: Corporate Cuotaholder(s) Information
-  // Stored as JSON array of CorporateCuotaholder objects
-  corporateCuotaholders       String   @db.Text // JSON array
+  // Shareholder 2
+  certificateNumber2          Int?     // Certificate number 2
+  reference2                  String?  // Reference 2
+  shareholder2Address         String?  // Shareholder 2 address
+  profession2                 String?  // Profession 2
+  maritalStatus2              String?  // Marital status 2
+  shareholderTwo              String?  // Shareholder 2
+  identification2             String?  // Identification 2
+  ownership2                  String?  // Ownership 2
+  percentage2                 String?  // Percentage 2
+  sharesInNumbers2            String?  // Shares in numbers 2
+  numberOfSharesHeld2         Int?     // Number of shares 2
 
-  // Section 5: Ultimate Beneficial Owner(s)
-  uboSameAsCuotaholder        Boolean  @default(false)
-  ubos                        String   @db.Text // JSON array of PersonInfo
+  // Additional Fields
+  field1                      Int?     // Field 1
+  legalIdInWords              String?  // Legal ID in words
+  renewalStartDate            String?  // Renewal start date
+  active                      Int?     // Active
+  archived                    Int?     // Archived
+  cooperator                  String?  // Cooperator
+  legalRepresentative         String?  // Legal representative
+  representativeId            String?  // Representative ID
+  activeTaxation              Int?     // Active taxation
 
-  // Section 6: Managing Director(s)
-  directorSameAsCuotaholder   Boolean  @default(false)
-  directors                   String   @db.Text // JSON array of PersonInfo
+  // Manager
+  managerFirstName            String?  // Manager first name
+  managerId                   String?  // Manager ID
+  managerAddress              String?  // Manager address
+  managerOccupation           String?  // Manager occupation
+  managerMaritalStatus        String?  // Manager marital status
+  managerNationality          String?  // Manager nationality
+  managerLastName             String?  // Manager last name
 
-  // Additional fields
-  nominalValueOfCuotas        String?  @default("100")
-  numberOfCuotasToBeIssued    String?  @default("1000")
-  natureOfBusiness            String?
-
-  // Status
-  status                      String   @default("active")
+  // Other
+  denomination                String?  // Denomination
+  idInNumbers                 String?  // ID in numbers
+  dissolvedRecord             Int?     // Dissolved record
+  bookLegalization            String?  // Book legalization
+  email                       String?  // Email
+  tradeName                   String?  // Trade name
 
   // Timestamps
   createdAt                   DateTime @default(now())
@@ -48,7 +90,8 @@ model Customer {
   // Relations
   documents                   GeneratedDocument[]
 
-  @@index([primaryContactEmail])
+  @@index([legalId])
+  @@index([companyName])
   @@index([createdAt])
 }
 

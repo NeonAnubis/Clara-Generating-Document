@@ -1,718 +1,879 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Textarea } from '@/components/ui/textarea'
-import { Pencil } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
+import { ArrowLeft, Pencil, Save, X } from 'lucide-react'
 
-interface PersonInfo {
-  lastName: string
-  givenNames: string
-  fullAddress: string
-  passportNumber: string
-  expiryDate: string
-  dateOfBirth: string
-  placeOfBirth: string
-  countryOfTaxResidency: string
-  emailAddress: string
-  telephoneNumber: string
-  profession: string
-  maritalStatus: string
-  numberOfSharesHeld: string
-  ownershipPercentage?: string
-}
-
-interface CorporateCuotaholder {
-  companyName: string
-  registeredAddress: string
-  taxIdRegistration: string
-  jurisdiction: string
-  dateOfIncorporation: string
-  uboSameAsNewCompany: boolean
-  numberOfSharesHeld: string
-}
-
-interface CustomerData {
+interface Customer {
   id: string
-  primaryContactName: string
-  primaryContactEmail: string
-  secondaryContactName: string
-  secondaryContactEmail: string
-  onlyPrimarySecondaryNotified: boolean
-  individualCuotaholders: PersonInfo[]
-  corporateCuotaholders: CorporateCuotaholder[]
-  uboSameAsCuotaholder: boolean
-  ubos: PersonInfo[]
-  directorSameAsCuotaholder: boolean
-  directors: PersonInfo[]
-  nominalValueOfCuotas: string
-  numberOfCuotasToBeIssued: string
-  natureOfBusiness: string
+  // Company Information
+  companyName: string | null
+  companyType: string | null
+  abbreviation: string | null
+  legalId: string | null
+  shareCapital: string | null
+  numberOfShares: string | null
+  shareValue: string | null
+  series: string | null
+  registeredAddress: string | null
+  companyTerm: number | null
+  incorporationDate: string | null
+
+  // Shareholder 1
+  shareholderOne: string | null
+  certificateNumber: number | null
+  identification: string | null
+  ownership: string | null
+  numberOfSharesHeld: number | null
+  date: number | null
+  month: string | null
+  year: number | null
+  print: string | null
+  excelId: number | null
+  capitalNumber: string | null
+  maritalStatus: string | null
+  profession: string | null
+  shareholder1Address: string | null
+  reference: string | null
+  sharesInWords1: string | null
+  percentage1: string | null
+
+  // Shareholder 2
+  certificateNumber2: number | null
+  reference2: string | null
+  shareholder2Address: string | null
+  profession2: string | null
+  maritalStatus2: string | null
+  shareholderTwo: string | null
+  identification2: string | null
+  ownership2: string | null
+  percentage2: string | null
+  sharesInNumbers2: string | null
+  numberOfSharesHeld2: number | null
+
+  // Additional Fields
+  field1: number | null
+  legalIdInWords: string | null
+  renewalStartDate: string | null
+  active: number | null
+  archived: number | null
+  cooperator: string | null
+  legalRepresentative: string | null
+  representativeId: string | null
+  activeTaxation: number | null
+
+  // Manager
+  managerFirstName: string | null
+  managerId: string | null
+  managerAddress: string | null
+  managerOccupation: string | null
+  managerMaritalStatus: string | null
+  managerNationality: string | null
+  managerLastName: string | null
+
+  // Other
+  denomination: string | null
+  idInNumbers: string | null
+  dissolvedRecord: number | null
+  bookLegalization: string | null
+  email: string | null
+  tradeName: string | null
+
+  createdAt: string
+  updatedAt: string
 }
 
-const emptyPersonInfo: PersonInfo = {
-  lastName: '', givenNames: '', fullAddress: '', passportNumber: '',
-  expiryDate: '', dateOfBirth: '', placeOfBirth: '', countryOfTaxResidency: '',
-  emailAddress: '', telephoneNumber: '', profession: '', maritalStatus: '',
-  numberOfSharesHeld: '', ownershipPercentage: ''
-}
-
-const emptyCorporate: CorporateCuotaholder = {
-  companyName: '', registeredAddress: '', taxIdRegistration: '',
-  jurisdiction: '', dateOfIncorporation: '', uboSameAsNewCompany: false, numberOfSharesHeld: ''
-}
-
-// Header Component
-function FormHeader({ t }: { t: (key: string) => string }) {
-  return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between py-4">
-        <div className="text-[#4a4a8a] dark:text-blue-400">
-          <p className="text-lg italic font-medium">! {t('formsMustBeDigital')}</p>
-          <p className="text-lg italic font-medium">{t('handwrittenNotAccepted')}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-14 h-14 bg-[#4a4a8a] rounded flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 8H24V12H12V16H20V20H12V28H8V8Z" fill="white"/>
-              <path d="M14 12L20 12" stroke="#c9a227" strokeWidth="2"/>
-              <path d="M14 20L18 20" stroke="#c9a227" strokeWidth="2"/>
-            </svg>
-          </div>
-          <div className="text-[#4a4a8a] dark:text-slate-300">
-            <div className="flex gap-3 text-sm tracking-[0.3em] font-light">
-              <span>F</span><span>A</span><span>S</span><span>T</span>
-            </div>
-            <div className="text-sm tracking-[0.15em] font-light border-t border-[#4a4a8a] dark:border-slate-400 pt-1">
-              OFFSHORE
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="border-b-2 border-[#4a4a8a] dark:border-slate-500" />
-    </div>
-  )
-}
-
-// Section title component
-function SectionTitle({ number, title, subtitle, sectionLabel }: { number: number; title: string; subtitle?: string; sectionLabel: string }) {
-  return (
-    <div className="mb-4">
-      <h3 className="text-base font-semibold text-blue-800 dark:text-blue-400">
-        {sectionLabel} {number} – {title}
-        {subtitle && <span className="font-normal text-red-600 dark:text-red-400"> ({subtitle})</span>}
-      </h3>
-    </div>
-  )
-}
-
-export default function CustomerViewPage() {
+export default function CustomerDetailPage() {
   const params = useParams()
-  const id = params.id as string
-  const t = useTranslations('companyForm')
+  const router = useRouter()
+  const t = useTranslations('customerForm')
   const tCommon = useTranslations('common')
+  const { toast } = useToast()
 
-  const [customer, setCustomer] = useState<CustomerData | null>(null)
-  const [formData, setFormData] = useState<CustomerData | null>(null)
+  const [customer, setCustomer] = useState<Customer | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [saving, setSaving] = useState(false)
+  const [editedCustomer, setEditedCustomer] = useState<Customer | null>(null)
+
+  const fetchCustomer = async () => {
+    try {
+      const response = await fetch(`/api/customers/${params.id}`)
+      if (!response.ok) throw new Error('Failed to fetch customer')
+      const data = await response.json()
+      setCustomer(data)
+      setEditedCustomer(data)
+    } catch (error) {
+      console.error('Error fetching customer:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to load customer data',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const response = await fetch(`/api/customers/${id}`)
-        if (response.ok) {
-          const data = await response.json()
-          setCustomer(data)
-          setFormData(data)
-        }
-      } catch (error) {
-        console.error('Error fetching customer:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchCustomer()
-  }, [id])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id])
 
   const handleEdit = () => {
     setIsEditing(true)
+    setEditedCustomer(customer)
   }
 
   const handleCancel = () => {
-    setFormData(customer)
     setIsEditing(false)
+    setEditedCustomer(customer)
   }
 
   const handleSave = async () => {
-    if (!formData) return
+    if (!editedCustomer) return
+
     setSaving(true)
     try {
-      const response = await fetch(`/api/customers/${id}`, {
+      const response = await fetch(`/api/customers/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(editedCustomer),
       })
-      if (response.ok) {
-        // Re-fetch to get parsed JSON fields
-        const refetchResponse = await fetch(`/api/customers/${id}`)
-        if (refetchResponse.ok) {
-          const refetchedData = await refetchResponse.json()
-          setCustomer(refetchedData)
-          setFormData(refetchedData)
-        }
-        setIsEditing(false)
-      }
+
+      if (!response.ok) throw new Error('Failed to update customer')
+
+      const updated = await response.json()
+      setCustomer(updated)
+      setEditedCustomer(updated)
+      setIsEditing(false)
+
+      toast({
+        title: 'Success',
+        description: 'Customer updated successfully',
+      })
     } catch (error) {
-      console.error('Error saving customer:', error)
+      console.error('Error updating customer:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to update customer',
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
   }
 
-  // Ensure arrays have 4 items for display
-  const ensureArrayLength = <T,>(arr: T[], emptyItem: T, length: number = 4): T[] => {
-    const result = [...(arr || [])]
-    while (result.length < length) {
-      result.push({ ...emptyItem })
-    }
-    return result
-  }
-
-  const updateFormData = (field: keyof CustomerData, value: unknown) => {
-    if (!formData) return
-    setFormData({ ...formData, [field]: value })
-  }
-
-  const updateIndividualCuotaholder = (index: number, field: keyof PersonInfo, value: string) => {
-    if (!formData) return
-    const updated = ensureArrayLength(formData.individualCuotaholders || [], emptyPersonInfo)
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, individualCuotaholders: updated })
-  }
-
-  const updateCorporateCuotaholder = (index: number, field: keyof CorporateCuotaholder, value: string | boolean) => {
-    if (!formData) return
-    const updated = ensureArrayLength(formData.corporateCuotaholders || [], emptyCorporate)
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, corporateCuotaholders: updated })
-  }
-
-  const updateUbo = (index: number, field: keyof PersonInfo, value: string) => {
-    if (!formData) return
-    const updated = ensureArrayLength(formData.ubos || [], emptyPersonInfo)
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, ubos: updated })
-  }
-
-  const updateDirector = (index: number, field: keyof PersonInfo, value: string) => {
-    if (!formData) return
-    const updated = ensureArrayLength(formData.directors || [], emptyPersonInfo)
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, directors: updated })
+  const updateField = (field: keyof Customer, value: string | number | null) => {
+    if (!editedCustomer) return
+    setEditedCustomer({ ...editedCustomer, [field]: value })
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">{tCommon('loading')}</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-lg">{tCommon('loading')}</p>
+        </div>
       </div>
     )
   }
 
-  if (!formData) {
+  if (!customer) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Customer not found</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-lg text-destructive">Customer not found</p>
+        </div>
       </div>
     )
   }
 
-  const individualCuotaholders = ensureArrayLength(formData.individualCuotaholders || [], emptyPersonInfo)
-  const corporateCuotaholders = ensureArrayLength(formData.corporateCuotaholders || [], emptyCorporate)
-  const ubos = ensureArrayLength(formData.ubos || [], emptyPersonInfo)
-  const directors = ensureArrayLength(formData.directors || [], emptyPersonInfo)
-
-  const inputClassName = isEditing ? 'h-8 text-sm border-slate-300' : 'h-8 text-sm border-slate-300 bg-slate-50'
-  const textareaClassName = isEditing ? 'text-sm h-16 resize-none' : 'text-sm h-16 resize-none bg-slate-50'
-  const largeInputClassName = isEditing ? 'max-w-xs text-2xl h-12' : 'max-w-xs text-2xl h-12 bg-slate-50'
-
-  const renderPage1 = () => (
-    <>
-      {/* Section 1: Company Setup Information */}
-      <div className="mb-8">
-        <SectionTitle number={1} title={t('companySetupInfo')} sectionLabel={t('section')} />
-        <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-          ({t('noteNumberedCompanies')})
-        </p>
-      </div>
-
-      {/* Section 2: Primary Contact(s) Information */}
-      <div className="mb-8">
-        <SectionTitle number={2} title={t('primaryContactInfo')} subtitle={t('primaryContactSubtitle')} sectionLabel={t('section')} />
-        <div className="border border-slate-300 rounded overflow-hidden">
-          <table className="w-full">
-            <tbody>
-              <tr className="border-b border-slate-300">
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 w-48 text-sm font-medium">{t('primaryContactName')}</td>
-                <td className="px-2 py-2">
-                  <Input
-                    value={formData.primaryContactName || ''}
-                    onChange={(e) => updateFormData('primaryContactName', e.target.value)}
-                    readOnly={!isEditing}
-                    className={inputClassName}
-                  />
-                </td>
-              </tr>
-              <tr className="border-b border-slate-300">
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('primaryContactEmail')}</td>
-                <td className="px-2 py-2">
-                  <Input
-                    value={formData.primaryContactEmail || ''}
-                    onChange={(e) => updateFormData('primaryContactEmail', e.target.value)}
-                    readOnly={!isEditing}
-                    className={inputClassName}
-                  />
-                </td>
-              </tr>
-              <tr className="border-b border-slate-300">
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactName')}</td>
-                <td className="px-2 py-2">
-                  <Input
-                    value={formData.secondaryContactName || ''}
-                    onChange={(e) => updateFormData('secondaryContactName', e.target.value)}
-                    readOnly={!isEditing}
-                    className={inputClassName}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium">{t('secondaryContactEmail')}</td>
-                <td className="px-2 py-2">
-                  <Input
-                    value={formData.secondaryContactEmail || ''}
-                    onChange={(e) => updateFormData('secondaryContactEmail', e.target.value)}
-                    readOnly={!isEditing}
-                    className={inputClassName}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="flex items-center gap-2 mt-3">
-          <Checkbox
-            id="onlyPrimarySecondary"
-            checked={formData.onlyPrimarySecondaryNotified}
-            onCheckedChange={(checked) => updateFormData('onlyPrimarySecondaryNotified', checked)}
-            disabled={!isEditing}
-          />
-          <label htmlFor="onlyPrimarySecondary" className="text-sm">{t('onlyPrimarySecondaryNotified')}</label>
-        </div>
-      </div>
-
-      {/* Section 3: Individual Cuotaholder(s) Information */}
-      <div className="mb-8">
-        <SectionTitle number={3} title={t('individualCuotaholderInfo')} subtitle={t('individualCuotaholderSubtitle')} sectionLabel={t('section')} />
-        <div className="border border-slate-300 rounded overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-100 dark:bg-slate-800">
-                <th className="px-4 py-2 text-left text-sm font-medium w-48 border-b border-r border-slate-300"></th>
-                {[1, 2, 3, 4].map((num) => (
-                  <th key={num} className="px-2 py-2 text-center text-sm font-medium border-b border-r border-slate-300 last:border-r-0">
-                    {t('cuotaholder')} {num}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { key: 'lastName', label: t('lastName') },
-                { key: 'givenNames', label: t('givenNames') },
-                { key: 'fullAddress', label: t('fullAddress') },
-                { key: 'passportNumber', label: t('passportNumber') },
-                { key: 'expiryDate', label: t('expiryDate') },
-                { key: 'dateOfBirth', label: t('dateOfBirth') },
-                { key: 'placeOfBirth', label: t('placeOfBirth') },
-                { key: 'countryOfTaxResidency', label: t('countryOfTaxResidency') },
-                { key: 'emailAddress', label: t('emailAddress') },
-                { key: 'telephoneNumber', label: t('telephoneNumber') },
-                { key: 'profession', label: t('profession') },
-                { key: 'maritalStatus', label: t('maritalStatus') },
-                { key: 'numberOfSharesHeld', label: t('numberOfSharesHeld') },
-              ].map(({ key, label }) => (
-                <tr key={key} className="border-b border-slate-300 last:border-b-0">
-                  <td className="bg-slate-100 dark:bg-slate-800 px-4 py-1 text-sm font-medium border-r border-slate-300">{label}</td>
-                  {[0, 1, 2, 3].map((idx) => (
-                    <td key={idx} className="px-1 py-1 border-r border-slate-300 last:border-r-0">
-                      {key === 'fullAddress' ? (
-                        <Textarea
-                          value={individualCuotaholders[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={textareaClassName}
-                        />
-                      ) : (
-                        <Input
-                          value={individualCuotaholders[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateIndividualCuotaholder(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={inputClassName}
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Section 4: Corporate Cuotaholder(s) Information */}
-      <div className="mb-8">
-        <SectionTitle number={4} title={t('corporateCuotaholderInfo')} subtitle={t('corporateCuotaholderSubtitle')} sectionLabel={t('section')} />
-        <div className="border border-slate-300 rounded overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-100 dark:bg-slate-800">
-                <th className="px-4 py-2 text-left text-sm font-medium w-48 border-b border-r border-slate-300"></th>
-                {[1, 2, 3, 4].map((num) => (
-                  <th key={num} className="px-2 py-2 text-center text-sm font-medium border-b border-r border-slate-300 last:border-r-0">
-                    {t('cuotaholder')} {num}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { key: 'companyName', label: t('companyName') },
-                { key: 'registeredAddress', label: t('registeredAddress') },
-                { key: 'taxIdRegistration', label: t('taxIdRegistration') },
-                { key: 'jurisdiction', label: t('jurisdiction') },
-                { key: 'dateOfIncorporation', label: t('dateOfIncorporation') },
-                { key: 'uboSameAsNewCompany', label: t('uboSameAsNewCompany'), isCheckbox: true },
-                { key: 'numberOfSharesHeld', label: t('numberOfSharesHeld') },
-              ].map(({ key, label, isCheckbox }) => (
-                <tr key={key} className="border-b border-slate-300 last:border-b-0">
-                  <td className="bg-slate-100 dark:bg-slate-800 px-4 py-1 text-sm font-medium border-r border-slate-300">{label}</td>
-                  {[0, 1, 2, 3].map((idx) => (
-                    <td key={idx} className="px-1 py-1 border-r border-slate-300 last:border-r-0">
-                      {isCheckbox ? (
-                        <div className="flex justify-center">
-                          <Checkbox
-                            checked={corporateCuotaholders[idx]?.uboSameAsNewCompany || false}
-                            onCheckedChange={(checked) => updateCorporateCuotaholder(idx, 'uboSameAsNewCompany', checked as boolean)}
-                            disabled={!isEditing}
-                          />
-                        </div>
-                      ) : key === 'registeredAddress' ? (
-                        <Textarea
-                          value={corporateCuotaholders[idx]?.[key as keyof CorporateCuotaholder] as string || ''}
-                          onChange={(e) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, e.target.value)}
-                          readOnly={!isEditing}
-                          className={textareaClassName}
-                        />
-                      ) : (
-                        <Input
-                          value={corporateCuotaholders[idx]?.[key as keyof CorporateCuotaholder] as string || ''}
-                          onChange={(e) => updateCorporateCuotaholder(idx, key as keyof CorporateCuotaholder, e.target.value)}
-                          readOnly={!isEditing}
-                          className={inputClassName}
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </>
-  )
-
-  const renderPage2 = () => (
-    <>
-      {/* Section 5: Ultimate Beneficial Owner(s) */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <h3 className="text-base font-semibold text-blue-800 dark:text-blue-400">
-            {t('section')} 5 – {t('ultimateBeneficialOwners')}
-          </h3>
-          <span className="text-sm">{t('checkIfUboSame')}</span>
-          <Checkbox
-            checked={formData.uboSameAsCuotaholder}
-            onCheckedChange={(checked) => updateFormData('uboSameAsCuotaholder', checked)}
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="border border-slate-300 rounded overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-100 dark:bg-slate-800">
-                <th className="px-4 py-2 text-left text-sm font-medium w-48 border-b border-r border-slate-300"></th>
-                {[1, 2, 3, 4].map((num) => (
-                  <th key={num} className="px-2 py-2 text-center text-sm font-medium border-b border-r border-slate-300 last:border-r-0">
-                    UBO {num}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { key: 'lastName', label: t('lastName') },
-                { key: 'givenNames', label: t('givenNames') },
-                { key: 'fullAddress', label: t('fullAddress') },
-                { key: 'passportNumber', label: t('passportNumber') },
-                { key: 'expiryDate', label: t('expiryDate') },
-                { key: 'dateOfBirth', label: t('dateOfBirth') },
-                { key: 'placeOfBirth', label: t('placeOfBirth') },
-                { key: 'countryOfTaxResidency', label: t('countryOfTaxResidency') },
-                { key: 'emailAddress', label: t('emailAddress') },
-                { key: 'telephoneNumber', label: t('telephoneNumber') },
-                { key: 'profession', label: t('profession') },
-                { key: 'maritalStatus', label: t('maritalStatus') },
-                { key: 'ownershipPercentage', label: t('ownershipPercentage') },
-              ].map(({ key, label }) => (
-                <tr key={key} className="border-b border-slate-300 last:border-b-0">
-                  <td className="bg-slate-100 dark:bg-slate-800 px-4 py-1 text-sm font-medium border-r border-slate-300">{label}</td>
-                  {[0, 1, 2, 3].map((idx) => (
-                    <td key={idx} className="px-1 py-1 border-r border-slate-300 last:border-r-0">
-                      {key === 'fullAddress' ? (
-                        <Textarea
-                          value={ubos[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateUbo(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={textareaClassName}
-                        />
-                      ) : (
-                        <Input
-                          value={ubos[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateUbo(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={inputClassName}
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Section 6: Managing Director(s) */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <h3 className="text-base font-semibold text-blue-800 dark:text-blue-400">
-            {t('section')} 6 – {t('managingDirectors')}
-          </h3>
-          <span className="text-sm">{t('checkIfDirectorSame')}</span>
-          <Checkbox
-            checked={formData.directorSameAsCuotaholder}
-            onCheckedChange={(checked) => updateFormData('directorSameAsCuotaholder', checked)}
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="border border-slate-300 rounded overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-100 dark:bg-slate-800">
-                <th className="px-4 py-2 text-left text-sm font-medium w-48 border-b border-r border-slate-300"></th>
-                {[1, 2, 3, 4].map((num) => (
-                  <th key={num} className="px-2 py-2 text-center text-sm font-medium border-b border-r border-slate-300 last:border-r-0">
-                    {t('director')} {num}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { key: 'lastName', label: t('lastName') },
-                { key: 'givenNames', label: t('givenNames') },
-                { key: 'fullAddress', label: t('fullAddress') },
-                { key: 'passportNumber', label: t('passportNumber') },
-                { key: 'expiryDate', label: t('expiryDate') },
-                { key: 'dateOfBirth', label: t('dateOfBirth') },
-                { key: 'placeOfBirth', label: t('placeOfBirth') },
-                { key: 'countryOfTaxResidency', label: t('countryOfTaxResidency') },
-                { key: 'emailAddress', label: t('emailAddress') },
-                { key: 'telephoneNumber', label: t('telephoneNumber') },
-                { key: 'profession', label: t('profession') },
-                { key: 'maritalStatus', label: t('maritalStatus') },
-              ].map(({ key, label }) => (
-                <tr key={key} className="border-b border-slate-300 last:border-b-0">
-                  <td className="bg-slate-100 dark:bg-slate-800 px-4 py-1 text-sm font-medium border-r border-slate-300">{label}</td>
-                  {[0, 1, 2, 3].map((idx) => (
-                    <td key={idx} className="px-1 py-1 border-r border-slate-300 last:border-r-0">
-                      {key === 'fullAddress' ? (
-                        <Textarea
-                          value={directors[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateDirector(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={textareaClassName}
-                        />
-                      ) : (
-                        <Input
-                          value={directors[idx]?.[key as keyof PersonInfo] || ''}
-                          onChange={(e) => updateDirector(idx, key as keyof PersonInfo, e.target.value)}
-                          readOnly={!isEditing}
-                          className={inputClassName}
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Cuotas Information */}
-      <div className="mb-8">
-        <div className="border border-slate-300 rounded overflow-hidden">
-          <table className="w-full">
-            <tbody>
-              <tr className="border-b border-slate-300">
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-3 w-64">
-                  <div className="text-sm font-medium">{t('nominalValueOfCuotas')}</div>
-                  <div className="text-xs text-muted-foreground">({t('defaultNominalValue')})</div>
-                </td>
-                <td className="px-4 py-3">
-                  <Input
-                    value={formData.nominalValueOfCuotas || ''}
-                    onChange={(e) => updateFormData('nominalValueOfCuotas', e.target.value)}
-                    readOnly={!isEditing}
-                    className={largeInputClassName}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-3">
-                  <div className="text-sm font-medium">{t('numberOfCuotasToBeIssued')}</div>
-                  <div className="text-xs text-muted-foreground">({t('defaultCuotas')})</div>
-                </td>
-                <td className="px-4 py-3">
-                  <Input
-                    value={formData.numberOfCuotasToBeIssued || ''}
-                    onChange={(e) => updateFormData('numberOfCuotasToBeIssued', e.target.value)}
-                    readOnly={!isEditing}
-                    className={largeInputClassName}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Nature of Business */}
-      <div className="mb-8">
-        <div className="border border-slate-300 rounded overflow-hidden">
-          <table className="w-full">
-            <tbody>
-              <tr>
-                <td className="bg-slate-100 dark:bg-slate-800 px-4 py-3 w-64 align-top">
-                  <div className="text-sm font-medium">{t('natureOfBusiness')}</div>
-                </td>
-                <td className="px-4 py-3">
-                  <Input
-                    value={formData.natureOfBusiness || ''}
-                    onChange={(e) => updateFormData('natureOfBusiness', e.target.value)}
-                    readOnly={!isEditing}
-                    className={isEditing ? 'text-2xl h-12' : 'text-2xl h-12 bg-slate-50'}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </>
-  )
+  const displayCustomer = isEditing ? editedCustomer : customer
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Form Header */}
-        <FormHeader t={t} />
+    <div className="container mx-auto py-6 max-w-6xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/customers')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">
+              {displayCustomer?.companyName || 'Customer Details'}
+            </h1>
+            <p className="text-muted-foreground">
+              {displayCustomer?.legalId || 'No Legal ID'}
+            </p>
+          </div>
+        </div>
 
-        {/* Edit/Save/Cancel Buttons */}
-        <div className="flex justify-end gap-2 mb-4 print:hidden">
+        <div className="flex gap-2">
           {isEditing ? (
             <>
               <Button onClick={handleCancel} variant="outline">
+                <X className="h-4 w-4 mr-2" />
                 {tCommon('cancel')}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
+                <Save className="h-4 w-4 mr-2" />
                 {saving ? tCommon('saving') : tCommon('save')}
               </Button>
             </>
           ) : (
-            <Button onClick={handleEdit} variant="outline" className="gap-2">
-              <Pencil className="h-4 w-4" />
+            <Button onClick={handleEdit}>
+              <Pencil className="h-4 w-4 mr-2" />
               {tCommon('edit')}
             </Button>
           )}
         </div>
+      </div>
 
-        {/* Page Indicator */}
-        <div className="flex items-center justify-center gap-2 mb-6 print:hidden">
-          <button
-            type="button"
-            onClick={() => setCurrentPage(1)}
-            className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
-              currentPage === 1
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
-            }`}
-          >
-            1
-          </button>
-          <div className="w-8 h-0.5 bg-slate-300 dark:bg-slate-600" />
-          <button
-            type="button"
-            onClick={() => setCurrentPage(2)}
-            className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
-              currentPage === 2
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
-            }`}
-          >
-            2
-          </button>
+      {/* Company Information */}
+      <div className="space-y-6">
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('companyInfo')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('companyName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.companyName || ''}
+                  onChange={(e) => updateField('companyName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.companyName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('companyType')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.companyType || ''}
+                  onChange={(e) => updateField('companyType', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.companyType || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('abbreviation')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.abbreviation || ''}
+                  onChange={(e) => updateField('abbreviation', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.abbreviation || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('legalId')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.legalId || ''}
+                  onChange={(e) => updateField('legalId', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.legalId || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('shareCapital')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareCapital || ''}
+                  onChange={(e) => updateField('shareCapital', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareCapital || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('numberOfShares')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.numberOfShares || ''}
+                  onChange={(e) => updateField('numberOfShares', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.numberOfShares || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('shareValue')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareValue || ''}
+                  onChange={(e) => updateField('shareValue', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareValue || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('series')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.series || ''}
+                  onChange={(e) => updateField('series', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.series || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('registeredAddress')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.registeredAddress || ''}
+                  onChange={(e) => updateField('registeredAddress', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.registeredAddress || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('companyTerm')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.companyTerm || ''}
+                  onChange={(e) => updateField('companyTerm', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.companyTerm || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('incorporationDate')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.incorporationDate || ''}
+                  onChange={(e) => updateField('incorporationDate', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.incorporationDate || '-'}</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {currentPage === 1 ? renderPage1() : renderPage2()}
+        {/* Shareholder 1 */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">Shareholder 1</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('shareholderOne')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareholderOne || ''}
+                  onChange={(e) => updateField('shareholderOne', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareholderOne || '-'}</p>
+              )}
+            </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center pt-6 border-t print:hidden">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          >
-            {t('previousPage')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setCurrentPage(2)}
-            disabled={currentPage === 2}
-          >
-            {t('nextPage')}
-          </Button>
+            <div className="space-y-2">
+              <Label>{t('identification')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.identification || ''}
+                  onChange={(e) => updateField('identification', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.identification || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('certificateNumber')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.certificateNumber || ''}
+                  onChange={(e) => updateField('certificateNumber', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.certificateNumber || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('ownership')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.ownership || ''}
+                  onChange={(e) => updateField('ownership', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.ownership || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('numberOfSharesHeld')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.numberOfSharesHeld || ''}
+                  onChange={(e) => updateField('numberOfSharesHeld', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.numberOfSharesHeld || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('percentage1')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.percentage1 || ''}
+                  onChange={(e) => updateField('percentage1', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.percentage1 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('maritalStatus')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.maritalStatus || ''}
+                  onChange={(e) => updateField('maritalStatus', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.maritalStatus || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('profession')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.profession || ''}
+                  onChange={(e) => updateField('profession', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.profession || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('shareholder1Address')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareholder1Address || ''}
+                  onChange={(e) => updateField('shareholder1Address', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareholder1Address || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('reference')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.reference || ''}
+                  onChange={(e) => updateField('reference', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.reference || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('sharesInWords1')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.sharesInWords1 || ''}
+                  onChange={(e) => updateField('sharesInWords1', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.sharesInWords1 || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Shareholder 2 */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">Shareholder 2</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('shareholderTwo')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareholderTwo || ''}
+                  onChange={(e) => updateField('shareholderTwo', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareholderTwo || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('identification2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.identification2 || ''}
+                  onChange={(e) => updateField('identification2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.identification2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('certificateNumber2')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.certificateNumber2 || ''}
+                  onChange={(e) => updateField('certificateNumber2', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.certificateNumber2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('ownership2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.ownership2 || ''}
+                  onChange={(e) => updateField('ownership2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.ownership2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('numberOfSharesHeld2')}</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={displayCustomer?.numberOfSharesHeld2 || ''}
+                  onChange={(e) => updateField('numberOfSharesHeld2', e.target.value ? parseInt(e.target.value) : null)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.numberOfSharesHeld2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('percentage2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.percentage2 || ''}
+                  onChange={(e) => updateField('percentage2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.percentage2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('maritalStatus2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.maritalStatus2 || ''}
+                  onChange={(e) => updateField('maritalStatus2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.maritalStatus2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('profession2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.profession2 || ''}
+                  onChange={(e) => updateField('profession2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.profession2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('shareholder2Address')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.shareholder2Address || ''}
+                  onChange={(e) => updateField('shareholder2Address', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.shareholder2Address || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('reference2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.reference2 || ''}
+                  onChange={(e) => updateField('reference2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.reference2 || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('sharesInNumbers2')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.sharesInNumbers2 || ''}
+                  onChange={(e) => updateField('sharesInNumbers2', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.sharesInNumbers2 || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Manager */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">Manager</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('managerFirstName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerFirstName || ''}
+                  onChange={(e) => updateField('managerFirstName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerFirstName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('managerLastName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerLastName || ''}
+                  onChange={(e) => updateField('managerLastName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerLastName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('managerId')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerId || ''}
+                  onChange={(e) => updateField('managerId', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerId || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('managerMaritalStatus')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerMaritalStatus || ''}
+                  onChange={(e) => updateField('managerMaritalStatus', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerMaritalStatus || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('managerOccupation')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerOccupation || ''}
+                  onChange={(e) => updateField('managerOccupation', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerOccupation || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('managerNationality')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerNationality || ''}
+                  onChange={(e) => updateField('managerNationality', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerNationality || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('managerAddress')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.managerAddress || ''}
+                  onChange={(e) => updateField('managerAddress', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.managerAddress || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Information */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('additionalInfo')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('email')}</Label>
+              {isEditing ? (
+                <Input
+                  type="email"
+                  value={displayCustomer?.email || ''}
+                  onChange={(e) => updateField('email', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.email || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('tradeName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.tradeName || ''}
+                  onChange={(e) => updateField('tradeName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.tradeName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('cooperator')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.cooperator || ''}
+                  onChange={(e) => updateField('cooperator', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.cooperator || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('legalRepresentative')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.legalRepresentative || ''}
+                  onChange={(e) => updateField('legalRepresentative', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.legalRepresentative || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('representativeId')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.representativeId || ''}
+                  onChange={(e) => updateField('representativeId', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.representativeId || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('denomination')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.denomination || ''}
+                  onChange={(e) => updateField('denomination', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.denomination || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('legalIdInWords')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.legalIdInWords || ''}
+                  onChange={(e) => updateField('legalIdInWords', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.legalIdInWords || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('idInNumbers')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.idInNumbers || ''}
+                  onChange={(e) => updateField('idInNumbers', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.idInNumbers || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('renewalStartDate')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.renewalStartDate || ''}
+                  onChange={(e) => updateField('renewalStartDate', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.renewalStartDate || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('bookLegalization')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.bookLegalization || ''}
+                  onChange={(e) => updateField('bookLegalization', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.bookLegalization || '-'}</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

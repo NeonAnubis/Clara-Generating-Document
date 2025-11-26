@@ -18,22 +18,22 @@ import { Download, Award } from 'lucide-react'
 
 interface Customer {
   id: string
-  primaryContactName: string | null
-  primaryContactEmail: string | null
-  natureOfBusiness: string | null
-  individualCuotaholders: Array<{ lastName: string; givenNames: string }>
-  corporateCuotaholders: Array<{ companyName: string }>
+  companyName: string | null
+  legalId: string | null
+  shareholderOne: string | null
+  shareholderTwo: string | null
+  email: string | null
 }
 
 const EXPORT_FIELDS = [
-  { key: 'primaryContactName', label: 'Primary Contact Name' },
-  { key: 'primaryContactEmail', label: 'Primary Contact Email' },
-  { key: 'secondaryContactName', label: 'Secondary Contact Name' },
-  { key: 'secondaryContactEmail', label: 'Secondary Contact Email' },
-  { key: 'natureOfBusiness', label: 'Nature of Business' },
-  { key: 'nominalValueOfCuotas', label: 'Nominal Value of Cuotas' },
-  { key: 'numberOfCuotasToBeIssued', label: 'Number of Cuotas' },
-  { key: 'status', label: 'Status' },
+  { key: 'companyName', label: 'Company Name' },
+  { key: 'companyType', label: 'Company Type' },
+  { key: 'legalId', label: 'Legal ID' },
+  { key: 'shareholderOne', label: 'Shareholder One' },
+  { key: 'shareholderTwo', label: 'Shareholder Two' },
+  { key: 'email', label: 'Email' },
+  { key: 'shareValue', label: 'Share Value' },
+  { key: 'numberOfShares', label: 'Number of Shares' },
 ]
 
 export default function ExportPage() {
@@ -73,20 +73,11 @@ export default function ExportPage() {
   }, [])
 
   const getCustomerDisplayName = (customer: Customer) => {
-    if (customer.primaryContactName) {
-      return customer.primaryContactName
+    if (customer.companyName) {
+      return customer.companyName
     }
-    if (customer.individualCuotaholders?.length > 0) {
-      const first = customer.individualCuotaholders[0]
-      if (first.givenNames || first.lastName) {
-        return `${first.givenNames || ''} ${first.lastName || ''}`.trim()
-      }
-    }
-    if (customer.corporateCuotaholders?.length > 0) {
-      const first = customer.corporateCuotaholders[0]
-      if (first.companyName) {
-        return first.companyName
-      }
+    if (customer.shareholderOne) {
+      return customer.shareholderOne
     }
     return 'Customer'
   }
@@ -217,7 +208,14 @@ export default function ExportPage() {
   const getSelectedCustomerCuotaholders = () => {
     const customer = customers.find(c => c.id === certCustomerId)
     if (!customer) return []
-    return customer.individualCuotaholders || []
+    const holders = []
+    if (customer.shareholderOne) {
+      holders.push({ name: customer.shareholderOne })
+    }
+    if (customer.shareholderTwo) {
+      holders.push({ name: customer.shareholderTwo })
+    }
+    return holders
   }
 
   if (loading) {
@@ -279,11 +277,6 @@ export default function ExportPage() {
                       />
                       <label htmlFor={customer.id} className="text-sm">
                         {getCustomerDisplayName(customer)}
-                        {customer.natureOfBusiness && (
-                          <span className="text-muted-foreground ml-1">
-                            ({customer.natureOfBusiness})
-                          </span>
-                        )}
                       </label>
                     </div>
                   ))}
@@ -350,7 +343,6 @@ export default function ExportPage() {
                     {customers.map(customer => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {getCustomerDisplayName(customer)}
-                        {customer.natureOfBusiness && ` (${customer.natureOfBusiness})`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -431,7 +423,6 @@ export default function ExportPage() {
                     {customers.map(customer => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {getCustomerDisplayName(customer)}
-                        {customer.natureOfBusiness && ` (${customer.natureOfBusiness})`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -448,9 +439,9 @@ export default function ExportPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {getSelectedCustomerCuotaholders().map((holder: { givenNames?: string; lastName?: string }, index: number) => (
+                        {getSelectedCustomerCuotaholders().map((holder: { name: string }, index: number) => (
                           <SelectItem key={index} value={index.toString()}>
-                            {`${holder.givenNames || ''} ${holder.lastName || ''}`.trim() || `Cuotaholder ${index + 1}`}
+                            {holder.name || `Cuotaholder ${index + 1}`}
                           </SelectItem>
                         ))}
                       </SelectContent>

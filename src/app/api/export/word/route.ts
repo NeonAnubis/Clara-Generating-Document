@@ -26,26 +26,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
 
-    // Parse JSON fields
-    const individualCuotaholders = JSON.parse(customer.individualCuotaholders)
-    const corporateCuotaholders = JSON.parse(customer.corporateCuotaholders)
-
-    // Get first cuotaholder name for file naming
-    const firstCuotaholder = individualCuotaholders[0] || {}
-    const cuotaholderName = firstCuotaholder.lastName
-      ? `${firstCuotaholder.givenNames || ''}_${firstCuotaholder.lastName}`.trim()
-      : corporateCuotaholders[0]?.companyName || 'customer'
+    // Get shareholder name for file naming
+    const cuotaholderName = customer.shareholderOne
+      ? customer.shareholderOne.replace(/\s+/g, '_')
+      : customer.companyName
+      ? customer.companyName.replace(/\s+/g, '_')
+      : 'customer'
 
     // Replace placeholders in template content
     let content = template.content
     const placeholders: Record<string, string | null> = {
-      '{{primaryContactName}}': customer.primaryContactName,
-      '{{primaryContactEmail}}': customer.primaryContactEmail,
-      '{{secondaryContactName}}': customer.secondaryContactName,
-      '{{secondaryContactEmail}}': customer.secondaryContactEmail,
-      '{{natureOfBusiness}}': customer.natureOfBusiness,
-      '{{nominalValueOfCuotas}}': customer.nominalValueOfCuotas,
-      '{{numberOfCuotasToBeIssued}}': customer.numberOfCuotasToBeIssued,
+      '{{companyName}}': customer.companyName,
+      '{{companyType}}': customer.companyType,
+      '{{legalId}}': customer.legalId,
+      '{{shareCapital}}': customer.shareCapital,
+      '{{numberOfShares}}': customer.numberOfShares,
+      '{{shareValue}}': customer.shareValue,
+      '{{registeredAddress}}': customer.registeredAddress,
+      '{{companyTerm}}': customer.companyTerm,
+      '{{incorporationDate}}': customer.incorporationDate,
+      '{{shareholderOne}}': customer.shareholderOne,
+      '{{certificateNumber}}': customer.certificateNumber,
+      '{{identification}}': customer.identification,
+      '{{ownership}}': customer.ownership,
+      '{{numberOfSharesHeld}}': customer.numberOfSharesHeld,
+      '{{maritalStatus}}': customer.maritalStatus,
+      '{{profession}}': customer.profession,
+      '{{shareholder1Address}}': customer.shareholder1Address,
+      '{{shareholderTwo}}': customer.shareholderTwo,
+      '{{identification2}}': customer.identification2,
+      '{{ownership2}}': customer.ownership2,
+      '{{maritalStatus2}}': customer.maritalStatus2,
+      '{{profession2}}': customer.profession2,
+      '{{shareholder2Address}}': customer.shareholder2Address,
+      '{{managerFirstName}}': customer.managerFirstName,
+      '{{managerLastName}}': customer.managerLastName,
+      '{{managerId}}': customer.managerId,
+      '{{legalRepresentative}}': customer.legalRepresentative,
+      '{{email}}': customer.email,
       '{{date}}': new Date().toLocaleDateString('es-CR'),
     }
 
@@ -123,8 +141,8 @@ export async function POST(request: NextRequest) {
         generatedData: JSON.stringify({
           customer: {
             id: customer.id,
-            primaryContactName: customer.primaryContactName,
-            natureOfBusiness: customer.natureOfBusiness,
+            companyName: customer.companyName,
+            companyType: customer.companyType,
           },
           template: { id: template.id, name: template.name }
         }),
