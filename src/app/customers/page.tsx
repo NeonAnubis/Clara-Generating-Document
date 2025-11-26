@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CustomerFormInline } from '@/components/customers/customer-form-inline'
+import { CustomerFormExcel } from '@/components/customers/customer-form-excel'
 import { CustomerListSortable } from '@/components/customers/customer-list-sortable'
 import { UserPlus, List } from 'lucide-react'
 
@@ -36,7 +36,7 @@ export default function CustomersPage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="register" className="mt-6">
-          <CustomerFormInline onSave={handleCustomerSaved} />
+          <CustomerFormExcel onSave={handleCustomerSaved} />
         </TabsContent>
         <TabsContent value="list" className="mt-6">
           <CustomerListSortable key={refreshKey} />
