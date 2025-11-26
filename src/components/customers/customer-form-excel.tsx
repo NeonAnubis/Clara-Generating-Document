@@ -73,7 +73,7 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   const [representativeId, setRepresentativeId] = useState('')
   const [activeTaxation, setActiveTaxation] = useState('')
 
-  // Manager
+  // Manager 1
   const [managerFirstName, setManagerFirstName] = useState('')
   const [managerId, setManagerId] = useState('')
   const [managerAddress, setManagerAddress] = useState('')
@@ -81,6 +81,24 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   const [managerMaritalStatus, setManagerMaritalStatus] = useState('')
   const [managerNationality, setManagerNationality] = useState('')
   const [managerLastName, setManagerLastName] = useState('')
+
+  // Manager 2
+  const [manager2FirstName, setManager2FirstName] = useState('')
+  const [manager2LastName, setManager2LastName] = useState('')
+  const [manager2Id, setManager2Id] = useState('')
+  const [manager2Address, setManager2Address] = useState('')
+  const [manager2Occupation, setManager2Occupation] = useState('')
+  const [manager2MaritalStatus, setManager2MaritalStatus] = useState('')
+  const [manager2Nationality, setManager2Nationality] = useState('')
+
+  // Sub-manager
+  const [subManagerFirstName, setSubManagerFirstName] = useState('')
+  const [subManagerLastName, setSubManagerLastName] = useState('')
+  const [subManagerId, setSubManagerId] = useState('')
+  const [subManagerAddress, setSubManagerAddress] = useState('')
+  const [subManagerOccupation, setSubManagerOccupation] = useState('')
+  const [subManagerMaritalStatus, setSubManagerMaritalStatus] = useState('')
+  const [subManagerNationality, setSubManagerNationality] = useState('')
 
   // Other
   const [denomination, setDenomination] = useState('')
@@ -141,7 +159,7 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
     setRepresentativeId('1-0234-0567')
     setActiveTaxation('0')
 
-    // Manager data
+    // Manager 1 data
     setManagerFirstName('Carlos')
     setManagerLastName('Rodríguez')
     setManagerId('1-0987-0654')
@@ -149,6 +167,24 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
     setManagerOccupation('administrador')
     setManagerNationality('costarricense')
     setManagerAddress('San José, Escazú, Calle Principal')
+
+    // Manager 2 data
+    setManager2FirstName('María')
+    setManager2LastName('González')
+    setManager2Id('1-1234-5678')
+    setManager2MaritalStatus('soltera')
+    setManager2Occupation('contadora')
+    setManager2Nationality('costarricense')
+    setManager2Address('San José, Santa Ana, Calle Segunda')
+
+    // Sub-manager data
+    setSubManagerFirstName('José')
+    setSubManagerLastName('Hernández')
+    setSubManagerId('1-5678-9012')
+    setSubManagerMaritalStatus('casado')
+    setSubManagerOccupation('abogado')
+    setSubManagerNationality('costarricense')
+    setSubManagerAddress('San José, Moravia, Avenida Central')
 
     // Other fields
     setDenomination('VISIONGLASS SOCIEDAD DE RESPONSABILIDAD LIMITADA')
@@ -228,6 +264,22 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
           managerMaritalStatus,
           managerNationality,
           managerLastName,
+          // Manager 2
+          manager2FirstName,
+          manager2LastName,
+          manager2Id,
+          manager2Address,
+          manager2Occupation,
+          manager2MaritalStatus,
+          manager2Nationality,
+          // Sub-manager
+          subManagerFirstName,
+          subManagerLastName,
+          subManagerId,
+          subManagerAddress,
+          subManagerOccupation,
+          subManagerMaritalStatus,
+          subManagerNationality,
           denomination,
           idInNumbers,
           dissolvedRecord: dissolvedRecord ? parseInt(dissolvedRecord) : null,
@@ -611,9 +663,9 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
         </div>
       </div>
 
-      {/* Manager Section */}
+      {/* Manager 1 Section */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="text-lg font-semibold">{t('manager')}</h3>
+        <h3 className="text-lg font-semibold">{t('manager1')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="managerFirstName">{t('managerFirstName')}</Label>
@@ -669,6 +721,132 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
               id="managerAddress"
               value={managerAddress}
               onChange={(e) => setManagerAddress(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Manager 2 Section */}
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="text-lg font-semibold">{t('manager2')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="manager2FirstName">{t('manager2FirstName')}</Label>
+            <Input
+              id="manager2FirstName"
+              value={manager2FirstName}
+              onChange={(e) => setManager2FirstName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="manager2LastName">{t('manager2LastName')}</Label>
+            <Input
+              id="manager2LastName"
+              value={manager2LastName}
+              onChange={(e) => setManager2LastName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="manager2Id">{t('manager2Id')}</Label>
+            <Input
+              id="manager2Id"
+              value={manager2Id}
+              onChange={(e) => setManager2Id(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="manager2MaritalStatus">{t('manager2MaritalStatus')}</Label>
+            <Input
+              id="manager2MaritalStatus"
+              value={manager2MaritalStatus}
+              onChange={(e) => setManager2MaritalStatus(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="manager2Occupation">{t('manager2Occupation')}</Label>
+            <Input
+              id="manager2Occupation"
+              value={manager2Occupation}
+              onChange={(e) => setManager2Occupation(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="manager2Nationality">{t('manager2Nationality')}</Label>
+            <Input
+              id="manager2Nationality"
+              value={manager2Nationality}
+              onChange={(e) => setManager2Nationality(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="manager2Address">{t('manager2Address')}</Label>
+            <Input
+              id="manager2Address"
+              value={manager2Address}
+              onChange={(e) => setManager2Address(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Sub-manager Section */}
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="text-lg font-semibold">{t('subManager')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="subManagerFirstName">{t('subManagerFirstName')}</Label>
+            <Input
+              id="subManagerFirstName"
+              value={subManagerFirstName}
+              onChange={(e) => setSubManagerFirstName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subManagerLastName">{t('subManagerLastName')}</Label>
+            <Input
+              id="subManagerLastName"
+              value={subManagerLastName}
+              onChange={(e) => setSubManagerLastName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subManagerId">{t('subManagerId')}</Label>
+            <Input
+              id="subManagerId"
+              value={subManagerId}
+              onChange={(e) => setSubManagerId(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subManagerMaritalStatus">{t('subManagerMaritalStatus')}</Label>
+            <Input
+              id="subManagerMaritalStatus"
+              value={subManagerMaritalStatus}
+              onChange={(e) => setSubManagerMaritalStatus(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subManagerOccupation">{t('subManagerOccupation')}</Label>
+            <Input
+              id="subManagerOccupation"
+              value={subManagerOccupation}
+              onChange={(e) => setSubManagerOccupation(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="subManagerNationality">{t('subManagerNationality')}</Label>
+            <Input
+              id="subManagerNationality"
+              value={subManagerNationality}
+              onChange={(e) => setSubManagerNationality(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="subManagerAddress">{t('subManagerAddress')}</Label>
+            <Input
+              id="subManagerAddress"
+              value={subManagerAddress}
+              onChange={(e) => setSubManagerAddress(e.target.value)}
             />
           </div>
         </div>

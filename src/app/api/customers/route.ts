@@ -12,8 +12,17 @@ const ALLOWED_FIELDS = [
   'profession2', 'maritalStatus2', 'shareholderTwo', 'identification2', 'ownership2',
   'percentage2', 'sharesInNumbers2', 'numberOfSharesHeld2', 'field1', 'legalIdInWords',
   'renewalStartDate', 'active', 'archived', 'cooperator', 'legalRepresentative',
-  'representativeId', 'activeTaxation', 'managerFirstName', 'managerId', 'managerAddress',
-  'managerOccupation', 'managerMaritalStatus', 'managerNationality', 'managerLastName',
+  'representativeId', 'activeTaxation',
+  // Manager 1
+  'managerFirstName', 'managerId', 'managerAddress', 'managerOccupation',
+  'managerMaritalStatus', 'managerNationality', 'managerLastName',
+  // Manager 2
+  'manager2FirstName', 'manager2LastName', 'manager2Id', 'manager2Address',
+  'manager2Occupation', 'manager2MaritalStatus', 'manager2Nationality',
+  // Sub-manager
+  'subManagerFirstName', 'subManagerLastName', 'subManagerId', 'subManagerAddress',
+  'subManagerOccupation', 'subManagerMaritalStatus', 'subManagerNationality',
+  // Other
   'denomination', 'idInNumbers', 'dissolvedRecord', 'bookLegalization', 'email', 'tradeName',
   'createdAt', 'updatedAt'
 ]
@@ -125,7 +134,7 @@ export async function POST(request: NextRequest) {
         representativeId: data.representativeId || null,
         activeTaxation: data.activeTaxation || null,
 
-        // Manager
+        // Manager 1
         managerFirstName: data.managerFirstName || null,
         managerId: data.managerId || null,
         managerAddress: data.managerAddress || null,
@@ -133,6 +142,24 @@ export async function POST(request: NextRequest) {
         managerMaritalStatus: data.managerMaritalStatus || null,
         managerNationality: data.managerNationality || null,
         managerLastName: data.managerLastName || null,
+
+        // Manager 2
+        manager2FirstName: data.manager2FirstName || null,
+        manager2LastName: data.manager2LastName || null,
+        manager2Id: data.manager2Id || null,
+        manager2Address: data.manager2Address || null,
+        manager2Occupation: data.manager2Occupation || null,
+        manager2MaritalStatus: data.manager2MaritalStatus || null,
+        manager2Nationality: data.manager2Nationality || null,
+
+        // Sub-manager
+        subManagerFirstName: data.subManagerFirstName || null,
+        subManagerLastName: data.subManagerLastName || null,
+        subManagerId: data.subManagerId || null,
+        subManagerAddress: data.subManagerAddress || null,
+        subManagerOccupation: data.subManagerOccupation || null,
+        subManagerMaritalStatus: data.subManagerMaritalStatus || null,
+        subManagerNationality: data.subManagerNationality || null,
 
         // Other
         denomination: data.denomination || null,

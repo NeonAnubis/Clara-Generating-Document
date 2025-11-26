@@ -90,7 +90,7 @@ export async function PUT(
         representativeId: data.representativeId || null,
         activeTaxation: data.activeTaxation || null,
 
-        // Manager
+        // Manager 1
         managerFirstName: data.managerFirstName || null,
         managerId: data.managerId || null,
         managerAddress: data.managerAddress || null,
@@ -98,6 +98,24 @@ export async function PUT(
         managerMaritalStatus: data.managerMaritalStatus || null,
         managerNationality: data.managerNationality || null,
         managerLastName: data.managerLastName || null,
+
+        // Manager 2
+        manager2FirstName: data.manager2FirstName || null,
+        manager2LastName: data.manager2LastName || null,
+        manager2Id: data.manager2Id || null,
+        manager2Address: data.manager2Address || null,
+        manager2Occupation: data.manager2Occupation || null,
+        manager2MaritalStatus: data.manager2MaritalStatus || null,
+        manager2Nationality: data.manager2Nationality || null,
+
+        // Sub-manager
+        subManagerFirstName: data.subManagerFirstName || null,
+        subManagerLastName: data.subManagerLastName || null,
+        subManagerId: data.subManagerId || null,
+        subManagerAddress: data.subManagerAddress || null,
+        subManagerOccupation: data.subManagerOccupation || null,
+        subManagerMaritalStatus: data.subManagerMaritalStatus || null,
+        subManagerNationality: data.subManagerNationality || null,
 
         // Other
         denomination: data.denomination || null,

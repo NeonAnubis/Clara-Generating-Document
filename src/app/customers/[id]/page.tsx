@@ -67,7 +67,7 @@ interface Customer {
   representativeId: string | null
   activeTaxation: number | null
 
-  // Manager
+  // Manager 1
   managerFirstName: string | null
   managerId: string | null
   managerAddress: string | null
@@ -75,6 +75,24 @@ interface Customer {
   managerMaritalStatus: string | null
   managerNationality: string | null
   managerLastName: string | null
+
+  // Manager 2
+  manager2FirstName: string | null
+  manager2LastName: string | null
+  manager2Id: string | null
+  manager2Address: string | null
+  manager2Occupation: string | null
+  manager2MaritalStatus: string | null
+  manager2Nationality: string | null
+
+  // Sub-manager
+  subManagerFirstName: string | null
+  subManagerLastName: string | null
+  subManagerId: string | null
+  subManagerAddress: string | null
+  subManagerOccupation: string | null
+  subManagerMaritalStatus: string | null
+  subManagerNationality: string | null
 
   // Other
   denomination: string | null
@@ -734,9 +752,9 @@ export default function CustomerDetailPage() {
           </div>
         </div>
 
-        {/* Manager */}
+        {/* Manager 1 */}
         <div className="bg-card rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-4">{t('manager')}</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('manager1')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('managerFirstName')}</Label>
@@ -819,6 +837,186 @@ export default function CustomerDetailPage() {
                 />
               ) : (
                 <p className="text-sm py-2">{displayCustomer?.managerAddress || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Manager 2 */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('manager2')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('manager2FirstName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2FirstName || ''}
+                  onChange={(e) => updateField('manager2FirstName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2FirstName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('manager2LastName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2LastName || ''}
+                  onChange={(e) => updateField('manager2LastName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2LastName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('manager2Id')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2Id || ''}
+                  onChange={(e) => updateField('manager2Id', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2Id || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('manager2MaritalStatus')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2MaritalStatus || ''}
+                  onChange={(e) => updateField('manager2MaritalStatus', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2MaritalStatus || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('manager2Occupation')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2Occupation || ''}
+                  onChange={(e) => updateField('manager2Occupation', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2Occupation || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('manager2Nationality')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2Nationality || ''}
+                  onChange={(e) => updateField('manager2Nationality', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2Nationality || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('manager2Address')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.manager2Address || ''}
+                  onChange={(e) => updateField('manager2Address', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.manager2Address || '-'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sub-manager */}
+        <div className="bg-card rounded-lg border p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('subManager')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('subManagerFirstName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerFirstName || ''}
+                  onChange={(e) => updateField('subManagerFirstName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerFirstName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subManagerLastName')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerLastName || ''}
+                  onChange={(e) => updateField('subManagerLastName', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerLastName || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subManagerId')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerId || ''}
+                  onChange={(e) => updateField('subManagerId', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerId || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subManagerMaritalStatus')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerMaritalStatus || ''}
+                  onChange={(e) => updateField('subManagerMaritalStatus', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerMaritalStatus || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subManagerOccupation')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerOccupation || ''}
+                  onChange={(e) => updateField('subManagerOccupation', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerOccupation || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subManagerNationality')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerNationality || ''}
+                  onChange={(e) => updateField('subManagerNationality', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerNationality || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t('subManagerAddress')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.subManagerAddress || ''}
+                  onChange={(e) => updateField('subManagerAddress', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.subManagerAddress || '-'}</p>
               )}
             </div>
           </div>
