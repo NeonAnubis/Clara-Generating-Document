@@ -33,10 +33,16 @@ export async function POST(request: NextRequest) {
     const numberOfShares = customer.numberOfShares || '1000'
     const totalCapital = parseInt(shareValue) * parseInt(numberOfShares)
 
-    // Generate current date in Spanish format
-    const currentDate = new Date()
-    const dateOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
-    const formattedDate = currentDate.toLocaleDateString('es-CR', dateOptions)
+    // Use customer's incorporation date for "Plazo Social" sentence
+    const incorporationDate = customer.incorporationDate || ''
+
+    // Use customer's date, month, year fields for the "San José" date
+    const customerDay = customer.date || ''
+    const customerMonth = customer.month || ''
+    const customerYear = customer.year || ''
+    const customerFormattedDate = customerDay && customerMonth && customerYear
+      ? `${customerDay} de ${customerMonth} de ${customerYear}`
+      : ''
 
     // Create company ID from legalId
     const companyId = customer.legalId || '3-102-XXXXXX'
@@ -245,7 +251,7 @@ export async function POST(request: NextRequest) {
                                   new Paragraph({
                                     alignment: AlignmentType.CENTER,
                                     children: [
-                                      new TextRun({ text: `Plazo Social 120 años a partir de la fecha de constitución el ${formattedDate}.`, size: 18 }),
+                                      new TextRun({ text: `Plazo Social 120 años a partir de la fecha de constitución el ${incorporationDate}.`, size: 18 }),
                                     ],
                                   }),
 
@@ -283,7 +289,7 @@ export async function POST(request: NextRequest) {
                                     alignment: AlignmentType.CENTER,
                                     spacing: { before: 200 },
                                     children: [
-                                      new TextRun({ text: `San José, ${formattedDate}.`, bold: true, size: 20 }),
+                                      new TextRun({ text: `San José, ${customerFormattedDate}.`, bold: true, size: 20 }),
                                     ],
                                   }),
 
