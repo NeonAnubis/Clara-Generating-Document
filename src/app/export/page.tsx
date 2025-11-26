@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -25,17 +24,6 @@ interface Customer {
   email: string | null
 }
 
-const EXPORT_FIELDS = [
-  { key: 'companyName', label: 'Company Name' },
-  { key: 'companyType', label: 'Company Type' },
-  { key: 'legalId', label: 'Legal ID' },
-  { key: 'shareholderOne', label: 'Shareholder One' },
-  { key: 'shareholderTwo', label: 'Shareholder Two' },
-  { key: 'email', label: 'Email' },
-  { key: 'shareValue', label: 'Share Value' },
-  { key: 'numberOfShares', label: 'Number of Shares' },
-]
-
 export default function ExportPage() {
   const t = useTranslations('export')
   const tCommon = useTranslations('common')
@@ -44,12 +32,6 @@ export default function ExportPage() {
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
-
-  // Excel export state
-  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([])
-  const [selectedFields, setSelectedFields] = useState<string[]>(
-    EXPORT_FIELDS.map(f => f.key)
-  )
 
   // Word export state
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
@@ -80,36 +62,6 @@ export default function ExportPage() {
       return customer.shareholderOne
     }
     return 'Customer'
-  }
-
-  const handleExcelExport = async () => {
-    setExporting(true)
-    try {
-      const response = await fetch('/api/export/excel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerIds: selectedCustomerIds,
-          fields: selectedFields,
-        }),
-      })
-
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `customers_${new Date().toISOString().split('T')[0]}.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
-      }
-    } catch (error) {
-      console.error('Error exporting to Excel:', error)
-    } finally {
-      setExporting(false)
-    }
   }
 
   const handleWordExport = async () => {
@@ -145,30 +97,6 @@ export default function ExportPage() {
     } finally {
       setExporting(false)
     }
-  }
-
-  const toggleAllCustomers = () => {
-    if (selectedCustomerIds.length === customers.length) {
-      setSelectedCustomerIds([])
-    } else {
-      setSelectedCustomerIds(customers.map(c => c.id))
-    }
-  }
-
-  const toggleCustomer = (id: string) => {
-    setSelectedCustomerIds(prev =>
-      prev.includes(id)
-        ? prev.filter(cid => cid !== id)
-        : [...prev, id]
-    )
-  }
-
-  const toggleField = (key: string) => {
-    setSelectedFields(prev =>
-      prev.includes(key)
-        ? prev.filter(f => f !== key)
-        : [...prev, key]
-    )
   }
 
   const handleCertificateExport = async () => {
@@ -231,7 +159,7 @@ export default function ExportPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="excel" className="space-y-4">
+      <Tabs defaultValue="certificate" className="space-y-4">
         <TabsList>
           {/* <TabsTrigger value="excel" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
@@ -246,81 +174,6 @@ export default function ExportPage() {
             {t('quotaCertificate')}
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="excel" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('selectCustomers')}</CardTitle>
-                <CardDescription>
-                  {t('selectCustomersDescription')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  <div className="flex items-center space-x-2 pb-2 border-b">
-                    <Checkbox
-                      id="all-customers"
-                      checked={selectedCustomerIds.length === customers.length}
-                      onCheckedChange={toggleAllCustomers}
-                    />
-                    <label htmlFor="all-customers" className="text-sm font-medium">
-                      {tCommon('selectAll')} ({customers.length})
-                    </label>
-                  </div>
-                  {customers.map(customer => (
-                    <div key={customer.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={customer.id}
-                        checked={selectedCustomerIds.includes(customer.id)}
-                        onCheckedChange={() => toggleCustomer(customer.id)}
-                      />
-                      <label htmlFor={customer.id} className="text-sm">
-                        {getCustomerDisplayName(customer)}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('fieldsToExport')}</CardTitle>
-                <CardDescription>
-                  {t('fieldsToExportDescription')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {EXPORT_FIELDS.map(field => (
-                    <div key={field.key} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`field-${field.key}`}
-                        checked={selectedFields.includes(field.key)}
-                        onCheckedChange={() => toggleField(field.key)}
-                      />
-                      <label htmlFor={`field-${field.key}`} className="text-sm">
-                        {field.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="flex justify-end">
-            <Button
-              onClick={handleExcelExport}
-              disabled={exporting || selectedFields.length === 0}
-              size="lg"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              {exporting ? t('exporting') : t('exportToExcel')}
-            </Button>
-          </div>
-        </TabsContent>
 
         <TabsContent value="word" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
