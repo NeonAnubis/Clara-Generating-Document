@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams
+    const activeOnly = searchParams.get('active') === 'true'
+    const minimal = searchParams.get('minimal') === 'true'
+
+    const where = activeOnly ? { isActive: true } : {}
+
+    // For minimal mode (export page), only fetch essential fields
+    const select = minimal ? {
+      id: true,
+      name: true,
+      category: true,
+      isActive: true,
+    } : undefined
+
     const templates = await prisma.documentTemplate.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
+      ...(select ? { select } : {}),
     })
 
     return NextResponse.json(templates)

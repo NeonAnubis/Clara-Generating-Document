@@ -1,10 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Fields allowed for selection (to prevent arbitrary field access)
+const ALLOWED_FIELDS = [
+  'id', 'companyName', 'companyType', 'abbreviation', 'legalId', 'shareCapital',
+  'numberOfShares', 'shareValue', 'series', 'registeredAddress', 'companyTerm',
+  'incorporationDate', 'shareholderOne', 'certificateNumber', 'identification',
+  'ownership', 'numberOfSharesHeld', 'date', 'month', 'year', 'print', 'excelId',
+  'capitalNumber', 'maritalStatus', 'profession', 'shareholder1Address', 'reference',
+  'sharesInWords1', 'percentage1', 'certificateNumber2', 'reference2', 'shareholder2Address',
+  'profession2', 'maritalStatus2', 'shareholderTwo', 'identification2', 'ownership2',
+  'percentage2', 'sharesInNumbers2', 'numberOfSharesHeld2', 'field1', 'legalIdInWords',
+  'renewalStartDate', 'active', 'archived', 'cooperator', 'legalRepresentative',
+  'representativeId', 'activeTaxation', 'managerFirstName', 'managerId', 'managerAddress',
+  'managerOccupation', 'managerMaritalStatus', 'managerNationality', 'managerLastName',
+  'denomination', 'idInNumbers', 'dissolvedRecord', 'bookLegalization', 'email', 'tradeName',
+  'createdAt', 'updatedAt'
+]
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
+    const fieldsParam = searchParams.get('fields')
 
     const where = search ? {
       OR: [
@@ -16,9 +34,24 @@ export async function GET(request: NextRequest) {
       ]
     } : {}
 
+    // Build select object if fields are specified
+    let select: Record<string, boolean> | undefined
+    if (fieldsParam) {
+      const requestedFields = fieldsParam.split(',').map(f => f.trim())
+      select = {}
+      for (const field of requestedFields) {
+        if (ALLOWED_FIELDS.includes(field)) {
+          select[field] = true
+        }
+      }
+      // Ensure id is always included
+      select.id = true
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const customers = await (prisma.customer as any).findMany({
       where,
+      select,
       orderBy: { createdAt: 'desc' },
     })
 

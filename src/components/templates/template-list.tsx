@@ -38,10 +38,14 @@ export function TemplateList({ onSelectTemplate, selectable }: TemplateListProps
   const fetchTemplates = async () => {
     try {
       const response = await fetch('/api/templates')
+      if (!response.ok) {
+        throw new Error('Failed to fetch templates')
+      }
       const data = await response.json()
-      setTemplates(data)
+      setTemplates(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching templates:', error)
+      setTemplates([])
     } finally {
       setLoading(false)
     }
