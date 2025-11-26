@@ -101,10 +101,6 @@ export default function CustomerDetailPage() {
   const [saving, setSaving] = useState(false)
   const [editedCustomer, setEditedCustomer] = useState<Customer | null>(null)
 
-  useEffect(() => {
-    fetchCustomer()
-  }, [params.id])
-
   const fetchCustomer = async () => {
     try {
       const response = await fetch(`/api/customers/${params.id}`)
@@ -123,6 +119,11 @@ export default function CustomerDetailPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchCustomer()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id])
 
   const handleEdit = () => {
     setIsEditing(true)
@@ -168,7 +169,7 @@ export default function CustomerDetailPage() {
     }
   }
 
-  const updateField = (field: keyof Customer, value: any) => {
+  const updateField = (field: keyof Customer, value: string | number | null) => {
     if (!editedCustomer) return
     setEditedCustomer({ ...editedCustomer, [field]: value })
   }
