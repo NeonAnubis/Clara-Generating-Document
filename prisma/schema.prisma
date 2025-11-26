@@ -10,36 +10,78 @@ datasource db {
 model Customer {
   id                          String   @id @default(cuid())
 
-  // Section 2: Primary Contact(s) Information
-  primaryContactName          String?
-  primaryContactEmail         String?
-  secondaryContactName        String?
-  secondaryContactEmail       String?
-  onlyPrimarySecondaryNotified Boolean @default(false)
+  // Company Information
+  nombreDeLaSociedad          String?  // NOMBRE DE LA SOCIEDAD
+  tipoDeSociedad              String?  // TIPO DE SOCIEDAD
+  abreviatura                 String?  // ABREVIATURA
+  cedulaJuridica              String?  // CÉDULA JURÍDICA
+  capitalSocial               String?  // CAPITAL SOCIAL
+  cantidadCuotas              String?  // CANTIDAD CUOTAS
+  valorDeCuotas               String?  // VALOR DE CUOTAS
+  serie                       String?  // SERIE
+  domicilio                   String?  // DOMICILIO
+  plazoSocial                 Int?     // PLAZO SOCIAL
+  fechaDeConstitucion         String?  // FECHA DE CONSTITUCIÓN
 
-  // Section 3: Individual Cuotaholder(s) Information
-  // Stored as JSON array of PersonInfo objects
-  individualCuotaholders      String   @db.Text // JSON array
+  // Cuotista 1
+  cuotistaUno                 String?  // CUOTISTA UNO
+  numeroDeCertificado         Int?     // NUMERO DE CERTIFICADO
+  identificacion              String?  // IDENTIFICACIÓN
+  propiedad                   String?  // PROPIEDAD
+  numeroDeCuotas              Int?     // NUMERO DE CUOTAS
+  fecha                       Int?     // FECHA
+  mes                         String?  // MES
+  ano                         Int?     // AÑO
+  imprimir                    String?  // IMPRIMIR
+  excelId                     Int?     // Id (from Excel)
+  capitalNumero               String?  // CAPITAL NÚMERO
+  estadoCivil                 String?  // ESTADO CIVIL
+  profesion                   String?  // PROFESION
+  domicilioCuotista1          String?  // DOMICILIO CUOTISTA1
+  referencia                  String?  // REFERENCIA
+  enLetrasCuotas1             String?  // EN LETRAS CUOTAS1
+  porcentaje1                 String?  // PORCENTAJE1
 
-  // Section 4: Corporate Cuotaholder(s) Information
-  // Stored as JSON array of CorporateCuotaholder objects
-  corporateCuotaholders       String   @db.Text // JSON array
+  // Cuotista 2
+  numeroDeCertificado2        Int?     // NUMERO DE CERTIFICADO2
+  referencia2                 String?  // REFERENCIA2
+  domicilioCuotista2          String?  // DOMICILIO CUOTISTA2
+  profesion2                  String?  // PROFESION2
+  estadoCivil2                String?  // ESTADO CIVIL2
+  cuotista2                   String?  // CUOTISTA 2
+  identificacion2             String?  // IDENTIFICACION2
+  propiedad2                  String?  // PROPIEDAD2
+  porcentaje2                 String?  // PORCENTAJE2
+  enNumerosCuotas2            String?  // EN NUMEROS CUOTAS2
+  numeroDeCuotas2             Int?     // NUMERO DE CUOTAS2
 
-  // Section 5: Ultimate Beneficial Owner(s)
-  uboSameAsCuotaholder        Boolean  @default(false)
-  ubos                        String   @db.Text // JSON array of PersonInfo
+  // Additional Fields
+  campo1                      Int?     // Campo1
+  cedulaLetras                String?  // CÉDULA LETRAS
+  fechaInicioRenovacion       String?  // Fecha Inicio Renovación
+  activa                      Int?     // Activa
+  archivado                   Int?     // Archivado
+  cooperador                  String?  // COOPERADOR
+  representanteLegal          String?  // Represntante Legal
+  identificacionRepresentante String?  // Identificación Representante
+  tributacionActiva           Int?     // Tributación Activa
 
-  // Section 6: Managing Director(s)
-  directorSameAsCuotaholder   Boolean  @default(false)
-  directors                   String   @db.Text // JSON array of PersonInfo
+  // Gerente (Manager)
+  nombreGerente               String?  // Nombre Gerente
+  idGerente                   String?  // ID Gerente
+  domicilioGerente            String?  // Domicilio Gerente
+  ocupacionGerente            String?  // Ocupación Gerente
+  estadoCivilGerente          String?  // Estado Civil Gerente
+  nacionalidadGerente         String?  // Nacionalidad Gerente
+  apellidoGerente             String?  // Apellido Gerente
 
-  // Additional fields
-  nominalValueOfCuotas        String?  @default("100")
-  numberOfCuotasToBeIssued    String?  @default("1000")
-  natureOfBusiness            String?
-
-  // Status
-  status                      String   @default("active")
+  // Other
+  denominacion                String?  // Denominación
+  idEnNumeros                 String?  // ID en numeros
+  disueltaRegistro            Int?     // Disuelta Registro
+  legalizacionLibros          String?  // Legalizacion libros
+  correoElectronico           String?  // Correo Electrónico
+  nombreComercial             String?  // Nombre Comercial
 
   // Timestamps
   createdAt                   DateTime @default(now())
@@ -48,7 +90,8 @@ model Customer {
   // Relations
   documents                   GeneratedDocument[]
 
-  @@index([primaryContactEmail])
+  @@index([cedulaJuridica])
+  @@index([nombreDeLaSociedad])
   @@index([createdAt])
 }
 
