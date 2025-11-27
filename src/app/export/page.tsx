@@ -13,12 +13,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
-import { Download, Award, FileText, BookOpen } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Download, Award, FileText, BookOpen, Search } from 'lucide-react'
 
 interface Customer {
   id: string
   companyName: string | null
   legalId: string | null
+  tradeName: string | null
   shareholderOne: string | null
   shareholderTwo: string | null
   email: string | null
@@ -50,6 +52,12 @@ export default function ExportPage() {
   // Portada state
   const [portadaCustomerId, setPortadaCustomerId] = useState<string>('')
 
+  // Customer filter states
+  const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
+  const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
+  const [portadaCustomerFilter, setPortadaCustomerFilter] = useState<string>('')
+  const [wordCustomerFilter, setWordCustomerFilter] = useState<string>('')
+
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -57,7 +65,7 @@ export default function ExportPage() {
 
     try {
       // Fetch customers first (required for all tabs)
-      const customersResponse = await fetch('/api/customers?fields=id,companyName,legalId,shareholderOne,shareholderTwo,email')
+      const customersResponse = await fetch('/api/customers?fields=id,companyName,legalId,tradeName,shareholderOne,shareholderTwo,email')
       if (!customersResponse.ok) {
         throw new Error('Failed to fetch customers')
       }
@@ -91,6 +99,27 @@ export default function ExportPage() {
       return customer.shareholderOne
     }
     return 'Customer'
+  }
+
+  const getCustomerDisplayWithTradeName = (customer: Customer) => {
+    const name = getCustomerDisplayName(customer)
+    if (customer.tradeName) {
+      return `${name} (${customer.tradeName})`
+    }
+    return name
+  }
+
+  const filterCustomers = (filter: string) => {
+    if (!filter.trim()) return customers
+    const lowerFilter = filter.toLowerCase()
+    return customers.filter(customer =>
+      (customer.companyName?.toLowerCase().includes(lowerFilter)) ||
+      (customer.tradeName?.toLowerCase().includes(lowerFilter)) ||
+      (customer.legalId?.toLowerCase().includes(lowerFilter)) ||
+      (customer.shareholderOne?.toLowerCase().includes(lowerFilter)) ||
+      (customer.shareholderTwo?.toLowerCase().includes(lowerFilter)) ||
+      (customer.email?.toLowerCase().includes(lowerFilter))
+    )
   }
 
   const handleWordExport = async () => {
@@ -299,21 +328,32 @@ export default function ExportPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Select
-                  value={selectedCustomerId}
-                  onValueChange={setSelectedCustomerId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {getCustomerDisplayName(customer)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={tCommon('search')}
+                      value={wordCustomerFilter}
+                      onChange={(e) => setWordCustomerFilter(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                  </div>
+                  <Select
+                    value={selectedCustomerId}
+                    onValueChange={setSelectedCustomerId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterCustomers(wordCustomerFilter).map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {getCustomerDisplayWithTradeName(customer)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
 
@@ -376,24 +416,35 @@ export default function ExportPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Select
-                  value={certCustomerId}
-                  onValueChange={(value) => {
-                    setCertCustomerId(value)
-                    setCertCuotaholderIndex(0)
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {getCustomerDisplayName(customer)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={tCommon('search')}
+                      value={certCustomerFilter}
+                      onChange={(e) => setCertCustomerFilter(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                  </div>
+                  <Select
+                    value={certCustomerId}
+                    onValueChange={(value) => {
+                      setCertCustomerId(value)
+                      setCertCuotaholderIndex(0)
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterCustomers(certCustomerFilter).map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {getCustomerDisplayWithTradeName(customer)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 {certCustomerId && getSelectedCustomerCuotaholders().length > 0 && (
                   <div className="space-y-2">
@@ -473,21 +524,32 @@ export default function ExportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Select
-                value={actaCustomerId}
-                onValueChange={setActaCustomerId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('selectCustomerPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {getCustomerDisplayName(customer)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder={tCommon('search')}
+                    value={actaCustomerFilter}
+                    onChange={(e) => setActaCustomerFilter(e.target.value)}
+                    className="pl-9 mb-2"
+                  />
+                </div>
+                <Select
+                  value={actaCustomerId}
+                  onValueChange={setActaCustomerId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filterCustomers(actaCustomerFilter).map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {getCustomerDisplayWithTradeName(customer)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
 
@@ -512,21 +574,32 @@ export default function ExportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Select
-                value={portadaCustomerId}
-                onValueChange={setPortadaCustomerId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('selectCustomerPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {getCustomerDisplayName(customer)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder={tCommon('search')}
+                    value={portadaCustomerFilter}
+                    onChange={(e) => setPortadaCustomerFilter(e.target.value)}
+                    className="pl-9 mb-2"
+                  />
+                </div>
+                <Select
+                  value={portadaCustomerId}
+                  onValueChange={setPortadaCustomerId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filterCustomers(portadaCustomerFilter).map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {getCustomerDisplayWithTradeName(customer)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
 

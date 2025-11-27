@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 const ALLOWED_FIELDS = [
   'id', 'companyName', 'companyType', 'abbreviation', 'legalId', 'shareCapital',
   'numberOfShares', 'shareValue', 'series', 'registeredAddress', 'companyTerm',
-  'incorporationDate', 'shareholderOne', 'certificateNumber', 'identification',
+  'incorporationDate', 'currency', 'administration', 'shareholderOne', 'certificateNumber', 'identification',
   'ownership', 'numberOfSharesHeld', 'date', 'month', 'year', 'print', 'excelId',
   'capitalNumber', 'maritalStatus', 'profession', 'shareholder1Address', 'reference',
   'sharesInWords1', 'percentage1', 'certificateNumber2', 'reference2', 'shareholder2Address',
@@ -90,6 +90,8 @@ export async function POST(request: NextRequest) {
         registeredAddress: data.registeredAddress || null,
         companyTerm: data.companyTerm || null,
         incorporationDate: data.incorporationDate || null,
+        currency: data.currency || null,
+        administration: data.administration || null,
 
         // Shareholder 1
         shareholderOne: data.shareholderOne || null,

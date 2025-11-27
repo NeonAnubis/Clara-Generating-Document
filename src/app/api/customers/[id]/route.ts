@@ -46,6 +46,8 @@ export async function PUT(
         registeredAddress: data.registeredAddress || null,
         companyTerm: data.companyTerm || null,
         incorporationDate: data.incorporationDate || null,
+        currency: data.currency || null,
+        administration: data.administration || null,
 
         // Shareholder 1
         shareholderOne: data.shareholderOne || null,

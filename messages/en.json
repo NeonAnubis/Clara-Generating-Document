@@ -73,6 +73,8 @@
     "customerSaved": "Customer saved successfully",
     "sortAsc": "Sort ascending",
     "sortDesc": "Sort descending",
+    "totalRecords": "Total Records",
+    "totalFields": "Total Fields",
     "primaryContact": "Primary Contact",
     "cuotaholder": "Cuotaholder",
     "cuotaholderCount": "Cuotaholders",
@@ -179,6 +181,8 @@
     "bookLegalization": "Book Legalization",
     "email": "Email",
     "tradeName": "Trade Name",
+    "currency": "Currency",
+    "administration": "Administration",
     "nombreDeLaSociedad": "Company Name",
     "tipoDeSociedad": "Company Type",
     "abreviatura": "Abbreviation",
@@ -309,7 +313,11 @@
     "file": "File",
     "records": "Records",
     "date": "Date",
-    "noExports": "No exports recorded"
+    "noExports": "No exports recorded",
+    "deleteSelected": "Delete Selected",
+    "deleteConfirmTitle": "Delete Export Records?",
+    "deleteConfirmDescription": "This action cannot be undone. The selected export records will be permanently deleted.",
+    "selectedCount": "selected"
   },
   "companyForm": {
     "formsMustBeDigital": "Forms must be completed digitally!",

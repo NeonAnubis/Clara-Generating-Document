@@ -43,13 +43,17 @@ interface Customer {
   companyName: string | null
   companyType: string | null
   legalId: string | null
+  tradeName: string | null
   shareholderOne: string | null
   shareholderTwo: string | null
   email: string | null
   createdAt: string
 }
 
-type SortField = 'companyName' | 'legalId' | 'email' | 'shareholder'
+// Number of fields in the Register Customer form (must match customer-form-excel.tsx)
+const TOTAL_FORM_FIELDS = 72
+
+type SortField = 'companyName' | 'legalId' | 'email' | 'shareholder' | 'tradeName'
 type SortDirection = 'asc' | 'desc' | null
 
 interface SortState {
@@ -72,6 +76,7 @@ export function CustomerListSortable() {
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
+      params.set('fields', 'id,companyName,companyType,legalId,tradeName,shareholderOne,shareholderTwo,email,createdAt')
 
       const response = await fetch(`/api/customers?${params}`)
       const data = await response.json()
@@ -134,6 +139,10 @@ export function CustomerListSortable() {
           valueA = (a.legalId || '').toLowerCase()
           valueB = (b.legalId || '').toLowerCase()
           break
+        case 'tradeName':
+          valueA = (a.tradeName || '').toLowerCase()
+          valueB = (b.tradeName || '').toLowerCase()
+          break
         case 'email':
           valueA = (a.email || '').toLowerCase()
           valueB = (b.email || '').toLowerCase()
@@ -195,9 +204,11 @@ export function CustomerListSortable() {
     )
   }
 
+  const tForm = useTranslations('customerForm')
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -206,6 +217,10 @@ export function CustomerListSortable() {
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
+        </div>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span>{t('totalRecords')}: <strong className="text-foreground">{customers.length}</strong></span>
+          <span>{t('totalFields')}: <strong className="text-foreground">{TOTAL_FORM_FIELDS}</strong></span>
         </div>
       </div>
 
@@ -220,6 +235,9 @@ export function CustomerListSortable() {
                 <SortableHeader field="legalId">Legal ID</SortableHeader>
               </TableHead>
               <TableHead>
+                <SortableHeader field="tradeName">{tForm('tradeName')}</SortableHeader>
+              </TableHead>
+              <TableHead>
                 <SortableHeader field="email">{t('email')}</SortableHeader>
               </TableHead>
               <TableHead>
@@ -232,13 +250,13 @@ export function CustomerListSortable() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={7} className="text-center py-8">
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
             ) : sortedCustomers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   {t('noCustomersFound')}
                 </TableCell>
               </TableRow>
@@ -249,6 +267,7 @@ export function CustomerListSortable() {
                     {customer.companyName || '-'}
                   </TableCell>
                   <TableCell>{customer.legalId || '-'}</TableCell>
+                  <TableCell>{customer.tradeName || '-'}</TableCell>
                   <TableCell>{customer.email || '-'}</TableCell>
                   <TableCell>{getShareholderDisplay(customer)}</TableCell>
                   <TableCell>{getShareholderCount(customer)}</TableCell>
