@@ -337,7 +337,6 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
               id="companyName"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              required
             />
           </div>
           <div className="space-y-2">
