@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
-    const shareValue = customer.shareValue || '100'
-    const numberOfShares = customer.numberOfShares || '1000'
-    const totalCapital = parseInt(shareValue) * parseInt(numberOfShares)
+    const shareValue = customer.shareValue || 'CIEN'
+    const numberOfShares = customer.numberOfShares || 'MIL'
+    const shareCapital = customer.shareCapital || ''
 
     // Use customer's incorporation date for "Plazo Social" sentence
     const incorporationDate = customer.incorporationDate || ''
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
                                               new Paragraph({
                                                 alignment: AlignmentType.CENTER,
                                                 children: [
-                                                  new TextRun({ text: `CAPITAL SOCIAL ${totalCapital.toLocaleString('es-CR')} COLONES REPRESENTANDO POR`, size: 20 }),
+                                                  new TextRun({ text: `CAPITAL SOCIAL ${shareCapital} COLONES REPRESENTANDO POR`, size: 20 }),
                                                 ],
                                               }),
                                               new Paragraph({
