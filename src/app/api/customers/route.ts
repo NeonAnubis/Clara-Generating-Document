@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
     const where = search ? {
       OR: [
         { companyName: { contains: search, mode: 'insensitive' as const } },
+        { tradeName: { contains: search, mode: 'insensitive' as const } },
         { legalId: { contains: search, mode: 'insensitive' as const } },
         { shareholderOne: { contains: search, mode: 'insensitive' as const } },
         { shareholderTwo: { contains: search, mode: 'insensitive' as const } },
