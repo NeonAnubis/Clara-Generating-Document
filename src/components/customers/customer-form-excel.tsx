@@ -29,6 +29,8 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
   const [registeredAddress, setRegisteredAddress] = useState('')
   const [companyTerm, setCompanyTerm] = useState('')
   const [incorporationDate, setIncorporationDate] = useState('')
+  const [currency, setCurrency] = useState('')
+  const [administration, setAdministration] = useState('')
 
   // Shareholder 1
   const [shareholderOne, setShareholderOne] = useState('')
@@ -121,6 +123,8 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
     setRegisteredAddress('SAN JOSÉ')
     setCompanyTerm('450')
     setIncorporationDate('31 de marzo del 2015')
+    setCurrency('Colones')
+    setAdministration('Gerente')
     setShareholderOne('CHRISTIAN FERNANDO BAEZA HASBÚN')
     setCertificateNumber('1')
     setIdentification('pasaporte venezolano número 042269762')
@@ -220,6 +224,8 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
           registeredAddress,
           companyTerm: companyTerm ? parseInt(companyTerm) : null,
           incorporationDate,
+          currency,
+          administration,
           shareholderOne,
           certificateNumber: certificateNumber ? parseInt(certificateNumber) : null,
           identification,
@@ -413,6 +419,22 @@ export function CustomerFormExcel({ onSave }: CustomerFormExcelProps) {
               id="incorporationDate"
               value={incorporationDate}
               onChange={(e) => setIncorporationDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="currency">{t('currency')}</Label>
+            <Input
+              id="currency"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="administration">{t('administration')}</Label>
+            <Input
+              id="administration"
+              value={administration}
+              onChange={(e) => setAdministration(e.target.value)}
             />
           </div>
         </div>

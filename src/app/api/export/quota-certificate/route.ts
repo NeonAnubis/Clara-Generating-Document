@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 400, after: 200 },
             children: [
-              new TextRun({ text: `${companyId} SOCIEDAD DE RESPONSABILIDAD LIMITADA`, bold: true, size: 44, color: '000000', font: 'Helvetica' }),
+              new TextRun({ text: `${companyId} SOCIEDAD DE RESPONSABILIDAD LIMITADA`, bold: true, size: 44, color: '000000' }),
             ],
           }),
 
@@ -174,13 +174,13 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 200 },
             children: [
-              new TextRun({ text: 'DOMICILIADA EN SAN JOSE', color: '000000', size: 28, font: 'Helvetica' }),
+              new TextRun({ text: 'DOMICILIADA EN SAN JOSE', color: '000000', size: 28 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `CEDULA JURIDICA ${companyId}`, color: '000000', size: 28, font: 'Helvetica' }),
+              new TextRun({ text: `CEDULA JURIDICA ${companyId}`, color: '000000', size: 28 }),
             ],
           }),
 
@@ -204,21 +204,21 @@ export async function POST(request: NextRequest) {
                       new Paragraph({
                         alignment: AlignmentType.CENTER,
                         children: [
-                          new TextRun({ text: `CAPITAL SOCIAL ${shareCapital} COLONES REPRESENTANDO POR`, size: 22, font: 'Helvetica' }),
+                          new TextRun({ text: `CAPITAL SOCIAL ${shareCapital} COLONES REPRESENTANDO POR`, size: 22 }),
                         ],
                       }),
                       new Paragraph({
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 200 },
                         children: [
-                          new TextRun({ text: `${numberOfShares} CUOTAS COMUNES Y NOMINATIVAS`, size: 22, font: 'Helvetica' }),
+                          new TextRun({ text: `${numberOfShares} CUOTAS COMUNES Y NOMINATIVAS`, size: 22 }),
                         ],
                       }),
                       new Paragraph({
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 200 },
                         children: [
-                          new TextRun({ text: `DE ${shareValue} COLONES CADA UNA`, size: 22, font: 'Helvetica' }),
+                          new TextRun({ text: `DE ${shareValue} COLONES CADA UNA`, size: 22 }),
                         ],
                       }),
                     ],
@@ -233,19 +233,19 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 300 },
             children: [
-              new TextRun({ text: 'Constituida por escritura otorgada en San José, ante la notaria Clara Alvarado Jiménez e inscrita ante el Registro', size: 22, font: 'Helvetica' }),
+              new TextRun({ text: 'Constituida por escritura otorgada en San José, ante la notaria Clara Alvarado Jiménez e inscrita ante el Registro', size: 22 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: 'Público, Sección Mercantil.', size: 22, font: 'Helvetica' }),
+              new TextRun({ text: 'Público, Sección Mercantil.', size: 22 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `Plazo Social 120 años a partir de la fecha de constitución el ${incorporationDate}.`, size: 22, font: 'Helvetica' }),
+              new TextRun({ text: `Plazo Social 120 años a partir de la fecha de constitución el ${incorporationDate}.`, size: 22 }),
             ],
           }),
 
@@ -254,18 +254,18 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 400 },
             children: [
-              new TextRun({ text: 'Certificamos que ', size: 22, font: 'Helvetica' }),
-              new TextRun({ text: cuotaholderName + ',', bold: true, size: 22, font: 'Helvetica' }),
-              new TextRun({ text: ` con identificación número ${identification}`, size: 22, font: 'Helvetica' }),
+              new TextRun({ text: 'Certificamos que ', size: 22 }),
+              new TextRun({ text: cuotaholderName + ',', bold: true, size: 22 }),
+              new TextRun({ text: ` con identificación número ${identification}`, size: 22 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             spacing: { before: 200 },
             children: [
-              new TextRun({ text: 'es propietaria de ', size: 22, font: 'Helvetica' }),
-              new TextRun({ text: `${numberOfShares} CUOTAS`, bold: true, size: 22, font: 'Helvetica' }),
-              new TextRun({ text: ' comunes y nominativas.', size: 22, font: 'Helvetica' }),
+              new TextRun({ text: 'es propietaria de ', size: 22 }),
+              new TextRun({ text: `${numberOfShares} CUOTAS`, bold: true, size: 22 }),
+              new TextRun({ text: ' comunes y nominativas.', size: 22 }),
             ],
           }),
 
@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 200 },
             children: [
-              new TextRun({ text: 'Para su validez, este título debe ser certificado por el GERENTE.', size: 22, font: 'Helvetica' }),
+              new TextRun({ text: 'Para su validez, este título debe ser certificado por el GERENTE.', size: 22 }),
             ],
           }),
 
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
             alignment: AlignmentType.CENTER,
             spacing: { before: 200 },
             children: [
-              new TextRun({ text: `San José, ${customerFormattedDate}.`, bold: true, size: 22, font: 'Helvetica' }),
+              new TextRun({ text: `San José, ${customerFormattedDate}.`, bold: true, size: 22 }),
             ],
           }),
 

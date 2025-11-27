@@ -22,6 +22,8 @@ model Customer {
   registeredAddress           String?  // Registered address
   companyTerm                 Int?     // Company term (years)
   incorporationDate           String?  // Incorporation date
+  currency                    String?  // Currency
+  administration              String?  // Administration
 
   // Shareholder 1
   shareholderOne              String?  // Shareholder one

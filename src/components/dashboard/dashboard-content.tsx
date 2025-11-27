@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, FileText, Download, Clock } from 'lucide-react'
+import { Users, Download, Clock } from 'lucide-react'
 import Link from 'next/link'
 
 interface DashboardStats {
@@ -29,7 +29,7 @@ export function DashboardContent({ stats }: { stats: DashboardStats }) {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -41,21 +41,6 @@ export function DashboardContent({ stats }: { stats: DashboardStats }) {
             <div className="text-2xl font-bold">{stats.customerCount}</div>
             <p className="text-xs text-muted-foreground">
               {t('registeredInSystem')}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('templates')}
-            </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.templateCount}</div>
-            <p className="text-xs text-muted-foreground">
-              {t('availableDocuments')}
             </p>
           </CardContent>
         </Card>
@@ -154,18 +139,6 @@ export function DashboardContent({ stats }: { stats: DashboardStats }) {
                 <p className="font-medium text-sm">{t('exportData')}</p>
                 <p className="text-xs text-muted-foreground">
                   {t('generateExcelOrWord')}
-                </p>
-              </div>
-            </Link>
-            <Link
-              href="/templates"
-              className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
-            >
-              <FileText className="h-5 w-5 text-primary" />
-              <div>
-                <p className="font-medium text-sm">{t('manageTemplates')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('createOrEditTemplates')}
                 </p>
               </div>
             </Link>

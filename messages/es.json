@@ -73,6 +73,8 @@
     "customerSaved": "Cliente guardado exitosamente",
     "sortAsc": "Ordenar ascendente",
     "sortDesc": "Ordenar descendente",
+    "totalRecords": "Total de Registros",
+    "totalFields": "Total de Campos",
     "primaryContact": "Contacto Principal",
     "cuotaholder": "Cuotahabiente",
     "cuotaholderCount": "Cuotahabientes",
@@ -179,6 +181,8 @@
     "bookLegalization": "Legalización Libros",
     "email": "Correo Electrónico",
     "tradeName": "Nombre Comercial",
+    "currency": "Moneda",
+    "administration": "Administración",
     "nombreDeLaSociedad": "Nombre de la Sociedad",
     "tipoDeSociedad": "Tipo de Sociedad",
     "abreviatura": "Abreviatura",
@@ -309,7 +313,11 @@
     "file": "Archivo",
     "records": "Registros",
     "date": "Fecha",
-    "noExports": "No hay exportaciones registradas"
+    "noExports": "No hay exportaciones registradas",
+    "deleteSelected": "Eliminar Seleccionados",
+    "deleteConfirmTitle": "¿Eliminar Registros de Exportación?",
+    "deleteConfirmDescription": "Esta acción no se puede deshacer. Los registros de exportación seleccionados se eliminarán permanentemente.",
+    "selectedCount": "seleccionados"
   },
   "companyForm": {
     "formsMustBeDigital": "Los formularios deben completarse digitalmente!",
