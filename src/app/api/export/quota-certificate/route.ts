@@ -169,11 +169,11 @@ export async function POST(request: NextRequest) {
                                     ],
                                   }),
 
-                                  // CR number
+                                  // Trade name
                                   new Paragraph({
                                     alignment: AlignmentType.RIGHT,
                                     children: [
-                                      new TextRun({ text: 'CR00043', color: '1E3A5F', size: 18 }),
+                                      new TextRun({ text: customer.tradeName || '', color: '1E3A5F', size: 18 }),
                                     ],
                                   }),
 
