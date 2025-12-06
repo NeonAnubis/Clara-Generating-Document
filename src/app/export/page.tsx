@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
 import { Input } from '@/components/ui/input'
-import { Download, Award, FileText, BookOpen, Search } from 'lucide-react'
+import { Download, Award, FileText, BookOpen, Search, FileType } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -52,11 +52,16 @@ export default function ExportPage() {
   // Portada state
   const [portadaCustomerId, setPortadaCustomerId] = useState<string>('')
 
+  // Book Header state
+  const [bookHeaderCustomerId, setBookHeaderCustomerId] = useState<string>('')
+  const [bookHeaderTomo, setBookHeaderTomo] = useState<string>('PRIMERO')
+
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
   const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
   const [portadaCustomerFilter, setPortadaCustomerFilter] = useState<string>('')
   const [wordCustomerFilter, setWordCustomerFilter] = useState<string>('')
+  const [bookHeaderCustomerFilter, setBookHeaderCustomerFilter] = useState<string>('')
 
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
@@ -270,6 +275,40 @@ export default function ExportPage() {
     }
   }
 
+  const handleBookHeaderExport = async () => {
+    if (!bookHeaderCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/book-header', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: bookHeaderCustomerId,
+          tomo: bookHeaderTomo,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === bookHeaderCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Book_Header_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating book header:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -315,6 +354,10 @@ export default function ExportPage() {
           <TabsTrigger value="portada" className="gap-2">
             <BookOpen className="h-4 w-4" />
             {t('portada')}
+          </TabsTrigger>
+          <TabsTrigger value="book-header" className="gap-2">
+            <FileType className="h-4 w-4" />
+            {t('bookHeader')}
           </TabsTrigger>
         </TabsList>
 
@@ -611,6 +654,87 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generatePortada')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="book-header" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('selectCustomer')}</CardTitle>
+                <CardDescription>
+                  {t('selectCustomerForBookHeader')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={tCommon('search')}
+                      value={bookHeaderCustomerFilter}
+                      onChange={(e) => setBookHeaderCustomerFilter(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                  </div>
+                  <Select
+                    value={bookHeaderCustomerId}
+                    onValueChange={setBookHeaderCustomerId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterCustomers(bookHeaderCustomerFilter).map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {getCustomerDisplayWithTradeName(customer)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('bookHeaderDetails')}</CardTitle>
+                <CardDescription>
+                  {t('bookHeaderDetailsDescription')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('tomoNumber')}</label>
+                  <Select
+                    value={bookHeaderTomo}
+                    onValueChange={setBookHeaderTomo}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PRIMERO">TOMO PRIMERO</SelectItem>
+                      <SelectItem value="SEGUNDO">TOMO SEGUNDO</SelectItem>
+                      <SelectItem value="TERCERO">TOMO TERCERO</SelectItem>
+                      <SelectItem value="CUARTO">TOMO CUARTO</SelectItem>
+                      <SelectItem value="QUINTO">TOMO QUINTO</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleBookHeaderExport}
+              disabled={exporting || !bookHeaderCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateBookHeader')}
             </Button>
           </div>
         </TabsContent>
