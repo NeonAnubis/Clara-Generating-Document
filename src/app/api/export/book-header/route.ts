@@ -139,6 +139,9 @@ export async function POST(request: NextRequest) {
                       }),
                       new Paragraph({
                         alignment: AlignmentType.RIGHT,
+                        indent: {
+                          right: 200,
+                        },
                         children: [
                           new TextRun({
                             text: tradeName,
