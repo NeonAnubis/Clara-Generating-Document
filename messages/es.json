@@ -304,7 +304,13 @@
     "generateActa": "Generar Acta Constitutiva",
     "portada": "Portada",
     "selectCustomerForPortada": "Elija el cliente para generar el documento de portadas de libros",
-    "generatePortada": "Generar Portada"
+    "generatePortada": "Generar Portada",
+    "bookHeader": "Encabezado de Libro",
+    "selectCustomerForBookHeader": "Elija el cliente para generar el documento de encabezado de libro",
+    "bookHeaderDetails": "Detalles del Encabezado",
+    "bookHeaderDetailsDescription": "Configure el número de tomo del libro",
+    "tomoNumber": "Tomo",
+    "generateBookHeader": "Generar Encabezado de Libro"
   },
   "history": {
     "title": "Historial de Exportaciones",
