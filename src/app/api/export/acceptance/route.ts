@@ -35,8 +35,8 @@ function formatDateEnglish(date: Date): string {
 
   // Add ordinal suffix
   const suffix = (day === 1 || day === 21 || day === 31) ? 'st' :
-                 (day === 2 || day === 22) ? 'nd' :
-                 (day === 3 || day === 23) ? 'rd' : 'th'
+    (day === 2 || day === 22) ? 'nd' :
+      (day === 3 || day === 23) ? 'rd' : 'th'
 
   return `${month} ${day}${suffix}, ${year}`
 }
@@ -93,19 +93,29 @@ export async function POST(request: NextRequest) {
 
     // Define colors
     const navyColor = '2C3E50'
-    const goldColor = 'C4A962'
 
     // Create footer
     const createDocumentFooter = () => {
       return new Footer({
         children: [
+          // Black line at top of footer
           new Paragraph({
-            spacing: { before: 200 },
+            border: {
+              top: {
+                color: '000000',
+                size: 6,
+                style: BorderStyle.SINGLE,
+              },
+            },
+            children: [],
+          }),
+          new Paragraph({
+            spacing: { before: 50 },
             children: [
               new TextRun({
                 text: '**Esta aceptación se ha realizado para expresar la voluntad expresa de o de las personas nombradas y de acuerdo con el Artículo 17, inciso 12) del Código de Comercio de Costa Rica aceptando todos los efectos legales de la misma.',
-                size: 16,
-                color: '666666',
+                size: 18,
+                color: '000000',
               }),
             ],
           }),
@@ -113,10 +123,9 @@ export async function POST(request: NextRequest) {
             spacing: { before: 100 },
             children: [
               new TextRun({
-                text: '**This acceptance letter was issued to expressly accept the position mention. It accordant to the article 17, part 12) of the',
-                size: 16,
+                text: '**This acceptance letter was issued to expressly accept the position mention. It accordant to the article 17, part 12) of the Costa Rican Commerce Code and accepting all legal effects of such acceptation.',
+                size: 18,
                 color: '666666',
-                italics: true,
               }),
             ],
           }),
@@ -139,7 +148,7 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: dateSpanish,
-            size: 20,
+            size: 24,
             color: navyColor,
           }),
         ],
@@ -147,13 +156,13 @@ export async function POST(request: NextRequest) {
       // Date - English
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        spacing: { after: 200 },
+        spacing: { after: 200, before: 200 },
         children: [
           new TextRun({
             text: dateEnglish,
-            size: 18,
+            size: 22,
             color: '666666',
-            italics: true,
+            italics: false,
           }),
         ],
       }),
@@ -165,8 +174,8 @@ export async function POST(request: NextRequest) {
           new TextRun({
             text: 'CARTA DE ACEPTACIÓN A PUESTO DE GERENTE',
             bold: true,
-            size: 24,
-            color: navyColor,
+            size: 28,
+            color: '000000',
             underline: {},
           }),
         ],
@@ -178,7 +187,7 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'ACCEPTANCE LETTER AS MANAGER',
-            size: 20,
+            size: 24,
             color: '666666',
             italics: true,
           }),
@@ -186,12 +195,12 @@ export async function POST(request: NextRequest) {
       }),
       // Spanish greeting
       new Paragraph({
-        spacing: { before: 300, after: 200 },
+        spacing: { before: 400, after: 300 },
         children: [
           new TextRun({
             text: 'Señores Accionistas:',
             bold: true,
-            size: 22,
+            size: 28,
           }),
         ],
       }),
@@ -203,83 +212,83 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'Quien suscribe, ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerFirstName.toUpperCase(),
             bold: true,
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ' (nombre) ',
-            size: 22,
+            size: 28,
             color: '666666',
           }),
           new TextRun({
             text: managerLastName.toUpperCase(),
             bold: true,
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ' (apellido), de nacionalidad ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerNationality.toLowerCase(),
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ', ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerMaritalStatus.toLowerCase(),
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ', ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerOccupation.toLowerCase(),
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ', con domicilio en ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerAddress,
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: '; portador del pasaporte de ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerNationality.toLowerCase(),
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ' ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: managerId,
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: '; por este medio acepto mi cargo como ',
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: 'GERENTE',
             bold: true,
-            size: 22,
+            size: 28,
           }),
           new TextRun({
             text: ' de la sociedad costarricense que se denominará legalmente con el número de cédula jurídica que le otorgue automáticamente el Registro Nacional:',
-            size: 22,
+            size: 28,
           }),
         ],
       }),
@@ -289,9 +298,9 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'Dear Shareholders:',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
+            italics: false,
           }),
         ],
       }),
@@ -303,79 +312,70 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'The undersigned ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerFirstName.toUpperCase(),
-            size: 20,
+            size: 22,
+            bold: true,
             color: '666666',
           }),
           new TextRun({
             text: ' (name) ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerLastName.toUpperCase(),
-            size: 20,
+            size: 22,
+            bold: true,
             color: '666666',
           }),
           new TextRun({
             text: ' (last name), of legal age, ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerMaritalStatus.toLowerCase(),
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: ', a ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerOccupation.toLowerCase(),
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: ', with domicile in ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerAddress,
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: '; bearer of the ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerNationality,
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: ' passport number ',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: managerId,
@@ -384,9 +384,8 @@ export async function POST(request: NextRequest) {
           }),
           new TextRun({
             text: ', does hereby accept my position of MANAGER of the Costa Rican corporation to be registered and named with the corporate identification number granted automatically by the National Registry:',
-            size: 20,
+            size: 22,
             color: '666666',
-            italics: true,
           }),
         ],
       }),
@@ -396,12 +395,12 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'Aceptación que será efectiva a partir de la fecha: ',
-            size: 22,
-            color: goldColor,
+            size: 24,
+            color: '000000',
           }),
           new TextRun({
             text: dateSpanish,
-            size: 22,
+            size: 24,
           }),
         ],
       }),
@@ -411,15 +410,13 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'Such acceptance being effective from this date: ',
-            size: 20,
+            size: 24,
             color: '666666',
-            italics: true,
           }),
           new TextRun({
             text: dateEnglish,
-            size: 20,
+            size: 24,
             color: '666666',
-            italics: true,
           }),
         ],
       }),
@@ -433,29 +430,29 @@ export async function POST(request: NextRequest) {
       }),
       // Spacing
       new Paragraph({
-        spacing: { before: 2000 },
+        spacing: { before: 3000 },
         children: [],
       }),
       // Signature line
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { after: 100 },
+        spacing: { after: 200 },
         children: [
           new TextRun({
             text: '_______________________________',
-            size: 22,
+            size: 20,
           }),
         ],
       }),
       // Manager name
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { after: 600 },
+        spacing: { after: 800 },
         children: [
           new TextRun({
             text: managerFullName.toUpperCase(),
             bold: true,
-            size: 24,
+            size: 28,
           }),
         ],
       }),
@@ -468,7 +465,7 @@ export async function POST(request: NextRequest) {
             text: 'REFERENCIA INTERNA:',
             bold: true,
             size: 20,
-            color: navyColor,
+            color: '000000',
           }),
         ],
       }),
@@ -478,9 +475,8 @@ export async function POST(request: NextRequest) {
         children: [
           new TextRun({
             text: 'INTERNAL REFERENCE:',
-            size: 18,
+            size: 16,
             color: '666666',
-            italics: true,
           }),
         ],
       }),
@@ -492,8 +488,8 @@ export async function POST(request: NextRequest) {
           new TextRun({
             text: tradeName,
             bold: true,
-            size: 22,
-            color: navyColor,
+            size: 20,
+            color: '000000',
           }),
         ],
       }),
