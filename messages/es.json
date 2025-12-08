@@ -310,7 +310,15 @@
     "bookHeaderDetails": "Detalles del Encabezado",
     "bookHeaderDetailsDescription": "Configure el número de tomo del libro",
     "tomoNumber": "Tomo",
-    "generateBookHeader": "Generar Encabezado de Libro"
+    "generateBookHeader": "Generar Encabezado de Libro",
+    "acceptance": "Aceptación",
+    "selectCustomerForAcceptance": "Elija el cliente para generar la carta de aceptación de gerente",
+    "acceptanceDetails": "Detalles de Aceptación",
+    "acceptanceDetailsDescription": "Seleccione para qué gerente generar la carta de aceptación",
+    "selectManager": "Seleccionar Gerente",
+    "manager1": "Gerente 1",
+    "manager2": "Gerente 2",
+    "generateAcceptance": "Generar Carta de Aceptación"
   },
   "history": {
     "title": "Historial de Exportaciones",

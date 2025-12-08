@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
 import { Input } from '@/components/ui/input'
-import { Download, Award, FileText, BookOpen, Search, FileType } from 'lucide-react'
+import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -56,12 +56,17 @@ export default function ExportPage() {
   const [bookHeaderCustomerId, setBookHeaderCustomerId] = useState<string>('')
   const [bookHeaderTomo, setBookHeaderTomo] = useState<string>('PRIMERO')
 
+  // Acceptance letter state
+  const [acceptanceCustomerId, setAcceptanceCustomerId] = useState<string>('')
+  const [acceptanceManagerIndex, setAcceptanceManagerIndex] = useState<number>(1)
+
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
   const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
   const [portadaCustomerFilter, setPortadaCustomerFilter] = useState<string>('')
   const [wordCustomerFilter, setWordCustomerFilter] = useState<string>('')
   const [bookHeaderCustomerFilter, setBookHeaderCustomerFilter] = useState<string>('')
+  const [acceptanceCustomerFilter, setAcceptanceCustomerFilter] = useState<string>('')
 
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
@@ -309,6 +314,40 @@ export default function ExportPage() {
     }
   }
 
+  const handleAcceptanceExport = async () => {
+    if (!acceptanceCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/acceptance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: acceptanceCustomerId,
+          managerIndex: acceptanceManagerIndex,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === acceptanceCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Acceptance_Letter_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating acceptance letter:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -358,6 +397,10 @@ export default function ExportPage() {
           <TabsTrigger value="book-header" className="gap-2">
             <FileType className="h-4 w-4" />
             {t('bookHeader')}
+          </TabsTrigger>
+          <TabsTrigger value="acceptance" className="gap-2">
+            <UserCheck className="h-4 w-4" />
+            {t('acceptance')}
           </TabsTrigger>
         </TabsList>
 
@@ -735,6 +778,84 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateBookHeader')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="acceptance" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('selectCustomer')}</CardTitle>
+                <CardDescription>
+                  {t('selectCustomerForAcceptance')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={tCommon('search')}
+                      value={acceptanceCustomerFilter}
+                      onChange={(e) => setAcceptanceCustomerFilter(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                  </div>
+                  <Select
+                    value={acceptanceCustomerId}
+                    onValueChange={setAcceptanceCustomerId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterCustomers(acceptanceCustomerFilter).map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {getCustomerDisplayWithTradeName(customer)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('acceptanceDetails')}</CardTitle>
+                <CardDescription>
+                  {t('acceptanceDetailsDescription')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('selectManager')}</label>
+                  <Select
+                    value={acceptanceManagerIndex.toString()}
+                    onValueChange={(value) => setAcceptanceManagerIndex(parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{t('manager1')}</SelectItem>
+                      <SelectItem value="2">{t('manager2')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleAcceptanceExport}
+              disabled={exporting || !acceptanceCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateAcceptance')}
             </Button>
           </div>
         </TabsContent>
