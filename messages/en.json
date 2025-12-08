@@ -310,7 +310,15 @@
     "bookHeaderDetails": "Header Details",
     "bookHeaderDetailsDescription": "Configure the book volume (tomo) number",
     "tomoNumber": "Volume (Tomo)",
-    "generateBookHeader": "Generate Book Header"
+    "generateBookHeader": "Generate Book Header",
+    "acceptance": "Acceptance",
+    "selectCustomerForAcceptance": "Choose the customer to generate the manager acceptance letter",
+    "acceptanceDetails": "Acceptance Details",
+    "acceptanceDetailsDescription": "Select which manager to generate the acceptance letter for",
+    "selectManager": "Select Manager",
+    "manager1": "Manager 1",
+    "manager2": "Manager 2",
+    "generateAcceptance": "Generate Acceptance Letter"
   },
   "history": {
     "title": "Export History",
