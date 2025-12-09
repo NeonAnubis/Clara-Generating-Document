@@ -8,7 +8,6 @@ import {
   AlignmentType,
   Footer,
   BorderStyle,
-  PageBreak,
 } from 'docx'
 
 // Helper function to format date in Spanish
@@ -422,17 +421,8 @@ export async function POST(request: NextRequest) {
       }),
     ]
 
-    // Page 2 content
-    const page2Content = [
-      // Page break
-      new Paragraph({
-        children: [new PageBreak()],
-      }),
-      // Spacing
-      new Paragraph({
-        spacing: { before: 3000 },
-        children: [],
-      }),
+    // Signature section (continued on same page)
+    const signatureContent = [
       // Signature line
       new Paragraph({
         alignment: AlignmentType.CENTER,
@@ -526,7 +516,7 @@ export async function POST(request: NextRequest) {
           footers: {
             default: createDocumentFooter(),
           },
-          children: [...page1Content, ...page2Content],
+          children: [...page1Content, ...signatureContent],
         },
       ],
     })
