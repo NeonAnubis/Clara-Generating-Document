@@ -318,6 +318,7 @@
     "selectManager": "Seleccionar Gerente",
     "manager1": "Gerente 1",
     "manager2": "Gerente 2",
+    "subManager": "Subgerente",
     "generateAcceptance": "Generar Carta de Aceptación"
   },
   "history": {

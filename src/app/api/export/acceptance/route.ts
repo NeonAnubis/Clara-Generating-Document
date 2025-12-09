@@ -72,6 +72,15 @@ export async function POST(request: NextRequest) {
       managerOccupation = customer.manager2Occupation || ''
       managerMaritalStatus = customer.manager2MaritalStatus || ''
       managerNationality = customer.manager2Nationality || ''
+    } else if (managerIndex === 3) {
+      // Sub-manager
+      managerFirstName = customer.subManagerFirstName || ''
+      managerLastName = customer.subManagerLastName || ''
+      managerId = customer.subManagerId || ''
+      managerAddress = customer.subManagerAddress || ''
+      managerOccupation = customer.subManagerOccupation || ''
+      managerMaritalStatus = customer.subManagerMaritalStatus || ''
+      managerNationality = customer.subManagerNationality || ''
     } else {
       managerFirstName = customer.managerFirstName || ''
       managerLastName = customer.managerLastName || ''

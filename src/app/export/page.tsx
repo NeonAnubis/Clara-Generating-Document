@@ -841,6 +841,7 @@ export default function ExportPage() {
                     <SelectContent>
                       <SelectItem value="1">{t('manager1')}</SelectItem>
                       <SelectItem value="2">{t('manager2')}</SelectItem>
+                      <SelectItem value="3">{t('subManager')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
