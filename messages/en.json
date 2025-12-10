@@ -319,7 +319,10 @@
     "manager1": "Manager 1",
     "manager2": "Manager 2",
     "subManager": "Sub-manager",
-    "generateAcceptance": "Generate Acceptance Letter"
+    "generateAcceptance": "Generate Acceptance Letter",
+    "stockAgreement": "Stock Agreement",
+    "selectCustomerForStockAgreement": "Choose the customer to generate the stock purchase and sale agreement",
+    "generateStockAgreement": "Generate Stock Agreement"
   },
   "history": {
     "title": "Export History",
