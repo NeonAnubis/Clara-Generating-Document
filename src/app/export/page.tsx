@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
 import { Input } from '@/components/ui/input'
-import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck } from 'lucide-react'
+import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck, FileSignature } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -60,6 +60,9 @@ export default function ExportPage() {
   const [acceptanceCustomerId, setAcceptanceCustomerId] = useState<string>('')
   const [acceptanceManagerIndex, setAcceptanceManagerIndex] = useState<number>(1)
 
+  // Stock Agreement state
+  const [stockAgreementCustomerId, setStockAgreementCustomerId] = useState<string>('')
+
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
   const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
@@ -67,6 +70,7 @@ export default function ExportPage() {
   const [wordCustomerFilter, setWordCustomerFilter] = useState<string>('')
   const [bookHeaderCustomerFilter, setBookHeaderCustomerFilter] = useState<string>('')
   const [acceptanceCustomerFilter, setAcceptanceCustomerFilter] = useState<string>('')
+  const [stockAgreementCustomerFilter, setStockAgreementCustomerFilter] = useState<string>('')
 
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
@@ -348,6 +352,39 @@ export default function ExportPage() {
     }
   }
 
+  const handleStockAgreementExport = async () => {
+    if (!stockAgreementCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/stock-agreement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: stockAgreementCustomerId,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === stockAgreementCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Stock_Agreement_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating stock agreement:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -401,6 +438,10 @@ export default function ExportPage() {
           <TabsTrigger value="acceptance" className="gap-2">
             <UserCheck className="h-4 w-4" />
             {t('acceptance')}
+          </TabsTrigger>
+          <TabsTrigger value="stock-agreement" className="gap-2">
+            <FileSignature className="h-4 w-4" />
+            {t('stockAgreement')}
           </TabsTrigger>
         </TabsList>
 
@@ -857,6 +898,56 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateAcceptance')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="stock-agreement" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('selectCustomer')}</CardTitle>
+              <CardDescription>
+                {t('selectCustomerForStockAgreement')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder={tCommon('search')}
+                    value={stockAgreementCustomerFilter}
+                    onChange={(e) => setStockAgreementCustomerFilter(e.target.value)}
+                    className="pl-9 mb-2"
+                  />
+                </div>
+                <Select
+                  value={stockAgreementCustomerId}
+                  onValueChange={setStockAgreementCustomerId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filterCustomers(stockAgreementCustomerFilter).map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {getCustomerDisplayWithTradeName(customer)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleStockAgreementExport}
+              disabled={exporting || !stockAgreementCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateStockAgreement')}
             </Button>
           </div>
         </TabsContent>

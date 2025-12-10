@@ -319,7 +319,10 @@
     "manager1": "Gerente 1",
     "manager2": "Gerente 2",
     "subManager": "Subgerente",
-    "generateAcceptance": "Generar Carta de Aceptación"
+    "generateAcceptance": "Generar Carta de Aceptación",
+    "stockAgreement": "Contrato de Acciones",
+    "selectCustomerForStockAgreement": "Elija el cliente para generar el contrato de compraventa de acciones",
+    "generateStockAgreement": "Generar Contrato de Acciones"
   },
   "history": {
     "title": "Historial de Exportaciones",
