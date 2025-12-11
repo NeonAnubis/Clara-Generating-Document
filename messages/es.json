@@ -322,7 +322,10 @@
     "generateAcceptance": "Generar Carta de Aceptación",
     "stockAgreement": "Contrato de Acciones",
     "selectCustomerForStockAgreement": "Elija el cliente para generar el contrato de compraventa de acciones",
-    "generateStockAgreement": "Generar Contrato de Acciones"
+    "generateStockAgreement": "Generar Contrato de Acciones",
+    "seatNumber": "Número de Asiento",
+    "selectCustomerForSeatNumber": "Elija el cliente para generar el documento de número de asiento (Libro de Registro de Cuotas)",
+    "generateSeatNumber": "Generar Número de Asiento"
   },
   "history": {
     "title": "Historial de Exportaciones",

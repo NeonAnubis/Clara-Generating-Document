@@ -322,7 +322,10 @@
     "generateAcceptance": "Generate Acceptance Letter",
     "stockAgreement": "Stock Agreement",
     "selectCustomerForStockAgreement": "Choose the customer to generate the stock purchase and sale agreement",
-    "generateStockAgreement": "Generate Stock Agreement"
+    "generateStockAgreement": "Generate Stock Agreement",
+    "seatNumber": "Seat Number",
+    "selectCustomerForSeatNumber": "Choose the customer to generate the seat number document (Libro de Registro de Cuotas)",
+    "generateSeatNumber": "Generate Seat Number"
   },
   "history": {
     "title": "Export History",
