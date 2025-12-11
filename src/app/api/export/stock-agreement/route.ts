@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: 'GUSTAVO ADOLFO JIMÉNEZ ARIAS',
+            text: 'CARLOS VÍLCHEZ PRIETO',
             bold: true,
             size: bodySize,
           }),

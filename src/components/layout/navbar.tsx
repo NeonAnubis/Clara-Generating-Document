@@ -48,8 +48,9 @@ export function Navbar() {
     const cookieLocale = document.cookie
       .split('; ')
       .find(row => row.startsWith('locale='))
-      ?.split('=')[1] as 'es' | 'en' | undefined
-    setCurrentLocale(cookieLocale || 'es')
+      ?.split('=')[1]
+    const validLocale = cookieLocale === 'en' || cookieLocale === 'es' ? cookieLocale : 'es'
+    setCurrentLocale(validLocale)
 
     // Fetch current user
     fetch('/api/auth/me')
