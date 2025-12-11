@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
 import { Input } from '@/components/ui/input'
-import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck, FileSignature } from 'lucide-react'
+import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck, FileSignature, Hash } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -63,6 +63,9 @@ export default function ExportPage() {
   // Stock Agreement state
   const [stockAgreementCustomerId, setStockAgreementCustomerId] = useState<string>('')
 
+  // Seat Number state
+  const [seatNumberCustomerId, setSeatNumberCustomerId] = useState<string>('')
+
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
   const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
@@ -71,6 +74,7 @@ export default function ExportPage() {
   const [bookHeaderCustomerFilter, setBookHeaderCustomerFilter] = useState<string>('')
   const [acceptanceCustomerFilter, setAcceptanceCustomerFilter] = useState<string>('')
   const [stockAgreementCustomerFilter, setStockAgreementCustomerFilter] = useState<string>('')
+  const [seatNumberCustomerFilter, setSeatNumberCustomerFilter] = useState<string>('')
 
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
@@ -385,6 +389,39 @@ export default function ExportPage() {
     }
   }
 
+  const handleSeatNumberExport = async () => {
+    if (!seatNumberCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/seat-number', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: seatNumberCustomerId,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === seatNumberCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Seat_Number_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating seat number document:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -442,6 +479,10 @@ export default function ExportPage() {
           <TabsTrigger value="stock-agreement" className="gap-2">
             <FileSignature className="h-4 w-4" />
             {t('stockAgreement')}
+          </TabsTrigger>
+          <TabsTrigger value="seat-number" className="gap-2">
+            <Hash className="h-4 w-4" />
+            {t('seatNumber')}
           </TabsTrigger>
         </TabsList>
 
@@ -948,6 +989,56 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateStockAgreement')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="seat-number" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('selectCustomer')}</CardTitle>
+              <CardDescription>
+                {t('selectCustomerForSeatNumber')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder={tCommon('search')}
+                    value={seatNumberCustomerFilter}
+                    onChange={(e) => setSeatNumberCustomerFilter(e.target.value)}
+                    className="pl-9 mb-2"
+                  />
+                </div>
+                <Select
+                  value={seatNumberCustomerId}
+                  onValueChange={setSeatNumberCustomerId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filterCustomers(seatNumberCustomerFilter).map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {getCustomerDisplayWithTradeName(customer)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleSeatNumberExport}
+              disabled={exporting || !seatNumberCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateSeatNumber')}
             </Button>
           </div>
         </TabsContent>
