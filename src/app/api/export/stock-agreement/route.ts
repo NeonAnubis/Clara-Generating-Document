@@ -14,6 +14,62 @@ import {
 import * as fs from 'fs'
 import * as path from 'path'
 
+// Helper function to convert Spanish number words to numeric value
+function spanishWordsToNumber(text: string): number {
+  const normalized = text.toUpperCase().trim()
+
+  // Map of Spanish number words to values
+  const units: { [key: string]: number } = {
+    'CERO': 0, 'UNO': 1, 'UN': 1, 'UNA': 1, 'DOS': 2, 'TRES': 3, 'CUATRO': 4,
+    'CINCO': 5, 'SEIS': 6, 'SIETE': 7, 'OCHO': 8, 'NUEVE': 9, 'DIEZ': 10,
+    'ONCE': 11, 'DOCE': 12, 'TRECE': 13, 'CATORCE': 14, 'QUINCE': 15,
+    'DIECISEIS': 16, 'DIECISÉIS': 16, 'DIECISIETE': 17, 'DIECIOCHO': 18, 'DIECINUEVE': 19,
+    'VEINTE': 20, 'VEINTIUNO': 21, 'VEINTIUNA': 21, 'VEINTIDOS': 22, 'VEINTIDÓS': 22,
+    'VEINTITRES': 23, 'VEINTITRÉS': 23, 'VEINTICUATRO': 24, 'VEINTICINCO': 25,
+    'VEINTISEIS': 26, 'VEINTISÉIS': 26, 'VEINTISIETE': 27, 'VEINTIOCHO': 28, 'VEINTINUEVE': 29,
+    'TREINTA': 30, 'CUARENTA': 40, 'CINCUENTA': 50, 'SESENTA': 60,
+    'SETENTA': 70, 'OCHENTA': 80, 'NOVENTA': 90,
+    'CIEN': 100, 'CIENTO': 100, 'DOSCIENTOS': 200, 'DOSCIENTAS': 200,
+    'TRESCIENTOS': 300, 'TRESCIENTAS': 300, 'CUATROCIENTOS': 400, 'CUATROCIENTAS': 400,
+    'QUINIENTOS': 500, 'QUINIENTAS': 500, 'SEISCIENTOS': 600, 'SEISCIENTAS': 600,
+    'SETECIENTOS': 700, 'SETECIENTAS': 700, 'OCHOCIENTOS': 800, 'OCHOCIENTAS': 800,
+    'NOVECIENTOS': 900, 'NOVECIENTAS': 900
+  }
+
+  const multipliers: { [key: string]: number } = {
+    'MIL': 1000,
+    'MILLON': 1000000, 'MILLÓN': 1000000, 'MILLONES': 1000000
+  }
+
+  // Check if it's already a number
+  const numericValue = Number(normalized.replace(/[\s,\.]/g, ''))
+  if (!isNaN(numericValue)) {
+    return numericValue
+  }
+
+  // Split by spaces and 'Y'
+  const words = normalized.replace(/\s+Y\s+/g, ' ').split(/\s+/)
+
+  let result = 0
+  let current = 0
+
+  for (const word of words) {
+    if (units[word] !== undefined) {
+      current += units[word]
+    } else if (multipliers[word] !== undefined) {
+      if (current === 0) current = 1
+      current *= multipliers[word]
+      if (word !== 'MIL' || words.indexOf(word) === words.length - 1 ||
+          (words.indexOf(word) < words.length - 1 && multipliers[words[words.indexOf(word) + 1]] === undefined)) {
+        result += current
+        current = 0
+      }
+    }
+  }
+
+  return result + current
+}
+
 // Helper function to format date with ordinal suffix
 function formatDateWithOrdinal(date: Date): string {
   const months = [
@@ -58,29 +114,18 @@ export async function POST(request: NextRequest) {
     const seller1Name = customer.shareholderOne || ''
     const seller1Id = customer.identification || ''
     const seller1Address = customer.shareholder1Address || ''
-    const seller1MaritalStatus = customer.maritalStatus || ''
     const seller1Profession = customer.profession || ''
     const seller1Shares = customer.numberOfSharesHeld?.toString() || '750'
     const seller1SharesInWords = customer.sharesInWords1 || 'SEVEN HUNDRED AND FIFTY'
 
     // Seller 2 (Shareholder 2)
     const seller2Name = customer.shareholderTwo || ''
-    const seller2Id = customer.identification2 || ''
-    const seller2Address = customer.shareholder2Address || ''
-    const seller2MaritalStatus = customer.maritalStatus2 || ''
-    const seller2Profession = customer.profession2 || ''
     const seller2Shares = customer.numberOfSharesHeld2?.toString() || '250'
     const seller2SharesInWords = customer.sharesInNumbers2 || 'TWO HUNDRED AND FIFTY'
 
     // Buyer (Manager or designated buyer)
-    const buyerFirstName = customer.managerFirstName || ''
-    const buyerLastName = customer.managerLastName || ''
-    const buyerName = `${buyerFirstName} ${buyerLastName}`.trim()
-    const buyerId = customer.managerId || ''
-    const buyerAddress = customer.managerAddress || ''
     const buyerMaritalStatus = customer.managerMaritalStatus || 'soltero'
-    const buyerProfession = customer.managerOccupation || 'teacher'
-    const buyerNationality = customer.managerNationality || 'Chinese'
+    const reference = customer.reference || ''
 
     // Current date
     const currentDate = new Date()
@@ -92,7 +137,7 @@ export async function POST(request: NextRequest) {
     // Load header image
     let headerImageData: Buffer | null = null
     try {
-      const headerImagePath = path.join(process.cwd(), 'src', 'assets', 'sixth_header.png')
+      const headerImagePath = path.join(process.cwd(), 'src', 'assets', 'header.png')
       headerImageData = fs.readFileSync(headerImagePath)
     } catch {
       console.warn('Header image not found, proceeding without it')
@@ -103,13 +148,12 @@ export async function POST(request: NextRequest) {
       const headerChildren: Paragraph[] = []
 
       if (headerImageData) {
-        // Original image dimensions: 806x139 pixels
-        // Aspect ratio: 806/139 ≈ 5.8
+        // Original image dimensions for header.png
         // Full page width: 8.5 inches = 612 points at 72 DPI
         // Image should span full page width (outside margins)
         // Using negative indent to pull image outside margin area
         const imageWidth = 615 // Full page width in points
-        const imageHeight = Math.round(imageWidth * (139 / 806)) // Maintain exact aspect ratio
+        const imageHeight = 45 // 0.56 inches (0.56 * 72 ≈ 40 points)
 
         // Left margin is 1.18 inches = ~85 points, use negative indent to compensate
         const negativeIndent = -Math.round(1.18 * 720) // Convert to twips (1 inch = 720 twips for indent)
@@ -200,21 +244,21 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: seller1Name.toUpperCase(),
+            text: 'GUSTAVO ADOLFO JIMÉNEZ ARIAS',
             bold: true,
             size: bodySize,
           }),
           new TextRun({
-            text: `, of legal age, ${seller1MaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the identification document number ${seller1Id}, with domicile in ${seller1Address}; and `,
+            text: ', of legal age, unmarried, a teacher, bearer of the identification document number four- one hundred and eighty-seven- four hundred and thirty-six, with domicile in San Rafael of Heredia, El Encanto residential, behind the cemetery, second house; and  ',
             size: bodySize,
           }),
           new TextRun({
-            text: seller2Name.toUpperCase(),
+            text: 'NURIA PATRICIA MENDEZ RAMIREZ',
             bold: true,
             size: bodySize,
           }),
           new TextRun({
-            text: `, of legal age, ${seller2MaritalStatus.toLowerCase()}, ${seller2Profession.toLowerCase()}, with domicile in ${seller2Address}, bearer of the identification document ${seller2Id}, hereinafter designated the "`,
+            text: ', of legal age, married, housewife, with domicile in San Pablo de Heredia, Residencial Lomas de San Pablo, from Aquafit pools one hundred meters south and two hundred and fifty meters west, bearer of the identification document one- seven hundred- three hundred and ninety-eight, hereinafter designated the "',
             size: bodySize,
           }),
           new TextRun({
@@ -227,12 +271,12 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: buyerName.toUpperCase(),
+            text: seller1Name.toUpperCase(),
             bold: true,
             size: bodySize,
           }),
           new TextRun({
-            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${buyerProfession.toLowerCase()}, bearer of the ${buyerNationality} passport number ${buyerId}, with domicile in ${buyerAddress}; hereinafter designated as the "`,
+            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the ${seller1Address} passport number ${seller1Id}, with domicile in ${reference}; hereinafter designated as the "`,
             size: bodySize,
           }),
           new TextRun({
@@ -490,7 +534,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `BUYER ${buyerName.toUpperCase()}`,
+            text: `BUYER ${seller1Name.toUpperCase()}`,
             bold: true,
             size: bodySize,
           }),
@@ -508,7 +552,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `BUYER ${buyerName.toUpperCase()}`,
+            text: `BUYER ${seller1Name.toUpperCase()}`,
             bold: true,
             size: bodySize,
           }),
@@ -583,7 +627,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: ` A single payment of ¢${shareCapital} (One hundred thousand Costa Rican ${currency}) at the same moment of signature of this document.`,
+            text: ` A single payment of ¢${spanishWordsToNumber(shareCapital).toLocaleString('en-US')} (One hundred thousand Costa Rican colones) at the same moment of signature of this document.`,
             size: bodySize,
           }),
         ],
@@ -858,7 +902,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: buyerName.toUpperCase(),
+            text: seller1Name.toUpperCase(),
             bold: true,
             size: 20,
           }),
