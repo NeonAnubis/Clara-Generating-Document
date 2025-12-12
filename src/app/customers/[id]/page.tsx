@@ -23,6 +23,8 @@ interface Customer {
   registeredAddress: string | null
   companyTerm: number | null
   incorporationDate: string | null
+  currency: string | null
+  administration: string | null
 
   // Shareholder 1
   shareholderOne: string | null
@@ -392,6 +394,30 @@ export default function CustomerDetailPage() {
                 />
               ) : (
                 <p className="text-sm py-2">{displayCustomer?.incorporationDate || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('currency')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.currency || ''}
+                  onChange={(e) => updateField('currency', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.currency || '-'}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('administration')}</Label>
+              {isEditing ? (
+                <Input
+                  value={displayCustomer?.administration || ''}
+                  onChange={(e) => updateField('administration', e.target.value)}
+                />
+              ) : (
+                <p className="text-sm py-2">{displayCustomer?.administration || '-'}</p>
               )}
             </div>
           </div>

@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     const shareCapital = customer.shareCapital || 'CIEN MIL'
     const numberOfShares = customer.numberOfShares || 'MIL'
     const shareValue = customer.shareValue || 'CIEN'
+    const currency = customer.currency || 'COLONES'
 
     // Seller 1 (from shareholderOne field)
     const seller1Name = customer.shareholderOne || 'CARLOS VÍLCHEZ PRIETO'
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `, la cual de acuerdo al pacto constitutivo posee un capital social de ${shareCapital} COLONES, dividido en ${numberOfShares} cuotas o títulos nominativos de ${shareValue} colones cada uno, totalmente suscrito y pagado de la siguiente manera: el señor `,
+                  text: `, la cual de acuerdo al pacto constitutivo posee un capital social de ${shareCapital} ${currency.toUpperCase()}, dividido en ${numberOfShares} cuotas o títulos nominativos de ${shareValue} ${currency.toLowerCase()} cada uno, totalmente suscrito y pagado de la siguiente manera: el señor `,
                   size: bodySize,
                   font: fontFamily,
                 }),
