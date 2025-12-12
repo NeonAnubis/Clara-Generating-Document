@@ -39,12 +39,13 @@ export async function POST(request: NextRequest) {
     // Extract customer data
     const legalId = customer.legalId || '3-102-949120'
     const reference = customer.reference || 'CR00058'
+    const companyType = customer.companyType || 'SOCIEDAD DE RESPONSABILIDAD LIMITADA'
     const shareCapital = customer.shareCapital || 'CIEN MIL'
     const numberOfShares = customer.numberOfShares || 'MIL'
     const shareValue = customer.shareValue || 'CIEN'
 
-    // Seller 1 (fixed as per document)
-    const seller1Name = 'CARLOS VÍLCHEZ PRIETO'
+    // Seller 1 (from shareholderOne field)
+    const seller1Name = customer.shareholderOne || 'CARLOS VÍLCHEZ PRIETO'
     const seller1MaritalStatus = customer.maritalStatus || 'divorciado una vez'
     const seller1Profession = customer.profession || 'asistente'
     const seller1Id = customer.identification || 'ocho- cien - cero cincuenta y dos'
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: 'SOCIEDAD DE RESPONSABILIDAD LIMITADA',
+                  text: companyType.toUpperCase(),
                   bold: true,
                   size: bodySize,
                   font: fontFamily,
@@ -291,13 +292,13 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `LA COMPRADORA ${buyerName}`,
+                  text: `LA COMPRADORA ${seller1Name}`,
                   bold: true,
                   size: bodySize,
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `, mayor, ${buyerMaritalStatus}, ${buyerProfession}, con domicilio en ${buyerAddress}, con pasaporte ${buyerNationality} número ${buyerPassport}, correspondiente a un 100% del capital social. La nueva Cuotista manifiesta la aceptación de dicho traspaso con la firma de la presente acta y a partir de este momento es la legítima propietaria de `,
+                  text: `, mayor, ${seller1MaritalStatus}, ${seller1Profession}, con domicilio en ${buyerAddress}, con ${seller1Id}, correspondiente a un 100% del capital social. La nueva Cuotista manifiesta la aceptación de dicho traspaso con la firma de la presente acta y a partir de este momento es la legítima propietaria de `,
                   size: bodySize,
                   font: fontFamily,
                 }),
@@ -402,7 +403,7 @@ export async function POST(request: NextRequest) {
               spacing: { before: 200, after: 0 },
               children: [
                 new TextRun({
-                  text: `${buyerName} ________________________`,
+                  text: `${seller1Name} ________________________`,
                   size: bodySize,
                   font: fontFamily,
                 }),
