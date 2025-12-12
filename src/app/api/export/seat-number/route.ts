@@ -60,15 +60,8 @@ export async function POST(request: NextRequest) {
     const seller2Id = customer.identification2 || 'uno-setecientos- trescientos noventa y ocho'
     const seller2Shares = customer.sharesInWords2 || 'DOSCIENTAS CINCUENTA'
 
-    // Buyer
-    const buyerName = customer.managerFirstName && customer.managerLastName
-      ? `${customer.managerFirstName} ${customer.managerLastName}`.toUpperCase()
-      : 'SLADANA ANDELKOVIC'
-    const buyerMaritalStatus = customer.managerMaritalStatus || 'soltera'
-    const buyerProfession = customer.managerOccupation || 'operadora'
+    // Buyer address
     const buyerAddress = customer.managerAddress || '30 Belostenska, Borca- Belgrade, 11211, Serbia'
-    const buyerPassport = customer.managerId || '012878969'
-    const buyerNationality = customer.managerNationality || 'serbio'
 
     // Current date
     const currentDate = new Date()
