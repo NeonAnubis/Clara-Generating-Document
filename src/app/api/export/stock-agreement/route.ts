@@ -115,11 +115,8 @@ export async function POST(request: NextRequest) {
     const seller1Id = customer.identification || ''
     const seller1Address = customer.shareholder1Address || ''
     const seller1Profession = customer.profession || ''
-    const seller1Shares = customer.numberOfSharesHeld?.toString() || '750'
-    const seller1SharesInWords = customer.sharesInWords1 || 'SEVEN HUNDRED AND FIFTY'
 
     // Seller 2 (Shareholder 2)
-    const seller2Name = customer.shareholderTwo || ''
     const seller2Shares = customer.numberOfSharesHeld2?.toString() || '250'
     const seller2SharesInWords = customer.sharesInNumbers2 || 'TWO HUNDRED AND FIFTY'
 
@@ -327,7 +324,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `SELLER ${seller1Name.split(' ')[0].toUpperCase()} ${seller1Name.split(' ').slice(-1)[0].toUpperCase()}`,
+            text: 'SELLER CARLOS VÍLCHEZ PRIETO',
             bold: true,
             size: bodySize,
           }),
@@ -336,7 +333,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `${seller1SharesInWords} QUOTAS (${seller1Shares})`,
+            text: 'SEVEN HUNDRED AND FIFTY QUOTAS (750)',
             bold: true,
             size: bodySize,
           }),
@@ -345,7 +342,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `SELLER ${seller2Name.split(' ')[0].toUpperCase()} ${seller2Name.split(' ').slice(-1)[0].toUpperCase()}`,
+            text: 'SELLER NURIA PATRICIA MENDEZ RAMIREZ',
             bold: true,
             size: bodySize,
           }),
@@ -480,7 +477,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: 'SELLERS',
+            text: 'SELLERS CARLOS VÍLCHEZ PRIETO and NURIA PATRICIA MENDEZ RAMIREZ',
             bold: true,
             size: bodySize,
           }),
@@ -516,7 +513,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `SELLER ${seller1Name.split(' ')[0].toUpperCase()} ${seller1Name.split(' ').slice(-1)[0].toUpperCase()}`,
+            text: 'SELLER CARLOS VÍLCHEZ PRIETO',
             bold: true,
             size: bodySize,
           }),
@@ -525,7 +522,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `SELLER ${seller2Name.split(' ')[0].toUpperCase()} ${seller2Name.split(' ').slice(-1)[0].toUpperCase()}`,
+            text: 'SELLER NURIA PATRICIA MENDEZ RAMIREZ',
             bold: true,
             size: bodySize,
           }),
@@ -854,7 +851,7 @@ export async function POST(request: NextRequest) {
           }),
         ],
       }),
-      // Signature section header
+      // Signature section header - "By the SELLERS" and "By the BUYER"
       new Paragraph({
         spacing: { before: 400, after: 200 },
         children: [
@@ -878,64 +875,62 @@ export async function POST(request: NextRequest) {
           }),
         ],
       }),
-      // Signature lines row 1
+      // Signature lines - Seller 1 and Buyer
       new Paragraph({
-        spacing: { before: 600, after: 100 },
+        spacing: { before: 400, after: 0 },
         children: [
           new TextRun({
-            text: '________________________\t\t\t\t________________________',
-            size: bodySize,
-          }),
-        ],
-      }),
-      // Seller 1 and Buyer names
-      new Paragraph({
-        spacing: { after: 400 },
-        children: [
-          new TextRun({
-            text: seller1Name.toUpperCase(),
-            bold: true,
-            size: 20,
-          }),
-          new TextRun({
-            text: '\t\t\t\t\t',
+            text: '________________________',
             size: bodySize,
           }),
           new TextRun({
-            text: seller1Name.toUpperCase(),
-            bold: true,
-            size: 20,
+            text: '\t\t\t\t',
+            size: bodySize,
           }),
-        ],
-      }),
-      // Seller 2 signature line
-      new Paragraph({
-        spacing: { before: 200, after: 100 },
-        children: [
           new TextRun({
             text: '________________________',
             size: bodySize,
           }),
         ],
       }),
-      // Seller 2 name
+      // Names row - CARLOS VÍLCHEZ PRIETO and CLARA ALVARADO JIMENEZ
       new Paragraph({
-        spacing: { after: 400 },
+        spacing: { before: 0, after: 200 },
         children: [
           new TextRun({
-            text: seller2Name.toUpperCase(),
+            text: 'CARLOS VÍLCHEZ PRIETO',
             bold: true,
-            size: 20,
+            size: bodySize,
+          }),
+          new TextRun({
+            text: '\t\t\t\t',
+            size: bodySize,
+          }),
+          new TextRun({
+            text: 'CLARA ALVARADO JIMENEZ',
+            bold: true,
+            size: bodySize,
           }),
         ],
       }),
-      // Notary section
+      // Seller 2 name - NURIA PATRICIA MENDEZ RAMIREZ
       new Paragraph({
-        spacing: { before: 200, after: 100 },
+        spacing: { before: 200, after: 400 },
+        children: [
+          new TextRun({
+            text: 'NURIA PATRICIA MENDEZ RAMIREZ',
+            bold: true,
+            size: bodySize,
+          }),
+        ],
+      }),
+      // Notary section - italic gray text
+      new Paragraph({
+        spacing: { before: 200, after: 200 },
         children: [
           new TextRun({
             text: 'The undersigned Notary authenticates the signature of the two sellers only. San José, July 23rd 2025:',
-            size: 18,
+            size: bodySize,
             italics: true,
             color: grayColor,
           }),
@@ -943,7 +938,7 @@ export async function POST(request: NextRequest) {
       }),
       // Notary signature line
       new Paragraph({
-        spacing: { before: 400, after: 100 },
+        spacing: { before: 400, after: 0 },
         children: [
           new TextRun({
             text: '________________________',
@@ -953,20 +948,22 @@ export async function POST(request: NextRequest) {
       }),
       // Notary name
       new Paragraph({
-        spacing: { after: 50 },
+        spacing: { before: 0, after: 0 },
         children: [
           new TextRun({
             text: 'Licda. Clara Alvarado Jiménez',
             bold: true,
-            size: 22,
+            size: bodySize,
           }),
         ],
       }),
+      // Notary title
       new Paragraph({
+        spacing: { before: 0, after: 0 },
         children: [
           new TextRun({
             text: 'Attorney at Law and Notary Public',
-            size: 20,
+            size: bodySize,
           }),
         ],
       }),
