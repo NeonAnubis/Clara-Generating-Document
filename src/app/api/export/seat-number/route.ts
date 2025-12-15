@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Extract customer data
     const legalId = customer.legalId || '3-102-949120'
-    const reference = customer.reference || 'CR00058'
+    const reference = customer.tradeName || 'CR00058'
     const companyType = customer.companyType || 'SOCIEDAD DE RESPONSABILIDAD LIMITADA'
     const shareCapital = customer.shareCapital || 'CIEN MIL'
     const numberOfShares = customer.numberOfShares || 'MIL'
