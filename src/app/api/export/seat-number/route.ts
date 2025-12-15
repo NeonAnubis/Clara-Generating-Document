@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
     const shareValue = customer.shareValue || 'CIEN'
     const currency = customer.currency || 'COLONES'
 
-    // Seller 1 (from shareholderOne field)
-    const seller1Name = customer.shareholderOne || 'CARLOS VÍLCHEZ PRIETO'
+    // Seller 1 (fixed name)
+    const seller1Name = 'CARLOS VÍLCHEZ PRIETO'
     const seller1MaritalStatus = customer.maritalStatus || 'divorciado una vez'
     const seller1Profession = customer.profession || 'asistente'
     const seller1Id = customer.identification || 'ocho- cien - cero cincuenta y dos'
@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
     const seller2Id = customer.identification2 || 'uno-setecientos- trescientos noventa y ocho'
     const seller2Shares = customer.sharesInWords2 || 'DOSCIENTAS CINCUENTA'
 
-    // Buyer address
+    // Buyer (from database)
+    const buyerName = customer.shareholderOne || 'CARLOS VÍLCHEZ PRIETO'
     const buyerAddress = customer.managerAddress || '30 Belostenska, Borca- Belgrade, 11211, Serbia'
 
     // Current date
@@ -397,7 +398,7 @@ export async function POST(request: NextRequest) {
               spacing: { before: 200, after: 0 },
               children: [
                 new TextRun({
-                  text: `${seller1Name} ________________________`,
+                  text: `${buyerName} ________________________`,
                   size: bodySize,
                   font: fontFamily,
                 }),
