@@ -37,13 +37,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract customer data
-    const legalId = customer.legalId || '3-102-949120'
-    const reference = customer.tradeName || 'CR00058'
+    const companyName = customer.companyName || '3102952363'
     const companyType = customer.companyType || 'SOCIEDAD DE RESPONSABILIDAD LIMITADA'
-    const shareCapital = customer.shareCapital || 'CIEN MIL'
+    const tradeName = customer.tradeName || 'CR00066'
+    const legalIdInWords = customer.legalIdInWords || 'TRES- CIENTO DOS- NOVECIENTOS CUARENTA Y NUEVE MIL CIENTO VEINTE'
+    const currency = customer.currency || 'COLONES'
     const numberOfShares = customer.numberOfShares || 'MIL'
     const shareValue = customer.shareValue || 'CIEN'
-    const currency = customer.currency || 'COLONES'
 
     // Seller 1 (fixed name)
     const seller1Name = 'CARLOS VÍLCHEZ PRIETO'
@@ -63,7 +63,10 @@ export async function POST(request: NextRequest) {
 
     // Buyer (from database)
     const buyerName = customer.shareholderOne || 'CARLOS VÍLCHEZ PRIETO'
-    const buyerAddress = customer.managerAddress || '30 Belostenska, Borca- Belgrade, 11211, Serbia'
+    const buyerMaritalStatus = customer.maritalStatus || 'soltero'
+    const buyerProfession = customer.profession || 'empresario'
+    const buyerAddress = customer.shareholder1Address || '11 kav,Semikok, Willemstad 14 Curazao, con 561161434'
+    const buyerPercentage = customer.percentage1 || '100%'
 
     // Current date
     const currentDate = new Date()
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `Se hace constar que la sociedad a la cual corresponde este libro, ${legalId} `,
+                  text: `Se hace constar que la sociedad a la cual corresponde este libro, ${companyName} `,
                   size: bodySize,
                   font: fontFamily,
                 }),
@@ -119,17 +122,7 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `, con referencia interna ${reference}, quedó inscrita en la sección mercantil del Registro Público bajo la cédula jurídica número (${legalId})`,
-                  size: bodySize,
-                  font: fontFamily,
-                }),
-                new TextRun({
-                  text: `    TRES- CIENTO DOS- NOVECIENTOS CUARENTA Y NUEVE MIL CIENTO VEINTE`,
-                  size: bodySize,
-                  font: fontFamily,
-                }),
-                new TextRun({
-                  text: `, la cual de acuerdo al pacto constitutivo posee un capital social de ${shareCapital} ${currency.toUpperCase()}, dividido en ${numberOfShares} cuotas o títulos nominativos de ${shareValue} ${currency.toLowerCase()} cada uno, totalmente suscrito y pagado de la siguiente manera: el señor `,
+                  text: `, con referencia interna ${tradeName}, quedó inscrita en la sección mercantil del Registro Público bajo la cédula jurídica número (${companyName})    ${legalIdInWords.toUpperCase()} ${currency.toUpperCase()}, dividido en ${numberOfShares} cuotas o títulos nominativos de ${shareValue} ${currency.toUpperCase()} cada uno, totalmente suscrito y pagado de la siguiente manera: el señor `,
                   size: bodySize,
                   font: fontFamily,
                 }),
@@ -287,13 +280,13 @@ export async function POST(request: NextRequest) {
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `LA COMPRADORA ${seller1Name}`,
+                  text: `LA COMPRADORA ${buyerName}`,
                   bold: true,
                   size: bodySize,
                   font: fontFamily,
                 }),
                 new TextRun({
-                  text: `, mayor, ${seller1MaritalStatus}, ${seller1Profession}, con domicilio en ${buyerAddress}, con ${seller1Id}, correspondiente a un 100% del capital social. La nueva Cuotista manifiesta la aceptación de dicho traspaso con la firma de la presente acta y a partir de este momento es la legítima propietaria de `,
+                  text: `, mayor, ${buyerMaritalStatus}, ${buyerProfession}, con domicilio en ${buyerAddress}, correspondiente a un ${buyerPercentage} del capital social. La nueva Cuotista manifiesta la aceptación de dicho traspaso con la firma de la presente acta y a partir de este momento es la legítima propietaria de `,
                   size: bodySize,
                   font: fontFamily,
                 }),
