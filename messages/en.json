@@ -325,7 +325,16 @@
     "generateStockAgreement": "Generate Stock Agreement",
     "seatNumber": "Seat Number",
     "selectCustomerForSeatNumber": "Choose the customer to generate the seat number document (Libro de Registro de Cuotas)",
-    "generateSeatNumber": "Generate Seat Number"
+    "generateSeatNumber": "Generate Seat Number",
+    "shareCapitalCertificate": "Certificate of Share Capital",
+    "selectCustomerForShareCapital": "Choose the customer to generate the Certificate of Share Capital",
+    "shareCapitalCertificateDetails": "Configure the notarial certification details",
+    "consecutiveNumber": "Consecutive Number",
+    "notaryName": "Notary Name",
+    "bookAuthNumber": "Book Authorization Number",
+    "destinationCountry": "Destination Country",
+    "selectShareholder": "Select Shareholder",
+    "generateShareCapitalCertificate": "Generate Share Capital Certificate"
   },
   "history": {
     "title": "Export History",

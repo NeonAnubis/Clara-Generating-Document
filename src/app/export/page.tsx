@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { DocumentTemplate } from '@/lib/types'
 import { Input } from '@/components/ui/input'
-import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck, FileSignature, Hash } from 'lucide-react'
+import { Download, Award, FileText, BookOpen, Search, FileType, UserCheck, FileSignature, Hash, Building2 } from 'lucide-react'
 
 interface Customer {
   id: string
@@ -66,6 +66,14 @@ export default function ExportPage() {
   // Seat Number state
   const [seatNumberCustomerId, setSeatNumberCustomerId] = useState<string>('')
 
+  // Share Capital Certificate state
+  const [shareCapitalCustomerId, setShareCapitalCustomerId] = useState<string>('')
+  const [shareCapitalShareholderIndex, setShareCapitalShareholderIndex] = useState<number>(0)
+  const [shareCapitalConsecutive, setShareCapitalConsecutive] = useState<string>('563-2025')
+  const [shareCapitalNotaryName, setShareCapitalNotaryName] = useState<string>('CLARA ALVARADO JIMÉNEZ')
+  const [shareCapitalBookAuth, setShareCapitalBookAuth] = useState<string>('4062001346173')
+  const [shareCapitalDestinationCountry, setShareCapitalDestinationCountry] = useState<string>('ESTADOS UNIDOS DE AMERICA')
+
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
   const [actaCustomerFilter, setActaCustomerFilter] = useState<string>('')
@@ -75,6 +83,7 @@ export default function ExportPage() {
   const [acceptanceCustomerFilter, setAcceptanceCustomerFilter] = useState<string>('')
   const [stockAgreementCustomerFilter, setStockAgreementCustomerFilter] = useState<string>('')
   const [seatNumberCustomerFilter, setSeatNumberCustomerFilter] = useState<string>('')
+  const [shareCapitalCustomerFilter, setShareCapitalCustomerFilter] = useState<string>('')
 
   // Fetch data with proper error handling
   const fetchData = useCallback(async () => {
@@ -422,6 +431,57 @@ export default function ExportPage() {
     }
   }
 
+  const handleShareCapitalCertificateExport = async () => {
+    if (!shareCapitalCustomerId) return
+
+    setExporting(true)
+    try {
+      const response = await fetch('/api/export/share-capital-certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: shareCapitalCustomerId,
+          shareholderIndex: shareCapitalShareholderIndex,
+          consecutiveNumber: shareCapitalConsecutive,
+          notaryName: shareCapitalNotaryName,
+          bookAuthorizationNumber: shareCapitalBookAuth,
+          destinationCountry: shareCapitalDestinationCountry,
+        }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const customer = customers.find(c => c.id === shareCapitalCustomerId)
+        const customerName = customer ? getCustomerDisplayName(customer).replace(/\s+/g, '_') : 'customer'
+        a.download = `Certificacion_Capital_Social_${customerName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error generating share capital certificate:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const getShareCapitalShareholders = () => {
+    const customer = customers.find(c => c.id === shareCapitalCustomerId)
+    if (!customer) return []
+    const holders = []
+    if (customer.shareholderOne) {
+      holders.push({ name: customer.shareholderOne })
+    }
+    if (customer.shareholderTwo) {
+      holders.push({ name: customer.shareholderTwo })
+    }
+    return holders
+  }
+
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
   }
@@ -483,6 +543,10 @@ export default function ExportPage() {
           <TabsTrigger value="seat-number" className="gap-2">
             <Hash className="h-4 w-4" />
             {t('seatNumber')}
+          </TabsTrigger>
+          <TabsTrigger value="share-capital-certificate" className="gap-2">
+            <Building2 className="h-4 w-4" />
+            {t('shareCapitalCertificate')}
           </TabsTrigger>
         </TabsList>
 
@@ -1039,6 +1103,129 @@ export default function ExportPage() {
             >
               <Download className="mr-2 h-4 w-4" />
               {exporting ? t('generating') : t('generateSeatNumber')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="share-capital-certificate" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('selectCustomer')}</CardTitle>
+                <CardDescription>
+                  {t('selectCustomerForShareCapital')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder={tCommon('search')}
+                      value={shareCapitalCustomerFilter}
+                      onChange={(e) => setShareCapitalCustomerFilter(e.target.value)}
+                      className="pl-9 mb-2"
+                    />
+                  </div>
+                  <Select
+                    value={shareCapitalCustomerId}
+                    onValueChange={(value) => {
+                      setShareCapitalCustomerId(value)
+                      setShareCapitalShareholderIndex(0)
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectCustomerPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterCustomers(shareCapitalCustomerFilter).map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {getCustomerDisplayWithTradeName(customer)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {shareCapitalCustomerId && getShareCapitalShareholders().length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('selectShareholder')}</label>
+                    <Select
+                      value={shareCapitalShareholderIndex.toString()}
+                      onValueChange={(value) => setShareCapitalShareholderIndex(parseInt(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getShareCapitalShareholders().map((holder: { name: string }, index: number) => (
+                          <SelectItem key={index} value={index.toString()}>
+                            {holder.name || `Shareholder ${index + 1}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('certificateDetails')}</CardTitle>
+                <CardDescription>
+                  {t('shareCapitalCertificateDetails')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('consecutiveNumber')}</label>
+                  <Input
+                    type="text"
+                    value={shareCapitalConsecutive}
+                    onChange={(e) => setShareCapitalConsecutive(e.target.value)}
+                    placeholder="563-2025"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('notaryName')}</label>
+                  <Input
+                    type="text"
+                    value={shareCapitalNotaryName}
+                    onChange={(e) => setShareCapitalNotaryName(e.target.value)}
+                    placeholder="CLARA ALVARADO JIMÉNEZ"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('bookAuthNumber')}</label>
+                  <Input
+                    type="text"
+                    value={shareCapitalBookAuth}
+                    onChange={(e) => setShareCapitalBookAuth(e.target.value)}
+                    placeholder="4062001346173"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('destinationCountry')}</label>
+                  <Input
+                    type="text"
+                    value={shareCapitalDestinationCountry}
+                    onChange={(e) => setShareCapitalDestinationCountry(e.target.value)}
+                    placeholder="ESTADOS UNIDOS DE AMERICA"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleShareCapitalCertificateExport}
+              disabled={exporting || !shareCapitalCustomerId}
+              size="lg"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exporting ? t('generating') : t('generateShareCapitalCertificate')}
             </Button>
           </div>
         </TabsContent>
