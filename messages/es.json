@@ -325,7 +325,16 @@
     "generateStockAgreement": "Generar Contrato de Acciones",
     "seatNumber": "Número de Asiento",
     "selectCustomerForSeatNumber": "Elija el cliente para generar el documento de número de asiento (Libro de Registro de Cuotas)",
-    "generateSeatNumber": "Generar Número de Asiento"
+    "generateSeatNumber": "Generar Número de Asiento",
+    "shareCapitalCertificate": "Certificación de Capital Social",
+    "selectCustomerForShareCapital": "Elija el cliente para generar la Certificación de Capital Social",
+    "shareCapitalCertificateDetails": "Configure los detalles de la certificación notarial",
+    "consecutiveNumber": "Número Consecutivo",
+    "notaryName": "Nombre del Notario",
+    "bookAuthNumber": "Número de Autorización de Libros",
+    "destinationCountry": "País de Destino",
+    "selectShareholder": "Seleccionar Accionista",
+    "generateShareCapitalCertificate": "Generar Certificación de Capital Social"
   },
   "history": {
     "title": "Historial de Exportaciones",
