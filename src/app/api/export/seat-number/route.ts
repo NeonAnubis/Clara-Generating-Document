@@ -45,13 +45,13 @@ export async function POST(request: NextRequest) {
     const numberOfShares = customer.numberOfShares || 'MIL'
     const shareValue = customer.shareValue || 'CIEN'
 
-    // Seller 1 (fixed name)
+    // Seller 1 (fixed values - always the same regardless of database)
     const seller1Name = 'CARLOS VÍLCHEZ PRIETO'
-    const seller1MaritalStatus = customer.maritalStatus || 'divorciado una vez'
-    const seller1Profession = customer.profession || 'asistente'
-    const seller1Id = customer.identification || 'ocho- cien - cero cincuenta y dos'
-    const seller1Address = customer.shareholder1Address || 'Santo Rafael de Heredia, ciento setenta y cinco metros al este del Restaurante Oasis'
-    const seller1Shares = customer.sharesInWords1 || 'SETECIENTAS CINCUENTA'
+    const seller1MaritalStatus = 'divorciado una vez'
+    const seller1Profession = 'asistente'
+    const seller1Id = 'ocho- cien - cero cincuenta y dos'
+    const seller1Address = 'Santo Rafael de Heredia, ciento setenta y cinco metros al este del Restaurante Oasis'
+    const seller1Shares = 'SETECIENTAS CINCUENTA'
 
     // Seller 2 (fixed as per document)
     const seller2Name = 'NURIA PATRICIA MENDEZ RAMIREZ'
