@@ -331,9 +331,11 @@
     "shareCapitalCertificateDetails": "Configure los detalles de la certificación notarial",
     "consecutiveNumber": "Número Consecutivo",
     "notaryName": "Nombre del Notario",
+    "notaryAddress": "Dirección del Notario",
+    "bookNumber": "Número de Tomo",
+    "seatNumberLabel": "Número de Asiento",
     "bookAuthNumber": "Número de Autorización de Libros",
-    "destinationCountry": "País de Destino",
-    "selectShareholder": "Seleccionar Accionista",
+    "certificationDateTime": "Fecha/Hora de Certificación",
     "generateShareCapitalCertificate": "Generar Certificación de Capital Social"
   },
   "history": {

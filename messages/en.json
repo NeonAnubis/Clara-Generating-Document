@@ -331,9 +331,11 @@
     "shareCapitalCertificateDetails": "Configure the notarial certification details",
     "consecutiveNumber": "Consecutive Number",
     "notaryName": "Notary Name",
+    "notaryAddress": "Notary Address",
+    "bookNumber": "Book Number (Tomo)",
+    "seatNumberLabel": "Seat Number (Asiento)",
     "bookAuthNumber": "Book Authorization Number",
-    "destinationCountry": "Destination Country",
-    "selectShareholder": "Select Shareholder",
+    "certificationDateTime": "Certification Date/Time",
     "generateShareCapitalCertificate": "Generate Share Capital Certificate"
   },
   "history": {
