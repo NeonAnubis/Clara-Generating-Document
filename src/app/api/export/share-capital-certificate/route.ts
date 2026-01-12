@@ -6,6 +6,7 @@ import {
   Paragraph,
   TextRun,
   AlignmentType,
+  UnderlineType,
 } from 'docx'
 
 export async function POST(request: NextRequest) {
@@ -13,11 +14,13 @@ export async function POST(request: NextRequest) {
     const data = await request.json()
     const {
       customerId,
-      consecutiveNumber = '563-2025',
-      notaryName = 'CLARA ALVARADO JIMÉNEZ',
-      bookAuthorizationNumber = '4062001346173',
-      destinationCountry = 'ESTADOS UNIDOS DE AMERICA',
-      shareholderIndex = 0,
+      consecutiveNumber = 'CERO ONCE- DOS MIL VEINTISÉIS',
+      notaryName = 'CLARA ALVARADO JIMENEZ',
+      notaryAddress = 'SAN JOSE, SAN PEDRO, BARRIO DENT, DEL AUTOMERCADO LOS YOSES CUATROCIENTOS METROS AL NORTE Y CINCUENTA AL ESTE',
+      bookNumber = 'primero',
+      seatNumber = 'segundo',
+      bookAuthorizationNumber = 'cuatro cero seis dos cero cero uno tres cero ocho seis seis ocho',
+      certificationDateTime = 'diez horas con cuarenta y ocho minutos del nueve de enero del año dos mil veintiséis',
     } = data
 
     // Get customer
@@ -30,53 +33,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
     }
 
-    // Helper function to convert numbers to Spanish words (simplified version)
-    const numberToSpanishWords = (num: string | number): string => {
-      // This is a simplified version - you may want to expand this
-      const numStr = num.toString()
-      const words: { [key: string]: string } = {
-        '0': 'cero', '1': 'uno', '2': 'dos', '3': 'tres', '4': 'cuatro',
-        '5': 'cinco', '6': 'seis', '7': 'siete', '8': 'ocho', '9': 'nueve',
-      }
+    // Extract company information from database
+    const companyName = customer.companyName || 'EVEREDGE MARKETING SOLUTIONS SOCIEDAD DE RESPONSABILIDAD LIMITADA'
+    const legalId = customer.legalId || 'tres - ciento dos – ochocientos ochenta y dos mil seiscientos ochenta y seis'
+    const shareCapital = customer.shareCapital || 'CIEN MIL COLONES'
+    const numberOfShares = customer.numberOfShares || 'MIL CUOTAS'
+    const shareValue = customer.shareValue || 'CIEN COLONES CADA UNA'
 
-      return numStr.split('').map(digit => words[digit] || digit).join(' ')
-    }
+    // Shareholder information (the company/person who owns shares)
+    const shareholderName = customer.shareholderOne || 'MAXIMUS DECIMUS LTD'
+    const shareholderType = customer.shareholderType || 'una sociedad inscrita y registrada en las Islas Vírgenes Británicas'
+    const shareholderCompanyNumber = customer.shareholderCompanyNumber || 'dos uno seis dos dos uno nueve'
+    const shareholderAddress = customer.shareholderAddress || 'Woodbourne Hall, Road Town, Tortola, VG uno uno uno cero, Islas Vírgenes Británicas'
+    const shareholderShares = customer.shareholderShares || 'MIL CUOTAS'
+    const shareholderShareValue = customer.shareholderShareValue || 'mil colones cada una'
+    const ownershipPercentage = customer.percentage1 || 'CIEN POR CIENTO'
 
-    // Extract company information
-    const companyName = customer.companyName || 'TRES - CIENTO DOS – NOVECIENTOS TREINTA Y CINCO MIL NOVECIENTOS NOVENTA Y CUATRO LIMITADA'
-    const legalId = customer.legalId || '3-102-935994'
-    const legalIdInWords = numberToSpanishWords(legalId)
+    // Destination
+    const destinationCountry = customer.destinationCountry || 'EUROPA Y ESTADOS UNIDOS'
 
-    // Capital information
-    const shareCapitalWords = 'CIEN MIL COLONES' // You may want to convert this programmatically
-    const numberOfSharesWords = 'MIL CUOTAS'
-    const shareValueWords = 'CIEN COLONES CADA UNA'
+    // Font size: 12pt = 24 half-points
+    const fontSize = 24
 
-    // Get shareholder information based on index
-    const shareholderField = shareholderIndex === 0 ? 'One' : 'Two'
-    const firstName = customer[`shareholderFirstName${shareholderField === 'One' ? '' : shareholderField}` as keyof typeof customer] as string || 'MARTA-IOLANDA'
-    const lastName = customer[`shareholderLastName${shareholderField === 'One' ? '' : shareholderField}` as keyof typeof customer] as string || 'URSU'
-    const fullName = `${firstName} ${lastName}`
-
-    const nationality = customer[`nationality${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || 'rumana'
-    const maritalStatus = customer[`maritalStatus${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || 'casada'
-    const occupation = customer[`occupation${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || 'fiscal financiera'
-    const address = customer[`address${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || 'veintiuno Kyriakou Neokleous, dos seis cuatro cinco Kapede, Chipre'
-    const passport = customer[`passport${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || '063054899'
-    const passportWords = numberToSpanishWords(passport)
-
-    const ownershipPercentage = customer[`ownershipPercentage${shareholderField === 'One' ? '' : '2'}` as keyof typeof customer] as string || 'CIEN POR CIENTO'
-
-    // Date information
-    const dateWords = `catorce horas con siete minutos del quince de diciembre del año dos mil veinticinco` // You may want to make this dynamic
-
-    // Create the document
+    // Create the document with exact format matching original.jpeg
     const doc = new Document({
       sections: [{
         properties: {
           page: {
             margin: {
-              top: 1440, // 1 inch
+              top: 1440,
               bottom: 1440,
               left: 1440,
               right: 1440,
@@ -84,94 +69,172 @@ export async function POST(request: NextRequest) {
           },
         },
         children: [
-          // Title
+          // Main content - single justified paragraph with mixed formatting
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
+            spacing: { after: 0, line: 276 },
             children: [
+              // Opening certification header
               new TextRun({
-                text: `CERTIFICACION CONSECUTIVO ${consecutiveNumber.toUpperCase()}: `,
+                text: `CERTIFICACIÓN CONSECUTIVO ${consecutiveNumber}: ${notaryName}, NOTARIA PUBLICA CON OFICINA ABIERTA EN LA CIUDAD DE ${notaryAddress}; CERTIFICA: `,
                 bold: true,
-                size: 24,
+                size: fontSize,
               }),
-            ],
-          }),
-
-          // Notary introduction
-          new Paragraph({
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
-            children: [
               new TextRun({
-                text: `${notaryName}, NOTARIA PÚBLICA, CON OFICINA ABIERTA EN LA CIUDAD DE SAN JOSÉ, CERTIFICO: PRIMERO: `,
+                text: `Con vista en el tomo ${bookNumber}, asiento ${seatNumber} del libro de Registro de `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `Cuotistas`,
+                underline: { type: UnderlineType.SINGLE },
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` de la sociedad `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${companyName}`,
                 bold: true,
-                size: 24,
+                size: fontSize,
               }),
-            ],
-          }),
-
-          // Main certification paragraph
-          new Paragraph({
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
-            children: [
               new TextRun({
-                text: `Con vista en el libro de Registro de Cuotistas, de la sociedad ${companyName.toUpperCase()}, con cedula de persona jurídica número ${legalIdInWords}, debidamente legalizado por el Registro Nacional de Costa Rica con número de autorización de libros ${numberToSpanishWords(bookAuthorizationNumber)}, asiento primero y segundo y último de dicho libro, en donde se indica que el capital social de esta compañía se encuentra conformado por la suma de ${shareCapitalWords} representado en ${numberOfSharesWords} comunes y nominativas de ${shareValueWords}, en donde consta que ${firstName.toUpperCase()} (nombre) ${lastName.toUpperCase()} (apellido), de nacionalidad ${nationality}, mayor, ${maritalStatus}, ${occupation}, con domicilio en ${address}, portadora del pasaporte ${nationality} ${passportWords}, es dueña de ${numberOfSharesWords} comunes y nominativas de mil colones cada una; y por lo tanto ${firstName.toUpperCase()} ${lastName.toUpperCase()} es dueña del ${ownershipPercentage} de las cuotas de la empresa. `,
-                size: 24,
+                text: `, con cédula jurídica ${legalId}, debidamente legalizados por Registro Nacional mediante autorización de libros digitales número ${bookAuthorizationNumber}, se indica que el capital social de esta compañía se encuentra conformado por la suma de `,
+                size: fontSize,
               }),
-            ],
-          }),
-
-          // Legal disclaimer
-          new Paragraph({
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
-            children: [
               new TextRun({
-                text: `Los asientos certificados lo han sido en lo conducente y lo omitido no modifica, altera, condiciona, restringe ni desvirtúa lo transcrito bajo responsabilidad de la suscrita notaria. No existen endosos ni asientos posteriores al día de hoy. Es todo. `,
-                size: 24,
+                text: `${shareCapital}`,
+                bold: true,
+                size: fontSize,
               }),
-            ],
-          }),
-
-          // Purpose statement
-          new Paragraph({
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
-            children: [
               new TextRun({
-                text: `Extiendo la presente a solicitud de ${companyName.toUpperCase()} PARA SER UTILIZADO EN ${destinationCountry.toUpperCase()}. `,
-                size: 24,
+                text: ` representado en `,
+                size: fontSize,
               }),
-            ],
-          }),
-
-          // Certification date and stamps
-          new Paragraph({
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { after: 200 },
-            children: [
               new TextRun({
-                text: `Certificación expedida en la ciudad de San José, a las ${dateWords}. Agrego y cancelo las especies fiscales de ley.`,
-                size: 24,
+                text: `${numberOfShares}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` comunes y nominativas de `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${shareValue}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` cada una, en donde consta que `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${shareholderName}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `, ${shareholderType}, con número de compañía ${shareholderCompanyNumber}, con domicilio en `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${shareholderAddress}`,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `, es dueña de `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${shareholderShares}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` comunes y nominativas de  ${shareholderShareValue} cada una; y por lo tanto la compañía `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${shareholderName}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` es dueña del `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `  ${ownershipPercentage}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: ` de las cuotas de la empresa. Los asientos certificados lo han sido en lo conducente y lo omitido no modifica, altera, condiciona, restringe ni desvirtúa lo transcrito bajo responsabilidad de la suscrita notaria. No existen endosos ni asientos posteriores al día de hoy. Es todo. Extiendo la presente a solicitud de `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `${companyName} PARA SER UTILIZADO EN ${destinationCountry}`,
+                bold: true,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `. Certificación expedida en la ciudad de San José, a las ${certificationDateTime}. Agrego y cancelo las especies fiscales de `,
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `ley`,
+                underline: { type: UnderlineType.SINGLE },
+                size: fontSize,
+              }),
+              new TextRun({
+                text: `.`,
+                size: fontSize,
+              }),
+              // Add asterisks line
+              new TextRun({
+                text: `*`.repeat(100),
+                size: fontSize,
               }),
             ],
           }),
 
-          // Spacing
+          // Spacing before signature
           new Paragraph({
-            spacing: { before: 400 },
+            spacing: { before: 600 },
+            children: [new TextRun({ text: '' })],
+          }),
+          new Paragraph({
+            spacing: { before: 200 },
+            children: [new TextRun({ text: '' })],
+          }),
+          new Paragraph({
+            spacing: { before: 200 },
             children: [new TextRun({ text: '' })],
           }),
 
-          // Signature line
+          // Signature - Licda. name
           new Paragraph({
             alignment: AlignmentType.LEFT,
             children: [
               new TextRun({
-                text: `(F) Licda. ${notaryName}.`,
-                size: 24,
+                text: `Licda. Clara Alvarado Jiménez`,
+                bold: true,
                 italics: true,
+                size: fontSize,
+              }),
+            ],
+          }),
+
+          // Title - Abogada y Notaria
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: `Abogada y Notaria`,
+                bold: true,
+                italics: true,
+                size: fontSize,
               }),
             ],
           }),
@@ -182,7 +245,7 @@ export async function POST(request: NextRequest) {
     // Generate buffer
     const buffer = await Packer.toBuffer(doc)
 
-    const fileName = `Certificacion_Capital_Social_${fullName.replace(/\s+/g, '_')}.docx`
+    const fileName = `Certificacion_Capital_Social_${companyName.replace(/\s+/g, '_').substring(0, 30)}.docx`
 
     // Log export history
     await prisma.exportHistory.create({

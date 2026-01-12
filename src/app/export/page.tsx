@@ -68,11 +68,13 @@ export default function ExportPage() {
 
   // Share Capital Certificate state
   const [shareCapitalCustomerId, setShareCapitalCustomerId] = useState<string>('')
-  const [shareCapitalShareholderIndex, setShareCapitalShareholderIndex] = useState<number>(0)
-  const [shareCapitalConsecutive, setShareCapitalConsecutive] = useState<string>('563-2025')
-  const [shareCapitalNotaryName, setShareCapitalNotaryName] = useState<string>('CLARA ALVARADO JIMÉNEZ')
-  const [shareCapitalBookAuth, setShareCapitalBookAuth] = useState<string>('4062001346173')
-  const [shareCapitalDestinationCountry, setShareCapitalDestinationCountry] = useState<string>('ESTADOS UNIDOS DE AMERICA')
+  const [shareCapitalConsecutive, setShareCapitalConsecutive] = useState<string>('CERO ONCE- DOS MIL VEINTISÉIS')
+  const [shareCapitalNotaryName, setShareCapitalNotaryName] = useState<string>('CLARA ALVARADO JIMENEZ')
+  const [shareCapitalNotaryAddress, setShareCapitalNotaryAddress] = useState<string>('SAN JOSE, SAN PEDRO, BARRIO DENT, DEL AUTOMERCADO LOS YOSES CUATROCIENTOS METROS AL NORTE Y CINCUENTA AL ESTE')
+  const [shareCapitalBookNumber, setShareCapitalBookNumber] = useState<string>('primero')
+  const [shareCapitalSeatNumber, setShareCapitalSeatNumber] = useState<string>('segundo')
+  const [shareCapitalBookAuth, setShareCapitalBookAuth] = useState<string>('cuatro cero seis dos cero cero uno tres cero ocho seis seis ocho')
+  const [shareCapitalDateTime, setShareCapitalDateTime] = useState<string>('diez horas con cuarenta y ocho minutos del nueve de enero del año dos mil veintiséis')
 
   // Customer filter states
   const [certCustomerFilter, setCertCustomerFilter] = useState<string>('')
@@ -441,11 +443,13 @@ export default function ExportPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerId: shareCapitalCustomerId,
-          shareholderIndex: shareCapitalShareholderIndex,
           consecutiveNumber: shareCapitalConsecutive,
           notaryName: shareCapitalNotaryName,
+          notaryAddress: shareCapitalNotaryAddress,
+          bookNumber: shareCapitalBookNumber,
+          seatNumber: shareCapitalSeatNumber,
           bookAuthorizationNumber: shareCapitalBookAuth,
-          destinationCountry: shareCapitalDestinationCountry,
+          certificationDateTime: shareCapitalDateTime,
         }),
       })
 
@@ -469,18 +473,6 @@ export default function ExportPage() {
     }
   }
 
-  const getShareCapitalShareholders = () => {
-    const customer = customers.find(c => c.id === shareCapitalCustomerId)
-    if (!customer) return []
-    const holders = []
-    if (customer.shareholderOne) {
-      holders.push({ name: customer.shareholderOne })
-    }
-    if (customer.shareholderTwo) {
-      holders.push({ name: customer.shareholderTwo })
-    }
-    return holders
-  }
 
   if (loading) {
     return <div className="text-center py-8">{tCommon('loading')}</div>
@@ -1129,10 +1121,7 @@ export default function ExportPage() {
                   </div>
                   <Select
                     value={shareCapitalCustomerId}
-                    onValueChange={(value) => {
-                      setShareCapitalCustomerId(value)
-                      setShareCapitalShareholderIndex(0)
-                    }}
+                    onValueChange={setShareCapitalCustomerId}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('selectCustomerPlaceholder')} />
@@ -1146,27 +1135,6 @@ export default function ExportPage() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {shareCapitalCustomerId && getShareCapitalShareholders().length > 0 && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('selectShareholder')}</label>
-                    <Select
-                      value={shareCapitalShareholderIndex.toString()}
-                      onValueChange={(value) => setShareCapitalShareholderIndex(parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getShareCapitalShareholders().map((holder: { name: string }, index: number) => (
-                          <SelectItem key={index} value={index.toString()}>
-                            {holder.name || `Shareholder ${index + 1}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -1184,7 +1152,7 @@ export default function ExportPage() {
                     type="text"
                     value={shareCapitalConsecutive}
                     onChange={(e) => setShareCapitalConsecutive(e.target.value)}
-                    placeholder="563-2025"
+                    placeholder="CERO ONCE- DOS MIL VEINTISÉIS"
                   />
                 </div>
                 <div className="space-y-2">
@@ -1193,8 +1161,37 @@ export default function ExportPage() {
                     type="text"
                     value={shareCapitalNotaryName}
                     onChange={(e) => setShareCapitalNotaryName(e.target.value)}
-                    placeholder="CLARA ALVARADO JIMÉNEZ"
+                    placeholder="CLARA ALVARADO JIMENEZ"
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('notaryAddress')}</label>
+                  <Input
+                    type="text"
+                    value={shareCapitalNotaryAddress}
+                    onChange={(e) => setShareCapitalNotaryAddress(e.target.value)}
+                    placeholder="SAN JOSE, SAN PEDRO, BARRIO DENT..."
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('bookNumber')}</label>
+                    <Input
+                      type="text"
+                      value={shareCapitalBookNumber}
+                      onChange={(e) => setShareCapitalBookNumber(e.target.value)}
+                      placeholder="primero"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('seatNumberLabel')}</label>
+                    <Input
+                      type="text"
+                      value={shareCapitalSeatNumber}
+                      onChange={(e) => setShareCapitalSeatNumber(e.target.value)}
+                      placeholder="segundo"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t('bookAuthNumber')}</label>
@@ -1202,16 +1199,16 @@ export default function ExportPage() {
                     type="text"
                     value={shareCapitalBookAuth}
                     onChange={(e) => setShareCapitalBookAuth(e.target.value)}
-                    placeholder="4062001346173"
+                    placeholder="cuatro cero seis dos cero cero uno tres..."
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('destinationCountry')}</label>
+                  <label className="text-sm font-medium">{t('certificationDateTime')}</label>
                   <Input
                     type="text"
-                    value={shareCapitalDestinationCountry}
-                    onChange={(e) => setShareCapitalDestinationCountry(e.target.value)}
-                    placeholder="ESTADOS UNIDOS DE AMERICA"
+                    value={shareCapitalDateTime}
+                    onChange={(e) => setShareCapitalDateTime(e.target.value)}
+                    placeholder="diez horas con cuarenta y ocho minutos..."
                   />
                 </div>
               </CardContent>
