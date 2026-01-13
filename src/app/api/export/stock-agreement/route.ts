@@ -60,7 +60,7 @@ function spanishWordsToNumber(text: string): number {
       if (current === 0) current = 1
       current *= multipliers[word]
       if (word !== 'MIL' || words.indexOf(word) === words.length - 1 ||
-          (words.indexOf(word) < words.length - 1 && multipliers[words[words.indexOf(word) + 1]] === undefined)) {
+        (words.indexOf(word) < words.length - 1 && multipliers[words[words.indexOf(word) + 1]] === undefined)) {
         result += current
         current = 0
       }
@@ -907,7 +907,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: 'CLARA ALVARADO JIMENEZ',
+            text: seller1Name.toUpperCase(),
             bold: true,
             size: bodySize,
           }),
