@@ -113,7 +113,6 @@ export async function POST(request: NextRequest) {
     // Seller 1 (Shareholder 1)
     const seller1Name = customer.shareholderOne || ''
     const seller1Id = customer.identification || ''
-    const seller1Address = customer.shareholder1Address || ''
     const seller1Profession = customer.profession || ''
 
     // Seller 2 (Shareholder 2)
@@ -273,7 +272,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the ${seller1Address} passport number ${seller1Id}, with domicile in ${reference}; hereinafter designated as the "`,
+            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the passport number ${seller1Id}, with domicile in ${reference}; hereinafter designated as the "`,
             size: bodySize,
           }),
           new TextRun({
@@ -929,7 +928,7 @@ export async function POST(request: NextRequest) {
         spacing: { before: 200, after: 200 },
         children: [
           new TextRun({
-            text: 'The undersigned Notary authenticates the signature of the two sellers only. San José, July 23rd 2025:',
+            text: `The undersigned Notary authenticates the signature of the two sellers only. San José, ${formattedDate}:`,
             size: bodySize,
             italics: true,
             color: grayColor,
