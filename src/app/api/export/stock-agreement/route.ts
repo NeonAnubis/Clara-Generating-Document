@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
     // Seller 1 (Shareholder 1)
     const seller1Name = customer.shareholderOne || ''
     const seller1Id = customer.identification || ''
+    const seller1Address = customer.shareholder1Address || ''
     const seller1Profession = customer.profession || ''
 
     // Seller 2 (Shareholder 2)
@@ -121,7 +122,6 @@ export async function POST(request: NextRequest) {
 
     // Buyer (Manager or designated buyer)
     const buyerMaritalStatus = customer.managerMaritalStatus || 'soltero'
-    const reference = customer.reference || ''
 
     // Current date
     const currentDate = new Date()
@@ -272,7 +272,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the passport number ${seller1Id}, with domicile in ${reference}; hereinafter designated as the "`,
+            text: `, of legal age, ${buyerMaritalStatus.toLowerCase()}, a ${seller1Profession.toLowerCase()}, bearer of the passport number ${seller1Id}, with domicile in ${seller1Address}; hereinafter designated as the "`,
             size: bodySize,
           }),
           new TextRun({
