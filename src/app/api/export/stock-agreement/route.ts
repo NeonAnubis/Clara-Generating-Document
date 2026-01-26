@@ -879,7 +879,7 @@ export async function POST(request: NextRequest) {
         spacing: { before: 400, after: 0 },
         children: [
           new TextRun({
-            text: '________________________',
+            text: '__________________________',
             size: bodySize,
           }),
           new TextRun({
@@ -887,7 +887,7 @@ export async function POST(request: NextRequest) {
             size: bodySize,
           }),
           new TextRun({
-            text: '________________________',
+            text: '_'.repeat(seller1Name.length + 5),
             size: bodySize,
           }),
         ],
@@ -912,9 +912,19 @@ export async function POST(request: NextRequest) {
           }),
         ],
       }),
+      // Seller 2 signature line
+      new Paragraph({
+        spacing: { before: 400, after: 0 },
+        children: [
+          new TextRun({
+            text: '______________________________________',
+            size: bodySize,
+          }),
+        ],
+      }),
       // Seller 2 name - NURIA PATRICIA MENDEZ RAMIREZ
       new Paragraph({
-        spacing: { before: 200, after: 400 },
+        spacing: { before: 0, after: 400 },
         children: [
           new TextRun({
             text: 'NURIA PATRICIA MENDEZ RAMIREZ',
